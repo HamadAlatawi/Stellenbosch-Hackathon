@@ -1040,3 +1040,99 @@
 2024-01-27T20:15:21Z dnsseed thread exit
 2024-01-27T20:16:22Z Adding fixed seeds as 60 seconds have passed and addrman is empty for at least one reachable network
 2024-01-27T20:16:22Z Added 0 fixed seeds from reachable networks.
+
+
+
+
+
+2024-01-28T11:41:49Z Bitcoin Core version v25.0.0 (release build)
+2024-01-28T11:41:49Z Using the 'sse4(1way),sse41(4way),avx2(8way)' SHA256 implementation
+2024-01-28T11:41:49Z Using RdRand as an additional entropy source
+2024-01-28T11:41:49Z Default data directory /home/hamad/.bitcoin
+2024-01-28T11:41:49Z Using data directory /home/hamad/motoko/hackathon/tailwind-svelte-motoko/bitcoin-25.0/data/regtest
+2024-01-28T11:41:49Z Config file: /home/hamad/motoko/hackathon/tailwind-svelte-motoko/bitcoin-25.0/bitcoin.conf
+2024-01-28T11:41:49Z Config file arg: regtest="1"
+2024-01-28T11:41:49Z Config file arg: rpcauth=****
+2024-01-28T11:41:49Z Config file arg: rpcpassword=****
+2024-01-28T11:41:49Z Config file arg: rpcuser=****
+2024-01-28T11:41:49Z Command-line arg: conf="/home/hamad/motoko/hackathon/tailwind-svelte-motoko/bitcoin-25.0/bitcoin.conf"
+2024-01-28T11:41:49Z Command-line arg: datadir="/home/hamad/motoko/hackathon/tailwind-svelte-motoko/bitcoin-25.0/data"
+2024-01-28T11:41:49Z Command-line arg: port="18444"
+2024-01-28T11:41:49Z Using at most 125 automatic connections (1048576 file descriptors available)
+2024-01-28T11:41:49Z Using 16 MiB out of 16 MiB requested for signature cache, able to store 524288 elements
+2024-01-28T11:41:49Z Using 16 MiB out of 16 MiB requested for script execution cache, able to store 524288 elements
+2024-01-28T11:41:49Z Script verification uses 7 additional threads
+2024-01-28T11:41:49Z scheduler thread start
+2024-01-28T11:41:49Z Binding RPC on address ::1 port 18443
+2024-01-28T11:41:49Z Binding RPC on address 127.0.0.1 port 18443
+2024-01-28T11:41:49Z [http] creating work queue of depth 16
+2024-01-28T11:41:49Z Config options rpcuser and rpcpassword will soon be deprecated. Locally-run instances may remove rpcuser to use cookie-based auth, or may be replaced with rpcauth. Please see share/rpcauth for rpcauth auth generation.
+2024-01-28T11:41:49Z Using rpcauth authentication.
+2024-01-28T11:41:49Z [http] starting 4 worker threads
+2024-01-28T11:41:49Z Using wallet directory /home/hamad/motoko/hackathon/tailwind-svelte-motoko/bitcoin-25.0/data/regtest/wallets
+2024-01-28T11:41:49Z init message: Verifying wallet(s)…
+2024-01-28T11:41:49Z Using /16 prefix for IP bucketing
+2024-01-28T11:41:49Z init message: Loading P2P addresses…
+2024-01-28T11:41:49Z Loaded 0 addresses from peers.dat  0ms
+2024-01-28T11:41:49Z init message: Loading banlist…
+2024-01-28T11:41:49Z SetNetworkActive: true
+2024-01-28T11:41:49Z Cache configuration:
+2024-01-28T11:41:49Z * Using 2.0 MiB for block index database
+2024-01-28T11:41:49Z * Using 8.0 MiB for chain state database
+2024-01-28T11:41:49Z * Using 440.0 MiB for in-memory UTXO set (plus up to 286.1 MiB of unused mempool space)
+2024-01-28T11:41:49Z init message: Loading block index…
+2024-01-28T11:41:49Z Validating signatures for all blocks.
+2024-01-28T11:41:49Z Setting nMinimumChainWork=0000000000000000000000000000000000000000000000000000000000000000
+2024-01-28T11:41:49Z Opening LevelDB in /home/hamad/motoko/hackathon/tailwind-svelte-motoko/bitcoin-25.0/data/regtest/blocks/index
+2024-01-28T11:41:49Z Opened LevelDB successfully
+2024-01-28T11:41:49Z Using obfuscation key for /home/hamad/motoko/hackathon/tailwind-svelte-motoko/bitcoin-25.0/data/regtest/blocks/index: 0000000000000000
+2024-01-28T11:41:49Z LoadBlockIndexDB: last block file = 0
+2024-01-28T11:41:49Z LoadBlockIndexDB: last block file info: CBlockFileInfo(blocks=1, size=293, heights=0...0, time=2011-02-02...2011-02-02)
+2024-01-28T11:41:49Z Checking all blk files are present...
+2024-01-28T11:41:49Z Initializing chainstate Chainstate [ibd] @ height -1 (null)
+2024-01-28T11:41:49Z Opening LevelDB in /home/hamad/motoko/hackathon/tailwind-svelte-motoko/bitcoin-25.0/data/regtest/chainstate
+2024-01-28T11:41:49Z Opened LevelDB successfully
+2024-01-28T11:41:49Z Using obfuscation key for /home/hamad/motoko/hackathon/tailwind-svelte-motoko/bitcoin-25.0/data/regtest/chainstate: e75062522fd3883d
+2024-01-28T11:41:49Z Loaded best chain: hashBestChain=0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206 height=0 date=2011-02-02T23:16:42Z progress=1.000000
+2024-01-28T11:41:49Z [snapshot] allocating all cache to the IBD chainstate
+2024-01-28T11:41:49Z Opening LevelDB in /home/hamad/motoko/hackathon/tailwind-svelte-motoko/bitcoin-25.0/data/regtest/chainstate
+2024-01-28T11:41:49Z Opened LevelDB successfully
+2024-01-28T11:41:49Z Using obfuscation key for /home/hamad/motoko/hackathon/tailwind-svelte-motoko/bitcoin-25.0/data/regtest/chainstate: e75062522fd3883d
+2024-01-28T11:41:49Z [Chainstate [ibd] @ height 0 (0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206)] resized coinsdb cache to 8.0 MiB
+2024-01-28T11:41:49Z [Chainstate [ibd] @ height 0 (0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206)] resized coinstip cache to 440.0 MiB
+2024-01-28T11:41:49Z init message: Verifying blocks…
+2024-01-28T11:41:49Z  block index              38ms
+2024-01-28T11:41:49Z Setting NODE_NETWORK on non-prune mode
+2024-01-28T11:41:49Z block tree size = 1
+2024-01-28T11:41:49Z nBestHeight = 0
+2024-01-28T11:41:49Z loadblk thread start
+2024-01-28T11:41:49Z torcontrol thread start
+2024-01-28T11:41:49Z Bound to 127.0.0.1:18445
+2024-01-28T11:41:49Z Bound to [::]:18444
+2024-01-28T11:41:49Z Bound to 0.0.0.0:18444
+2024-01-28T11:41:49Z Imported mempool transactions from disk: 0 succeeded, 0 failed, 0 expired, 0 already there, 0 waiting for initial broadcast
+2024-01-28T11:41:49Z loadblk thread exit
+2024-01-28T11:41:49Z 0 block-relay-only anchors will be tried for connections.
+2024-01-28T11:41:49Z init message: Starting network threads…
+2024-01-28T11:41:49Z net thread start
+2024-01-28T11:41:49Z dnsseed thread start
+2024-01-28T11:41:49Z Loading addresses from DNS seed dummySeed.invalid.
+2024-01-28T11:41:49Z addcon thread start
+2024-01-28T11:41:49Z opencon thread start
+2024-01-28T11:41:49Z msghand thread start
+2024-01-28T11:41:49Z init message: Done loading
+2024-01-28T11:41:49Z 0 addresses found from DNS seeds
+2024-01-28T11:41:49Z dnsseed thread exit
+2024-01-28T11:42:50Z Adding fixed seeds as 60 seconds have passed and addrman is empty for at least one reachable network
+2024-01-28T11:42:50Z Added 0 fixed seeds from reachable networks.
+2024-01-28T12:14:04Z Potential stale tip detected, will try using extra outbound peer (last tip update: 1890 seconds ago)
+2024-01-28T12:24:34Z Potential stale tip detected, will try using extra outbound peer (last tip update: 2520 seconds ago)
+2024-01-28T12:35:04Z Potential stale tip detected, will try using extra outbound peer (last tip update: 3150 seconds ago)
+2024-01-28T12:45:34Z Potential stale tip detected, will try using extra outbound peer (last tip update: 3780 seconds ago)
+2024-01-28T12:56:04Z Potential stale tip detected, will try using extra outbound peer (last tip update: 4410 seconds ago)
+2024-01-28T13:06:34Z Potential stale tip detected, will try using extra outbound peer (last tip update: 5040 seconds ago)
+2024-01-28T13:17:04Z Potential stale tip detected, will try using extra outbound peer (last tip update: 5670 seconds ago)
+2024-01-28T13:27:34Z Potential stale tip detected, will try using extra outbound peer (last tip update: 6300 seconds ago)
+2024-01-28T13:38:04Z Potential stale tip detected, will try using extra outbound peer (last tip update: 6930 seconds ago)
+2024-01-28T13:48:34Z Potential stale tip detected, will try using extra outbound peer (last tip update: 7560 seconds ago)
+2024-01-28T13:59:04Z Potential stale tip detected, will try using extra outbound peer (last tip update: 8190 seconds ago)
