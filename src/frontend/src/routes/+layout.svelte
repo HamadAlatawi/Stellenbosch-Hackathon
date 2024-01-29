@@ -21,7 +21,7 @@
   }
 </script>
 
-  <nav class="border-b-slate-900 bg-white  lg:border-slate-900 lg:border-b-4
+  <nav class="border-b-stone-900 bg-white  lg:border-stone-900 border-b-[8px]
   flex w-full flex-nowrap items-center justify-between bg-[#FBFBFB] py-2 text-neutral-500
    hover:text-neutral-700 focus:text-neutral-700 dark:bg-neutral-600 lg:flex-wrap lg:justify-start lg:py-4
   data-te-navbar-ref">

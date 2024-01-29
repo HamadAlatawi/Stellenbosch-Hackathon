@@ -9,6 +9,7 @@
 	export { className as class };
 </script>
 
+
 <DrawerPrimitive.Title
 	bind:el
 	class={cn("text-lg font-semibold leading-none tracking-tight", className)}
@@ -16,3 +17,4 @@
 >
 	<slot />
 </DrawerPrimitive.Title>
+
