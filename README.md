@@ -16,7 +16,41 @@ To learn more before you start working with back_end and front_end, see the foll
 - [Shadcn-Svelte Component Library](https://www.shadcn-svelte.com/)
 
 
+## The DFINITY Command-Line
+____________________________________
+
+This project utilizes The DFINITY command-line execution environment (dfx). The primary tool for creating, deploying, and managing, dapps that are developed in for the Internet Computer.
+
+
+***Note that currently the dfx tool is not natively supported on windows.***
+
+In order to use dfx on a Windows machine you'll need to download the Windows Subsystem for Linux (WSL). Refer to Microsoft's official guide [here](https://learn.microsoft.com/en-us/windows/wsl/install), and [here](https://learn.microsoft.com/en-us/windows/wsl/setup/environment)
+
+
+### Installing IC SDK and DFX
+
+To install dfx run the following:
+
+```bash
+sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
+```
+
+To verify that the IC SDK is successfully installed, run the following command:
+```bash
+dfx --version
+```
+
+It's recommended to create an identity using dfx. To set an identity and a key run the following command:
+
+```bash
+dfx identity new
+```
+
+Learn more about dfx identities here - [dfx identity](https://internetcomputer.org/docs/current/references/cli-reference/dfx-identity)
+
+
 ## Installing Bitcoin Core
+_________________________________
 The project requires bitcoin core to work. Download the relevant version for your system here:
 
 [Download Bitcoin Core](https://bitcoin.org/en/download)
@@ -48,14 +82,6 @@ rpcauth=ic-btc-integration:cdf2741387f3a12438f69092f0fdad8e$62081498c98bee09a0dc
 
 ## Starting the project
 
-### ***If you don't have an identity in dfx it's reccomended to create one***
-Create an identity and set a key by running the following command:
-
-```bash
-dfx identity new
-```
-
-Learn more about dfx identities here - [dfx identity](https://internetcomputer.org/docs/current/references/cli-reference/dfx-identity)
 
 --------------------------------------
 If you want to start working on your project, run the following commands:
@@ -110,3 +136,17 @@ Using svelte's native localhost:5173 local server you can now edit your code wit
 ## Deploying to IC
 
 Todo
+
+## Design Documents
+
+todo
+
+[architecture design]()
+
+[UI mockups]()
+
+[data designs]()
+
+[flow diagrams]()
+
+[interaction diagrams]()
