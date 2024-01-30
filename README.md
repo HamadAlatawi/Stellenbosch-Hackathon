@@ -47,7 +47,18 @@ rpcauth=ic-btc-integration:cdf2741387f3a12438f69092f0fdad8e$62081498c98bee09a0dc
 ```
 
 ## Starting the project
-If you want to start working on your project, you might want to try the following commands:
+
+### ***If you don't have an identity in dfx it's reccomended to create one***
+Create an identity and set a key by running the following command:
+
+```bash
+dfx identity new
+```
+
+Learn more about dfx identities here - [dfx identity](https://internetcomputer.org/docs/current/references/cli-reference/dfx-identity)
+
+--------------------------------------
+If you want to start working on your project, run the following commands:
 
 Open three separate terminals and in each terminal run:
 
