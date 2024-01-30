@@ -10,13 +10,6 @@
     export { className as class };
 </script>
 
-<style>
-    /* Define your custom height class here */
-    .custom-height {
-        height: 500px !important; /* Example height */
-    }
-</style>
-
 <DrawerPrimitive.Overlay
     bind:el
     class={cn("fixed inset-0 z-50 bg-black/80", overlayHeight, className)}
