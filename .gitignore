@@ -34,3 +34,5 @@ node_modules
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+#bitcoin
+bitcoin-25.0
