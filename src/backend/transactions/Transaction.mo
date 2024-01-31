@@ -1,12 +1,12 @@
 import Array "mo:base/Array";
 import Types "Types";
 
-actor class Transaction (id:Nat, source:Text, amount: Types.Amount, dateTime:Text, receivers:[Text], entityID:Nat){
+actor class Transaction (id:Nat, source:Text, amount: Types.Amount, dateTime:Text, receivers:[Types.Reciever], entityID:Nat){
     var transactionID: Nat = id;
     var sourceBTCAddy: Text = source;
     var transactionAmount: Types.Amount = amount;
     var transactionDateTime: Text = dateTime;
-    var transactionReceivers: [Text] = receivers;
+    var transactionReceivers: [Types.Reciever] = receivers;
     var transactionEntityID: Nat = entityID;
 
     public query func getID(): async Nat {
@@ -25,7 +25,7 @@ actor class Transaction (id:Nat, source:Text, amount: Types.Amount, dateTime:Tex
         return transactionDateTime;
     };
 
-    public query func getReceivers(): async [Text] {
+    public query func getReceivers(): async [Types.Reciever] {
         return transactionReceivers;
     };
 
@@ -45,7 +45,7 @@ actor class Transaction (id:Nat, source:Text, amount: Types.Amount, dateTime:Tex
         transactionDateTime := newDateTime;
     };
 
-    public func setReceivers(newReceivers: [Text]): async () {
+    public func setReceivers(newReceivers: [Types.Reciever]): async () {
         transactionReceivers := newReceivers;
     };
 

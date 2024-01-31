@@ -9,6 +9,7 @@
 
 # dfx temporary files
 .dfx/
+dfx.json
 
 # generated files
 src/declarations/
@@ -36,3 +37,5 @@ vite.config.ts.timestamp-*
 
 #bitcoin
 bitcoin-25.0
+
+

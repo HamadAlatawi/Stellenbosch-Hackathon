@@ -11,7 +11,7 @@ actor Transactions {
     var transactionBuffer = Buffer.fromArray<Transaction>(transactionArray);
     stable var transactionID = 0;
 
-    public func createTransaction(source: Text, amount: Types.Amount, dateTime: Text, receivers: [Text], entityID: Nat): async Transaction {
+    public func createTransaction(source: Text, amount: Types.Amount, dateTime: Text, receivers: [Types.Reciever], entityID: Nat): async Transaction {
         let trans = await Transaction.Transaction(transactionID, source, amount, dateTime, receivers, entityID);
         incrementID();
         return trans;
@@ -51,4 +51,52 @@ actor Transactions {
         };
         return null;
     };
+
+    public func getTransactionByEntityId(entityId: Nat): async ?[Transaction] {
+        let transactionArr = await getAllTransactions();
+        let transactionOfEntity: Buffer.Buffer<Transaction>(0);
+        for (transaction in transactionArr.vals()) {
+            let transactionEntityId = await transaction.getEntityID();
+            if (transactionEntityId == entityId) {
+                    transactionOfEntity.add(transaction);
+                };
+            };
+        let transactionOfEntityArray=Buffer.toArray<Transaction>(transactionOfEntity);
+        return transactionOfEntityArray;
+        return null;
+    };
+
+    // public func getAccumulatedByEntityId(entityId: Nat): async Float {
+    //     let transactionArr = await getAllTransactions();
+    //     let sum: Float= 0.0;
+    //     for (transaction in transactionArr.vals()) {
+    //         let transactionEntityId = await transaction.getEntityID();
+    //         if (transactionEntityId == entityId) {
+    //                let addition = await transaction.getAmount();
+    //                 sum+=addition;
+    //             };
+    //         };
+    //     let transactionOfEntityArray=Buffer.toArray<Transaction>(transactionOfEntity);
+    //     return transactionOfEntityArray;
+    //     return null;
+    // };
+
+    // public func getAccumulatedForBeneficiary(beneficiary:Beneficiary): Nat{
+    //     let transactionArr = await getAllTransactions();
+    //     for (transaction in transactionArr.vals()) {
+    //         let transactionReceivers = (await transaction.getReceivers()).vals();
+    //         for (reciever in transactionReceivers){
+    //         if (transactionId == id) {
+    //             switch (?transaction) {
+    //                 case (null) { };
+    //                 case (transaction) { return transaction; };
+    //             }
+    //         }
+    //         }
+    //     };
+    // }
+
+
+
+    
 };
