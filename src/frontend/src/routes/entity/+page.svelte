@@ -16,6 +16,10 @@
 	};
 </script>
 
+<svelte:head>
+	<title>Entities - Donation Engine</title>
+	<meta name="description" content="View Donation Engine Entities" />
+</svelte:head>
 
 <section class="grid grid-cols-12 relative h-screen flex items-center justify-center">
     <div class="col-span-3"></div>

@@ -155,8 +155,49 @@
 		border-radius: 10px;
 		border: 3px solid #ffffff;
 	}
-	::selection {
-		background: #49418d;
-		color: white;
+  
+  
+  [data-theme='light'] ::selection {
+    background: #1c1917;
+    color: white;
+  }
+
+  [data-theme='dark'] ::selection {
+    background: white; /* Change to white background for dark mode */
+    color: black; /* Change to black color for dark mode */
+  }
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
 	}
 }
+
+@keyframes fade-out {
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes slide-from-right {
+	from {
+		transform: translateX(30px);
+	}
+}
+
+@keyframes slide-to-left {
+	to {
+		transform: translateX(-30px);
+	}
+}
+
+:root::view-transition-old(root) {
+	animation: 90ms cubic-bezier(0.4, 0, 1, 1) both fade-out, 300ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
+}
+
+:root::view-transition-new(root) {
+	animation: 210ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in, 300ms cubic-bezier(0.4, 0, 0.2, 1) both
+			slide-from-right;
+}
+

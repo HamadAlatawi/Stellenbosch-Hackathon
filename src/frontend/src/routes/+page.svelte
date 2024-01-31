@@ -36,6 +36,11 @@
 	};
 </script>
 
+<svelte:head>
+	<title>Home - Donation Engine</title>
+	<meta name="description" content="Donation Engine Home Page" />
+</svelte:head>
+
 <main class="my-20 grid grid-cols-12 h-screen w-full justify-center">
 	<div class="col-span-12 mt-20 text-center">
 		<form on:submit={handleOnSubmit}>

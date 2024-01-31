@@ -5,6 +5,8 @@
     import * as Pagination from "$lib/components/ui/pagination";
     import Skeleton from '$lib/components/ui/skeleton/skeleton.svelte';
     import * as Drawer from "$lib/components/ui/drawer";
+    import { Input } from "$lib/components/ui/input";
+    import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 
     let showSkeleton = true;
     
@@ -32,7 +34,7 @@
         { invoiceNumber: 'INV020', status: 'Paid', method: 'Bank Transfer', amount: '$1900.00' }
     ];
 
-
+    let position = "";
     
     onMount(() => {
         setTimeout(() => {
@@ -41,17 +43,61 @@
     });
 </script>
 
+<svelte:head>
+	<title>Transaction - Donation Engine</title>
+	<meta name="description" content="View Donation Engine Transactions" />
+</svelte:head>
+
+<section class="grid grid-cols flex my-20">
+    <h1 class="text-4xl font-bold ml-10">LIST OF TRANSACTIONS</h1>
+</section>
+
+<section class="grid grid-cols-12 flex mb-5">
+    <div class="col-span-1"></div>
+    <div class="col-span-5 flex items-center space-x-2 max-w-sm">
+        <form class="flex w-full max-w-sm items-center space-x-2">
+            <Input type="text" placeholder="Search for Recepient" />
+            <Button type="submit">Search</Button>
+        </form>
+    </div>
+    <div class="col-span-5 flex justify-end">
+        <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild let:builder>
+              <Button class="w-[150px]" variant="outline" builders={[builder]}>{position ? position : "Filter..." }</Button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content class="w-56">
+              <DropdownMenu.Label>Filter Ascending</DropdownMenu.Label>
+              <DropdownMenu.Separator />
+              <DropdownMenu.RadioGroup bind:value={position} class="mb-1">
+                <DropdownMenu.RadioItem value="ID Asc...">ID</DropdownMenu.RadioItem>
+                <DropdownMenu.RadioItem value="Amount Asc...">Amount</DropdownMenu.RadioItem>
+                <DropdownMenu.RadioItem value="Recepient Asc...">Recepient</DropdownMenu.RadioItem>
+                <DropdownMenu.RadioItem value="Country Asc...">Country</DropdownMenu.RadioItem>
+                <DropdownMenu.Separator />
+                <DropdownMenu.Label>Filter Descending</DropdownMenu.Label>
+                <DropdownMenu.RadioItem value="ID Desc...">ID</DropdownMenu.RadioItem>
+                <DropdownMenu.RadioItem value="Amount Desc...">Amount</DropdownMenu.RadioItem>
+                <DropdownMenu.RadioItem value="Recepient Desc...">Recepient</DropdownMenu.RadioItem>
+                <DropdownMenu.RadioItem value="Country Desc...">Country</DropdownMenu.RadioItem>
+              </DropdownMenu.RadioGroup>
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
+    </div>
+    <div class="col-span-1"></div>
+</section>
+
+
 <section class="grid grid-cols-12 flex justify-center items-center h-screen w-full">
     {#if showSkeleton}
-        <div class="col-span-3"></div>
-        <div class="col-span-6">
+        <div class="col-span-1"></div>
+        <div class="col-span-10">
             <Table.Root>
                 <Table.Caption>A list of transactions</Table.Caption>
                 <Table.Header>
                     <Table.Row>
-                        <Table.Head class="w-1/5">Invoice</Table.Head>
-                        <Table.Head class="w-1/5">Status</Table.Head>
-                        <Table.Head class="w-1/5">Method</Table.Head>
+                        <Table.Head class="w-1/5">Transaction ID</Table.Head>
+                        <Table.Head class="w-1/5">Recepient</Table.Head>
+                        <Table.Head class="w-1/5">Country</Table.Head>
                         <Table.Head class="w-1/5">Amount</Table.Head>
                         <Table.Head class="w-1/5 text-right">Transaction Details</Table.Head>
                     </Table.Row>
@@ -103,17 +149,17 @@
                 </Pagination.Content>
             </Pagination.Root>
         </div>
-        <div class="col-span-3"></div>
+        <div class="col-span-1"></div>
     {:else}
-        <div class="col-span-3"></div>
-        <div class="col-span-6">
+        <div class="col-span-1"></div>
+        <div class="col-span-10">
             <Table.Root>
                 <Table.Caption>A list of transactions</Table.Caption>
                 <Table.Header>
                     <Table.Row>
-                        <Table.Head class="w-1/5">Invoice</Table.Head>
-                        <Table.Head class="w-1/5">Status</Table.Head>
-                        <Table.Head class="w-1/5">Method</Table.Head>
+                        <Table.Head class="w-1/5">Tranasction ID</Table.Head>
+                        <Table.Head class="w-1/5">Recepient</Table.Head>
+                        <Table.Head class="w-1/5">Country</Table.Head>
                         <Table.Head class="w-1/5">Amount</Table.Head>
                         <Table.Head class="w-1/5 text-right">Transaction Details</Table.Head>
                     </Table.Row>
@@ -180,7 +226,7 @@
                 </Pagination.Content>
             </Pagination.Root>
         </div>
-        <div class="col-span-3"></div>
+        <div class="col-span-1"></div>
     {/if}
 </section>
   
