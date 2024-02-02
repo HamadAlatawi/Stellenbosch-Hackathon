@@ -69,7 +69,7 @@
                         <span class="sr-only">Toggle theme</span>
                     </Button>
                 </DropdownMenu.Trigger>
-                <DropdownMenu.Content align="end">
+                <DropdownMenu.Content align="start">
                     <DropdownMenu.Item on:click={() => setMode("light")}>Light</DropdownMenu.Item>
                     <DropdownMenu.Item on:click={() => setMode("dark")}>Dark</DropdownMenu.Item>
                     <DropdownMenu.Item on:click={() => resetMode()}>System</DropdownMenu.Item>
