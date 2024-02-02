@@ -1,37 +1,84 @@
 <script>
-    import { page } from '$app/stores'
     import { goto } from '$app/navigation';
     import { Button } from "$lib/components/ui/button";
     import { setMode, resetMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
     import { Sun, Moon } from "radix-icons-svelte";
+    import { tweened } from 'svelte/motion';
 
     const frontendCanisterId = import.meta.env.VITE_FRONTEND_CANISTER_ID;
 
+    let sideNavBar = false;
+
+    const scale = tweened(1);
+    const translateX = tweened(0);
+
+    function toggleNavBar() {
+        sideNavBar = !sideNavBar;
+
+        // Update the scale and translateX values based on the navbar visibility
+        if (sideNavBar) {
+            scale.set(0.9);
+            translateX.set(-90);
+        } else {
+            scale.set(1);
+            translateX.set(0);
+        }
+
+        // Add or remove the class to the body element based on navbar visibility
+        document.body.classList.toggle('nav-open', sideNavBar);
+    }
 
     function Entity() {
         goto('/entity?canisterId=' + frontendCanisterId);
+        sideNavBar = false;
+        document.body.classList.toggle('nav-open', sideNavBar);
+
     }
 
     function Transaction() {
         goto('/transaction?canisterId=' + frontendCanisterId);
+        sideNavBar = false;
+        document.body.classList.toggle('nav-open', sideNavBar);
+
     }
 
     function goHome(){
-    goto('/?canisterId=' + frontendCanisterId)
+        goto('/?canisterId=' + frontendCanisterId);
+        sideNavBar = false;
+        document.body.classList.toggle('nav-open', sideNavBar);
+
+    }
+
+    function closeNav(){
+        sideNavBar = false;
+        document.body.classList.toggle('nav-open', sideNavBar);
     }
 </script>
 
 <header>
-    <nav class="border-b-stone-900 bg-white lg:border-stone-900 border-b-[8px]
-    grid grid-cols-12 lg:grid-cols-12 gap-4 flex w-full flex-nowrap items-center justify-between bg-white py-2 text-stone-500
-     hover:text-stone-500 focus:text-stone-700 dark:bg-[#0C0A09] lg:flex-wrap lg:justify-start lg:py-6
-    data-te-navbar-ref dark:border-white">
-        <div class="col-span-10 lg:col-span-3">
+    <!-- Mobile Navigation -->
+    <div class="text-black dark:text-white fixed lg:hidden inset-0 z-50 top-0 right-0 h-full w-80svw bg-white dark:bg-[#0C0A09] transform translate-x-full transition-transform duration-300 navbarVisible pointer-events-auto thisIsNav">
+        <div class="flex justify-end h-[12%] " style="width: 80%; overflow: hidden">
+            <button class="flex justify-end h-full text-6xl text-black dark:text-white cursor-pointer" on:click={closeNav} aria-label="Close Navigation">&times;</button>
+        </div>
+        <div class="h-[80%]">
+            <div class="grid grid-rows-4 grid-flow-col gap-10 flex justify-center items-center content-center h-full text-4xl font-semibold">
+                <a href="/?canisterId={frontendCanisterId}" on:click={goHome}>Home &#8594;</a>
+                <a href="/transaction?canisterId={frontendCanisterId}" on:click={Transaction}>Transactions &#8594;</a>
+                <a href="/entity?canisterId={frontendCanisterId}" on:click={Entity} >Entity &#8594;</a>
+                <a href="#" class="cursor-not-allowed pointer-events-auto text-neutral-500" aria-disabled="true">Learn More</a>
+            </div>
+        </div>
+        <div>
+        </div>
+    </div>
+    <nav class="border-b-stone-900 bg-white lg:border-stone-900 border-b-[8px] grid grid-cols-12 lg:grid-cols-12 gap-4 flex w-full flex-nowrap items-center justify-between bg-white py-4 text-stone-500 hover:text-stone-500 focus:text-stone-700 dark:bg-[#0C0A09] lg:flex-wrap lg:justify-start lg:py-6 data-te-navbar-ref dark:border-white">
+        <div class="col-span-8 lg:col-span-3">
             <!-- Header -->
             <div class="ml-2 lg:ml-10">
-                <a class="text-2xl 2xL:text-4xl font-semibold text-stone-800 dark:text-stone-200" href="#">Donation Engine</a>
+                <a class="text-2xl 2xL:text-4xl font-semibold text-stone-800 dark:text-stone-200" href="/?canisterId={frontendCanisterId}" on:click={goHome}>Donation Engine</a>
             </div>
         </div>
   
@@ -56,7 +103,7 @@
                     </li>
                     <Separator orientation="vertical" />
                     <li data-te-nav-item-ref>
-                      <a class="p-0 text-lg font-semibold text-stone-500 transition duration-200 hover:text-stone-700 hover:ease-in-out focus:text-stone-700 disabled:text-black/30 motion-reduce:transition-none dark:text-stone-200 dark:hover:text-stone-400 dark:focus:text-stone-400 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400 hover:cursor-pointer" data-te-nav-link-ref>Learn More</a>
+                      <a  class="p-0 text-lg font-semibold cursor-not-allowed pointer-events-auto text-neutral-500" aria-disabled="true">Learn More</a>
                     </li>
                 </ul>
             </div>
@@ -85,20 +132,34 @@
           <Button class="mx-5">Donate</Button>
         </div>
   
-        <div class="col-span-2 lg:hidden">
-          <div>
-            <div class="w-6 h-1 my-1 bg-stone-900 dark:bg-white"></div>
-            <div class="w-6 h-1 my-1 bg-stone-900 dark:bg-white"></div>
-            <div class="w-6 h-1 bg-stone-900 dark:bg-white"></div>
-          </div>
+        <div class="col-span-4 lg:hidden content-end flex justify-between mr-3">
+            <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild let:builder>
+                    <Button builders={[builder]} variant="outline" size="icon" class="mt-1 h-[1.6rem] w-[1.6rem] ml-4 min-[500px]:ml-12 min-[600px]:ml-26 sm:ml-32 md:ml-40">
+                        <Sun class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                        <Moon class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                        <span class="sr-only">Toggle theme</span>
+                    </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content align="end">
+                    <DropdownMenu.Item on:click={() => setMode("light")}>Light</DropdownMenu.Item>
+                    <DropdownMenu.Item on:click={() => setMode("dark")}>Dark</DropdownMenu.Item>
+                    <DropdownMenu.Item on:click={() => resetMode()}>System</DropdownMenu.Item>
+                </DropdownMenu.Content>
+            </DropdownMenu.Root>
+            <button aria-label="Toggle navigation" on:click={toggleNavBar}>
+                <div class="w-6 h-1 my-1 bg-stone-900 dark:bg-white"></div>
+                <div class="w-6 h-1 my-1 bg-stone-900 dark:bg-white"></div>
+                <div class="w-6 h-1 bg-stone-900 dark:bg-white"></div>
+            </button>
         </div>
     </nav>
 </header>
 
 <style>
-	header {
-		display: flex;
-		justify-content: space-between;
-		view-transition-name: header;
-	}
+    header {
+        display: flex;
+        justify-content: space-between;
+        view-transition-name: header;
+    }
 </style>

@@ -4,6 +4,8 @@
   import { onNavigate } from '$app/navigation';
   import Header from "$lib/components/ui/Header/Header.svelte";
 
+
+    //Svelte Transition Directory from page to page. Except the Header
     onNavigate((navigation) => {
       if (!(document as any).startViewTransition) return;
       return new Promise((resolve) => {
@@ -14,7 +16,7 @@
       });
     });
 
-    
+    //Svelte Reactive variable to keep watch for the light/dark mode for CSS selection.
     $: {
         if (typeof document !== 'undefined') {
             document.body.dataset.theme = $mode;
