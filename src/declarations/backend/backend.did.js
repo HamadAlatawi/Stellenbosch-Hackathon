@@ -29,7 +29,23 @@ export const idlFactory = ({ IDL }) => {
     'destination_address' : IDL.Text,
     'amount_in_satoshi' : Satoshi,
   });
+  const HttpHeader = IDL.Record({ 'value' : IDL.Text, 'name' : IDL.Text });
+  const HttpResponsePayload = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(HttpHeader),
+  });
+  const TransformArgs = IDL.Record({
+    'context' : IDL.Vec(IDL.Nat8),
+    'response' : HttpResponsePayload,
+  });
+  const CanisterHttpResponsePayload = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(HttpHeader),
+  });
   const BasicBitcoin = IDL.Service({
+    'generateUUID' : IDL.Func([], [IDL.Text], []),
     'get_balance' : IDL.Func([BitcoinAddress], [Satoshi__1], []),
     'get_current_fee_percentiles' : IDL.Func(
         [],
@@ -39,6 +55,16 @@ export const idlFactory = ({ IDL }) => {
     'get_p2pkh_address' : IDL.Func([], [BitcoinAddress], []),
     'get_utxos' : IDL.Func([BitcoinAddress], [GetUtxosResponse], []),
     'send' : IDL.Func([SendRequest], [IDL.Text], []),
+    'send_http_post_request_to_get_transaction' : IDL.Func(
+        [IDL.Text],
+        [IDL.Text],
+        [],
+      ),
+    'transform' : IDL.Func(
+        [TransformArgs],
+        [CanisterHttpResponsePayload],
+        ['query'],
+      ),
   });
   return BasicBitcoin;
 };

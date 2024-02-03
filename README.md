@@ -115,7 +115,7 @@ If you want to test your project locally with Hot Module Replacement (HMR), you 
 ```bash
 # Terminal 1
 cd bitcoin-25.0/
-./bin/bitcoind -conf=$(pwd)/bitcoin.conf -datadir=$(pwd)/data --port=18444
+./bin/bitcoind -conf="$(pwd)/bitcoin.conf" -datadir="$(pwd)/data" --port=18444
 ```
 
 ```bash
