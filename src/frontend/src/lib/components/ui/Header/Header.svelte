@@ -61,10 +61,24 @@
 <header>
     <!-- Mobile Navigation -->
     <div class="text-black dark:text-white fixed lg:hidden inset-0 z-50 top-0 right-0 h-full w-80svw bg-white dark:bg-[#0C0A09] transform translate-x-full transition-transform duration-300 navbarVisible pointer-events-auto thisIsNav">
-        <div class="flex justify-end h-[12%] " style="width: 80%; overflow: hidden">
-            <button class="flex justify-end h-full text-6xl text-black dark:text-white cursor-pointer" on:click={closeNav} aria-label="Close Navigation">&times;</button>
+        <div class="flex justify-between h-[20%] item-center content-center justify-center max-[500px]:mb-10" style="width: 80%; overflow: hidden">
+            <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild let:builder>
+                    <Button builders={[builder]} variant="ghost" size="icon" class="h-[4.5rem] w-[5rem] ml-2 min-[500px]:ml-12 min-[600px]:ml-26 sm:ml-32 md:ml-40">
+                        <Sun class="h-[2rem] w-[2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                        <Moon class="absolute h-[2rem] w-[2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                        <span class="sr-only">Toggle theme</span>
+                    </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content align="start">
+                    <DropdownMenu.Item on:click={() => setMode("light")}>Light</DropdownMenu.Item>
+                    <DropdownMenu.Item on:click={() => setMode("dark")}>Dark</DropdownMenu.Item>
+                    <DropdownMenu.Item on:click={() => resetMode()}>System</DropdownMenu.Item>
+                </DropdownMenu.Content>
+            </DropdownMenu.Root>
+            <button class="flex justify-end justify-center h-full text-6xl text-black dark:text-white cursor-pointer" on:click={closeNav} aria-label="Close Navigation">&times;</button>
         </div>
-        <div class="h-[80%]">
+        <div class="h-[75%]">
             <div class="grid grid-rows-4 grid-flow-col gap-10 flex justify-center items-center content-center h-full text-4xl font-semibold">
                 <a href="/?canisterId={frontendCanisterId}" on:click={goHome}>Home &#8594;</a>
                 <a href="/transaction?canisterId={frontendCanisterId}" on:click={Transaction}>Transactions &#8594;</a>
@@ -134,21 +148,7 @@
           <!-- <DonateButton/> -->
         </div>
   
-        <div class="col-span-4 lg:hidden content-end flex justify-between mr-3">
-            <DropdownMenu.Root>
-                <DropdownMenu.Trigger asChild let:builder>
-                    <Button builders={[builder]} variant="outline" size="icon" class="mt-1 h-[1.6rem] w-[1.6rem] ml-4 min-[500px]:ml-12 min-[600px]:ml-26 sm:ml-32 md:ml-40">
-                        <Sun class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                        <Moon class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                        <span class="sr-only">Toggle theme</span>
-                    </Button>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content align="end">
-                    <DropdownMenu.Item on:click={() => setMode("light")}>Light</DropdownMenu.Item>
-                    <DropdownMenu.Item on:click={() => setMode("dark")}>Dark</DropdownMenu.Item>
-                    <DropdownMenu.Item on:click={() => resetMode()}>System</DropdownMenu.Item>
-                </DropdownMenu.Content>
-            </DropdownMenu.Root>
+        <div class="col-span-4 lg:hidden content-end flex justify-end mr-3">
             <button aria-label="Toggle navigation" on:click={toggleNavBar}>
                 <div class="w-6 h-1 my-1 bg-stone-900 dark:bg-white"></div>
                 <div class="w-6 h-1 my-1 bg-stone-900 dark:bg-white"></div>
