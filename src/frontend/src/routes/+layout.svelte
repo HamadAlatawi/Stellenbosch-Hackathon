@@ -3,6 +3,7 @@
   import { ModeWatcher, mode } from "mode-watcher";
   import { onNavigate } from '$app/navigation';
   import Header from "$lib/components/ui/Header/Header.svelte";
+  import Footer from "$lib/components/ui/footer/footer.svelte";
 
 
     //Svelte Transition Directory from page to page. Except the Header
@@ -27,4 +28,7 @@
 <Header />
 
 <ModeWatcher />
+
 <slot />
+
+<Footer />

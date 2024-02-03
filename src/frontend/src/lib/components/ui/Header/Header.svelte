@@ -6,8 +6,9 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
     import { Sun, Moon } from "radix-icons-svelte";
     import { tweened } from 'svelte/motion';
+  import DonateButton from '../donateButton/donateButton.svelte';
 
-    const frontendCanisterId = import.meta.env.VITE_FRONTEND_CANISTER_ID;
+    const frontendCanisterId = import.meta.env.VITE_FRONTEND_CANISTER_ID || "";
 
     let sideNavBar = false;
 
@@ -103,7 +104,7 @@
                     </li>
                     <Separator orientation="vertical" />
                     <li data-te-nav-item-ref>
-                      <a  class="p-0 text-lg font-semibold cursor-not-allowed pointer-events-auto text-neutral-500" aria-disabled="true">Learn More</a>
+                      <span  class="p-0 text-lg font-semibold cursor-not-allowed pointer-events-auto text-neutral-500" aria-disabled="true">Learn More</span>
                     </li>
                 </ul>
             </div>
@@ -130,6 +131,7 @@
           <Separator orientation="vertical" />
   
           <Button class="mx-5">Donate</Button>
+          <!-- <DonateButton/> -->
         </div>
   
         <div class="col-span-4 lg:hidden content-end flex justify-between mr-3">
