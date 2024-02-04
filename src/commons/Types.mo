@@ -138,6 +138,7 @@ module Types {
         #development;
         #infrastructure;
     };
+    
     public type Reciever = {
         amount : Amount;
         percentage : Float;

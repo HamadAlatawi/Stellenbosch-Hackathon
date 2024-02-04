@@ -20,13 +20,10 @@ actor class TransactionsMain(address :  Types.BitcoinAddress) {
     stable var transactionID = 0;
     let canisterBitcoinAddress = address;
     let intervalSecondsForTimer = 86400; // Set your desired interval here
-    // stable var processedBlocksArr : [Types.BlockHeight] = [];
-    // var processedBlocksBuffer = Buffer.fromArray<Types.BlockHeight>(processedBlocksArr);
 
     public func createTransaction(source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) : async Transaction {
         let dateTime = await MyDateTime.MyDateTime();
         let trans = await Transaction.Transaction(transactionID, source, amount, dateTime, receivers, entityID, status, lastCanisterBalanceInSatoshi, lastBlockInCanisterHeight);
-        incrementID();
         return trans;
     };
 
@@ -44,6 +41,7 @@ actor class TransactionsMain(address :  Types.BitcoinAddress) {
 
     public func storeTransaction(transaction : Transaction) : async () {
         transactionBuffer.add(transaction);
+        incrementID();
         transactionArray := Buffer.toArray<Transaction>(transactionBuffer);
     };
 
@@ -100,9 +98,9 @@ actor class TransactionsMain(address :  Types.BitcoinAddress) {
         var currentTime = Time.now();
         var pendingTransactions = await getTransactionByStatus(#pending);
         for (transaction in pendingTransactions.vals()) {
-            await transaction.updateTransactionStatus(utxos, currentBalance, currentTime/*, lastConfirmedBlockHeight, {apply : updateLastConfirmedBlockHeight}*/);
+            await transaction.updateTransactionStatus(utxos, currentBalance, currentTime);
         };
     };
 
-    // ignore recurringTimer(#seconds intervalSecondsForTimer, updateTransactionStatus);
+    ignore recurringTimer(#seconds intervalSecondsForTimer, updateTransactionStatus);
 };

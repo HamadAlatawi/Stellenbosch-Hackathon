@@ -16,10 +16,6 @@ actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime
     var transactionReceivers : [Types.Reciever] = receivers;
     var transactionEntityID : Nat = entityID;
     var transactionStatus : Types.Status = status;
-    // type UpdateLastHeight = {
-    //     apply : shared Nat32 -> ();
-    // };
-
 
     public query func getID() : async Nat {
         return transactionID;
@@ -73,17 +69,15 @@ actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime
         transactionStatus := status;
     };
 
-    public func updateTransactionStatus(utxos : [Types.Utxo], currentBalance : Types.Satoshi, timeOfCheck : Time.Time/*, lastCheckedHeight : Nat32, updateLastHeight : Types.UpdateLastHeight*/) : async () {
+    public func updateTransactionStatus(utxos : [Types.Utxo], canisterCurrentBalance : Types.Satoshi, timeOfCheck : Time.Time) : async () {
         var aDaySince = await transactionDateTime.didADayPassSince(timeOfCheck);
         var amountInSatoshi = transactionAmount.amountInSatoshi;
         // var lastHeight = lastCheckedHeight;
-        if (currentBalance > amountInSatoshi and not aDaySince) {
+        if (canisterCurrentBalance > amountInSatoshi and not aDaySince) {
             label iterateUtxos for (utxo in utxos.vals()) {
                 var currentHeight = utxo.height;
-                if (utxo.value == amountInSatoshi and currentHeight > lastBlockInCanisterHeight /*and currentHeight > lastHeight*/) {
+                if (utxo.value == amountInSatoshi and currentHeight >= lastBlockInCanisterHeight) {
                     await setStatus(#confirmed);
-                    // await updateLastHeight.apply(currentHeight);
-                    // lastHeight := currentHeight;
                     break iterateUtxos;
                 };
             };
