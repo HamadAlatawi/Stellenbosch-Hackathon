@@ -4,7 +4,7 @@ export const idlFactory = ({ IDL }) => {
     'regtest' : IDL.Null,
     'testnet' : IDL.Null,
   });
-  const BitcoinAddress = IDL.Text;
+  const BitcoinAddress__1 = IDL.Text;
   const Satoshi__1 = IDL.Nat64;
   const MillisatoshiPerVByte = IDL.Nat64;
   const Page = IDL.Vec(IDL.Nat8);
@@ -25,19 +25,31 @@ export const idlFactory = ({ IDL }) => {
     'tip_block_hash' : BlockHash,
     'utxos' : IDL.Vec(Utxo),
   });
+  const BitcoinAddress = IDL.Text;
+  const TransactionDetails = IDL.Record({
+    'confirmation' : IDL.Nat,
+    'recipientAddress' : BitcoinAddress,
+    'amount' : Satoshi,
+    'senderAddress' : BitcoinAddress,
+  });
   const SendRequest = IDL.Record({
     'destination_address' : IDL.Text,
     'amount_in_satoshi' : Satoshi,
   });
   const BasicBitcoin = IDL.Service({
-    'get_balance' : IDL.Func([BitcoinAddress], [Satoshi__1], []),
+    'get_balance' : IDL.Func([BitcoinAddress__1], [Satoshi__1], []),
     'get_current_fee_percentiles' : IDL.Func(
         [],
         [IDL.Vec(MillisatoshiPerVByte)],
         [],
       ),
-    'get_p2pkh_address' : IDL.Func([], [BitcoinAddress], []),
-    'get_utxos' : IDL.Func([BitcoinAddress], [GetUtxosResponse], []),
+    'get_p2pkh_address' : IDL.Func([], [BitcoinAddress__1], []),
+    'get_utxos' : IDL.Func([BitcoinAddress__1], [GetUtxosResponse], []),
+    'processTransaction' : IDL.Func(
+        [IDL.Text, Network],
+        [TransactionDetails],
+        [],
+      ),
     'send' : IDL.Func([SendRequest], [IDL.Text], []),
   });
   return BasicBitcoin;
