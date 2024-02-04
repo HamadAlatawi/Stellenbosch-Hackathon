@@ -4,13 +4,15 @@ import Int "mo:base/Int";
 import Float "mo:base/Float";
 import Time "mo:base/Time";
 import Nat32 "mo:base/Nat32";
-import Types "../Common/Types";
+import Types "../commons/Types";
+import MyDateTime "MyDateTime";
 
-actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime : Types.MyDateTime, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) {
+actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime : MyDateTime.MyDateTime, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) {
+    type MyDateTime = MyDateTime.MyDateTime;
     var transactionID : Nat = id;
     var sourceBTCAddy : Text = source;
     var transactionAmount : Types.Amount = amount;
-    var transactionDateTime : Types.MyDateTime = dateTime;
+    var transactionDateTime : MyDateTime = dateTime;
     var transactionReceivers : [Types.Reciever] = receivers;
     var transactionEntityID : Nat = entityID;
     var transactionStatus : Types.Status = status;
@@ -31,7 +33,7 @@ actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime
         return transactionAmount;
     };
 
-    public query func getDateTime() : async Types.MyDateTime {
+    public query func getDateTime() : async MyDateTime {
         return transactionDateTime;
     };
 
@@ -55,7 +57,7 @@ actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime
         transactionAmount := newAmount;
     };
 
-    public func setDateTime(newDateTime : Types.MyDateTime) : async () {
+    public func setDateTime(newDateTime : MyDateTime) : async () {
         transactionDateTime := newDateTime;
     };
 

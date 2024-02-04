@@ -26,7 +26,7 @@ import Publickey "../../motoko-bitcoin/src/ecdsa/Publickey";
 import Der "../../motoko-bitcoin/src/ecdsa/Der";
 import Affine "../../motoko-bitcoin/src/ec/Affine";
 
-import Types "../Common/Types";
+import Types "../commons/Types";
 import EcdsaApi "EcdsaApi";
 import BitcoinApi "BitcoinApi";
 import Utils "Utils";

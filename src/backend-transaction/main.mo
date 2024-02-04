@@ -1,4 +1,3 @@
-import Types "../Common/Types";
 import BasicBitcoin "canister:backend";
 import Float "mo:base/Float";
 import Transaction "Transaction";
@@ -12,15 +11,17 @@ import MyDateTime "MyDateTime";
 import BitcoinApi "../backend/BitcoinApi";
 import Transactions "Transactions";
 import { setTimer; recurringTimer } = "mo:base/Timer";
+import Types "../commons/Types";
 
-actor class TransactionsMain(address : Types.BitcoinAddress) {
+actor class TransactionsMain(address :  Types.BitcoinAddress) {
     type Transaction = Transaction.Transaction;
     stable var transactionArray : [Transaction] = [];
     var transactionBuffer = Buffer.fromArray<Transaction>(transactionArray);
     stable var transactionID = 0;
     let canisterBitcoinAddress = address;
-    stable var lastConfirmedBlockHeight : Nat32 = 0;
     let intervalSecondsForTimer = 86400; // Set your desired interval here
+    // stable var processedBlocksArr : [Types.BlockHeight] = [];
+    // var processedBlocksBuffer = Buffer.fromArray<Types.BlockHeight>(processedBlocksArr);
 
     public func createTransaction(source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) : async Transaction {
         let dateTime = await MyDateTime.MyDateTime();
@@ -83,9 +84,14 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
         return Buffer.toArray(buffer);
     };
 
-    public func updateLastConfirmedBlockHeight(height: Nat32) : async () {
-        lastConfirmedBlockHeight := height;
-    };
+    // public func updateProcessedBlocks(height: Types.BlockHeight) : async () {
+    //     processedBlocksBuffer.add(height);
+    //     processedBlocksArr := Buffer.toArray(processedBlocksBuffer);
+    // };
+
+    // public func getAllprocessedBlocks(height: Types.BlockHeight) : async [Types.BlockHeight] {
+    //     processedBlocksArr;
+    // };
 
     public func updateTransactionStatus() : async () {
         var utxoResponse = await BasicBitcoin.get_utxos(canisterBitcoinAddress);
@@ -98,5 +104,5 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
         };
     };
 
-    ignore recurringTimer(#seconds intervalSecondsForTimer, updateTransactionStatus);
+    // ignore recurringTimer(#seconds intervalSecondsForTimer, updateTransactionStatus);
 };

@@ -14,7 +14,8 @@
 		},
 		"backend-transaction":{
 			"main": "src/backend-transaction/main.mo",
-			"type": "motoko"
+			"type": "motoko",
+			"dependencies": ["backend"]
 		}
 	},
 	"defaults": {
