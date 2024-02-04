@@ -4,67 +4,69 @@ import Nat "mo:base/Nat";
 import Buffer "mo:base/Buffer";
 import Array "mo:base/Array";
 import Types "Types";
+import MyDateTime "MyDateTime";
 
 actor Transactions {
     type Transaction = Transaction.Transaction;
-    stable var transactionArray: [Transaction] = [];
+    stable var transactionArray : [Transaction] = [];
     var transactionBuffer = Buffer.fromArray<Transaction>(transactionArray);
     stable var transactionID = 0;
 
-    public func createTransaction(source: Text, amount: Types.Amount, dateTime: Text, receivers: [Types.Reciever], entityID: Nat): async Transaction {
-        let trans = await Transaction.Transaction(transactionID, source, amount, dateTime, receivers, entityID);
+    public func createTransaction(source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status) : async Transaction {
+        let dateTime = await MyDateTime.MyDateTime();
+        let trans = await Transaction.Transaction(transactionID, source, amount, dateTime, receivers, entityID, status);
         incrementID();
         return trans;
     };
 
-    public func incrementID(): () {
+    public func incrementID() : () {
         transactionID += 1;
     };
 
-    public query func getID(): async Nat {
+    public query func getID() : async Nat {
         return transactionID;
     };
 
-    public func resetID(): () {
+    public func resetID() : () {
         transactionID := 0;
     };
 
-    public func storeTransaction(transaction: Transaction): async () {
+    public func storeTransaction(transaction : Transaction) : async () {
         transactionBuffer.add(transaction);
         transactionArray := Buffer.toArray<Transaction>(transactionBuffer);
     };
 
-    public query func getAllTransactions(): async [Transaction] {
+    public query func getAllTransactions() : async [Transaction] {
         return transactionArray;
     };
 
-    public func getTransactionById(id: Nat): async ?Transaction {
+    public func getTransactionById(id : Nat) : async ?Transaction {
         let transactionArr = await getAllTransactions();
         for (transaction in transactionArr.vals()) {
             let transactionId = await transaction.getID();
             if (transactionId == id) {
                 switch (?transaction) {
-                    case (null) { };
-                    case (transaction) { return transaction; };
-                }
-            }
+                    case (null) {};
+                    case (transaction) { return transaction };
+                };
+            };
         };
         return null;
     };
 
-    public func getTransactionByEntityId(entityId: Nat): async ?[Transaction] {
-        let transactionArr = await getAllTransactions();
-        let transactionOfEntity: Buffer.Buffer<Transaction>(0);
-        for (transaction in transactionArr.vals()) {
-            let transactionEntityId = await transaction.getEntityID();
-            if (transactionEntityId == entityId) {
-                    transactionOfEntity.add(transaction);
-                };
-            };
-        let transactionOfEntityArray=Buffer.toArray<Transaction>(transactionOfEntity);
-        return transactionOfEntityArray;
-        return null;
-    };
+    // public func getTransactionByEntityId(entityId : Nat) : async ?[Transaction] {
+    //     let transactionArr = await getAllTransactions();
+    //     let transactionOfEntity : Buffer.Buffer<Transaction>(0);
+    //     for (transaction in transactionArr.vals()) {
+    //         let transactionEntityId = await transaction.getEntityID();
+    //         if (transactionEntityId == entityId) {
+    //             transactionOfEntity.add(transaction);
+    //         };
+    //     };
+    //     let transactionOfEntityArray = Buffer.toArray<Transaction>(transactionOfEntity);
+    //     return transactionOfEntityArray;
+    //     return null;
+    // };
 
     // public func getAccumulatedByEntityId(entityId: Nat): async Float {
     //     let transactionArr = await getAllTransactions();
@@ -96,7 +98,4 @@ actor Transactions {
     //     };
     // }
 
-
-
-    
 };
