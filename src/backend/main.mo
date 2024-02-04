@@ -4,6 +4,11 @@ import BitcoinWallet "BitcoinWallet";
 import BitcoinApi "BitcoinApi";
 import Types "Types";
 import Utils "Utils";
+import Array "mo:base/Array";
+import Iter "mo:base/Iter";
+import Nat32 "mo:base/Nat32";
+import Float "mo:base/Float";
+import Int "mo:base/Int";
 
 actor class BasicBitcoin(_network : Types.Network) {
   type GetUtxosResponse = Types.GetUtxosResponse;
@@ -56,6 +61,19 @@ actor class BasicBitcoin(_network : Types.Network) {
   /// Returns the transaction ID.
   public func send(request : SendRequest) : async Text {
     Utils.bytesToText(await BitcoinWallet.send(NETWORK, DERIVATION_PATH, KEY_NAME, request.destination_address, request.amount_in_satoshi))
+  };
+
+   public func get_last_utxo_block_height(address : Types.BitcoinAddress) : async Nat32 {
+    let utxosRes = await get_utxos(address);
+    let utxos = utxosRes.utxos;
+    var lastHeight : Nat32 = 0;
+    for (utxo in  utxos.vals()) {
+      var height = utxo.height;
+      if(height > lastHeight) {
+        lastHeight := utxo.height;
+      }
+    };
+    return lastHeight;
   };
 };
 

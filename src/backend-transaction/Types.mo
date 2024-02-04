@@ -1,4 +1,6 @@
 import Curves "../../motoko-bitcoin/src/ec/Curves";
+import MyDateTime "MyDateTime";
+import Nat64 "mo:base/Nat64";
 
 module Types {
     public type SendRequest = {
@@ -123,5 +125,36 @@ module Types {
     public type SendTransactionRequest = {
         transaction : [Nat8];
         network : Network;
+    };
+
+    public type Amount = {
+        amountBTC : Float;
+        amountInSatoshi : Satoshi;
+    };
+
+    public type Beneficiary = {
+        #entity;
+        #token;
+        #education;
+        #development;
+        #infrastructure;
+    };
+    public type Reciever = {
+        amount : Amount;
+        percentage : Float;
+        benificiary : Beneficiary;
+    };
+
+    public type Status = {
+        #confirmed;
+        #pending;
+        #rejected;
+    };
+
+    public type MyDateTime = MyDateTime.MyDateTime;
+
+    public type Category = {
+        #school;
+        #student;
     };
 };

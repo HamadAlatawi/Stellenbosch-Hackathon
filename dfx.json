@@ -12,15 +12,10 @@
 			"source": ["build/"],
 			"type": "assets"
 		},
-		"entity":{
-			"main": "src/backend/entity/Entities.mo",
-			"type": "motoko"
-		},
-		"transaction":{
-			"main": "src/backend/transactions/Transactions.mo",
+		"backend-transaction":{
+			"main": "src/backend-transaction/main.mo",
 			"type": "motoko"
 		}
-		
 	},
 	"defaults": {
 		"bitcoin": {

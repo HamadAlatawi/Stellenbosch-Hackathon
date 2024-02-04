@@ -1,14 +1,17 @@
 import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
+import type { IDL } from '@dfinity/candid';
 
 export interface BasicBitcoin {
   'get_balance' : ActorMethod<[BitcoinAddress], Satoshi__1>,
   'get_current_fee_percentiles' : ActorMethod<[], BigUint64Array | bigint[]>,
+  'get_last_utxo_block_height' : ActorMethod<[BitcoinAddress__1], number>,
   'get_p2pkh_address' : ActorMethod<[], BitcoinAddress>,
   'get_utxos' : ActorMethod<[BitcoinAddress], GetUtxosResponse>,
   'send' : ActorMethod<[SendRequest], string>,
 }
 export type BitcoinAddress = string;
+export type BitcoinAddress__1 = string;
 export type BlockHash = Uint8Array | number[];
 export interface GetUtxosResponse {
   'next_page' : [] | [Page],
@@ -34,3 +37,4 @@ export interface Utxo {
   'outpoint' : OutPoint,
 }
 export interface _SERVICE extends BasicBitcoin {}
+export declare const idlFactory: IDL.InterfaceFactory;

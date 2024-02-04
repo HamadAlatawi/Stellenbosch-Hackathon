@@ -32,13 +32,22 @@ type GetUtxosResponse =
    utxos: vec Utxo;
  };
 type BlockHash = vec nat8;
+type BitcoinAddress__1 = text;
 type BitcoinAddress = text;
 type BasicBitcoin = 
  service {
+   /// Returns the balance of the given Bitcoin address.
    get_balance: (BitcoinAddress) -> (Satoshi__1);
+   /// Returns the 100 fee percentiles measured in millisatoshi/vbyte.
+   /// Percentiles are computed from the last 10,000 transactions (if available).
    get_current_fee_percentiles: () -> (vec MillisatoshiPerVByte);
+   get_last_utxo_block_height: (BitcoinAddress__1) -> (nat32);
+   /// Returns the P2PKH address of this canister at a specific derivation path.
    get_p2pkh_address: () -> (BitcoinAddress);
+   /// Returns the UTXOs of the given Bitcoin address.
    get_utxos: (BitcoinAddress) -> (GetUtxosResponse);
+   /// Sends the given amount of bitcoin from this canister to the given address.
+   /// Returns the transaction ID.
    send: (SendRequest) -> (text);
  };
 service : (Network) -> BasicBitcoin

@@ -6,15 +6,15 @@ import Array "mo:base/Array";
 import Types "Types";
 import MyDateTime "MyDateTime";
 
-actor Transactions {
+actor class Transactions() {
     type Transaction = Transaction.Transaction;
     stable var transactionArray : [Transaction] = [];
     var transactionBuffer = Buffer.fromArray<Transaction>(transactionArray);
     stable var transactionID = 0;
 
-    public func createTransaction(source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status) : async Transaction {
+    public func createTransaction(source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) : async Transaction {
         let dateTime = await MyDateTime.MyDateTime();
-        let trans = await Transaction.Transaction(transactionID, source, amount, dateTime, receivers, entityID, status);
+        let trans = await Transaction.Transaction(transactionID, source, amount, dateTime, receivers, entityID, status, lastCanisterBalanceInSatoshi, lastBlockInCanisterHeight);
         incrementID();
         return trans;
     };

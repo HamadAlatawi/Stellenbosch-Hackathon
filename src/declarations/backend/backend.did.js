@@ -7,6 +7,7 @@ export const idlFactory = ({ IDL }) => {
   const BitcoinAddress = IDL.Text;
   const Satoshi__1 = IDL.Nat64;
   const MillisatoshiPerVByte = IDL.Nat64;
+  const BitcoinAddress__1 = IDL.Text;
   const Page = IDL.Vec(IDL.Nat8);
   const BlockHash = IDL.Vec(IDL.Nat8);
   const Satoshi = IDL.Nat64;
@@ -34,6 +35,11 @@ export const idlFactory = ({ IDL }) => {
     'get_current_fee_percentiles' : IDL.Func(
         [],
         [IDL.Vec(MillisatoshiPerVByte)],
+        [],
+      ),
+    'get_last_utxo_block_height' : IDL.Func(
+        [BitcoinAddress__1],
+        [IDL.Nat32],
         [],
       ),
     'get_p2pkh_address' : IDL.Func([], [BitcoinAddress], []),

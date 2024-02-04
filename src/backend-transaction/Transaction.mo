@@ -1,7 +1,10 @@
 import Array "mo:base/Array";
+import Nat "mo:base/Nat";
+import Int "mo:base/Int";
+import Float "mo:base/Float";
 import Types "Types";
 
-actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime : Types.MyDateTime, receivers : [Types.Reciever], entityID : Nat, status : Types.Status) {
+actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime : Types.MyDateTime, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) {
     var transactionID : Nat = id;
     var sourceBTCAddy : Text = source;
     var transactionAmount : Types.Amount = amount;
