@@ -3,7 +3,7 @@ import List "mo:base/List";
 import Nat "mo:base/Nat";
 import Buffer "mo:base/Buffer";
 import Array "mo:base/Array";
-import Types "Types";
+import Types "../Common/Types";
 import MyDateTime "MyDateTime";
 
 actor class Transactions() {
@@ -15,7 +15,6 @@ actor class Transactions() {
     public func createTransaction(source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) : async Transaction {
         let dateTime = await MyDateTime.MyDateTime();
         let trans = await Transaction.Transaction(transactionID, source, amount, dateTime, receivers, entityID, status, lastCanisterBalanceInSatoshi, lastBlockInCanisterHeight);
-        incrementID();
         return trans;
     };
 
@@ -33,6 +32,7 @@ actor class Transactions() {
 
     public func storeTransaction(transaction : Transaction) : async () {
         transactionBuffer.add(transaction);
+        incrementID();
         transactionArray := Buffer.toArray<Transaction>(transactionBuffer);
     };
 
@@ -52,6 +52,17 @@ actor class Transactions() {
             };
         };
         return null;
+    };
+
+    public func getTransactionByStatus(status : Types.Status) : async [Transaction] {
+        let buffer = Buffer.Buffer<Transaction>(transactionArray.size());
+        for (transaction in transactionArray.vals()) {
+            let transactionStatus = await transaction.getStatus();
+            if (transactionStatus == status) {
+                buffer.add(transaction);
+            };
+        };
+        return Buffer.toArray(buffer);
     };
 
     // public func getTransactionByEntityId(entityId : Nat) : async ?[Transaction] {

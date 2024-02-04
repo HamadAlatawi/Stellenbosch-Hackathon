@@ -1,6 +1,6 @@
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
-import Types "Types";
+import Types "../Common/Types";
 
 actor class Entity(id:Nat, name:Text, category:Types.Category){
     var entityID:Nat=id;

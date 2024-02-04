@@ -1,6 +1,5 @@
 import ExperimentalCycles "mo:base/ExperimentalCycles";
-
-import Types "Types";
+import Types "../Common/Types";
 
 module {
   type Cycles = Types.Cycles;

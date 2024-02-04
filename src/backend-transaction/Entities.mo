@@ -3,7 +3,8 @@ import List "mo:base/List";
 import Nat "mo:base/Nat";
 import Buffer "mo:base/Buffer";
 import Array "mo:base/Array";
-import Types "Types";
+import Types "../Common/Types";
+
 actor Entities{
     type Entity=Entity.Entity;
     stable var entityArray:[Entity]= [];

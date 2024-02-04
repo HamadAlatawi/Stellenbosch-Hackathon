@@ -2,7 +2,7 @@ import Text "mo:base/Text";
 
 import BitcoinWallet "BitcoinWallet";
 import BitcoinApi "BitcoinApi";
-import Types "Types";
+import Types "../Common/Types";
 import Utils "Utils";
 import Array "mo:base/Array";
 import Iter "mo:base/Iter";

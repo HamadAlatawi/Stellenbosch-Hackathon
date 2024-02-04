@@ -2,7 +2,9 @@ import Array "mo:base/Array";
 import Nat "mo:base/Nat";
 import Int "mo:base/Int";
 import Float "mo:base/Float";
-import Types "Types";
+import Time "mo:base/Time";
+import Nat32 "mo:base/Nat32";
+import Types "../Common/Types";
 
 actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime : Types.MyDateTime, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) {
     var transactionID : Nat = id;
@@ -12,6 +14,10 @@ actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime
     var transactionReceivers : [Types.Reciever] = receivers;
     var transactionEntityID : Nat = entityID;
     var transactionStatus : Types.Status = status;
+    // type UpdateLastHeight = {
+    //     apply : shared Nat32 -> ();
+    // };
+
 
     public query func getID() : async Nat {
         return transactionID;
@@ -63,5 +69,24 @@ actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime
 
     public func setStatus(status : Types.Status) : async () {
         transactionStatus := status;
+    };
+
+    public func updateTransactionStatus(utxos : [Types.Utxo], currentBalance : Types.Satoshi, timeOfCheck : Time.Time/*, lastCheckedHeight : Nat32, updateLastHeight : Types.UpdateLastHeight*/) : async () {
+        var aDaySince = await transactionDateTime.didADayPassSince(timeOfCheck);
+        var amountInSatoshi = transactionAmount.amountInSatoshi;
+        // var lastHeight = lastCheckedHeight;
+        if (currentBalance > amountInSatoshi and not aDaySince) {
+            label iterateUtxos for (utxo in utxos.vals()) {
+                var currentHeight = utxo.height;
+                if (utxo.value == amountInSatoshi and currentHeight > lastBlockInCanisterHeight /*and currentHeight > lastHeight*/) {
+                    await setStatus(#confirmed);
+                    // await updateLastHeight.apply(currentHeight);
+                    // lastHeight := currentHeight;
+                    break iterateUtxos;
+                };
+            };
+        } else {
+            await setStatus(#rejected);
+        };
     };
 };
