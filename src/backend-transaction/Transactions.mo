@@ -3,6 +3,7 @@ import List "mo:base/List";
 import Nat "mo:base/Nat";
 import Buffer "mo:base/Buffer";
 import Array "mo:base/Array";
+import Float "mo:base/Float";
 import Types "../commons/Types";
 import MyDateTime "MyDateTime";
 
@@ -65,48 +66,46 @@ actor class Transactions() {
         return Buffer.toArray(buffer);
     };
 
-    // public func getTransactionByEntityId(entityId : Nat) : async ?[Transaction] {
-    //     let transactionArr = await getAllTransactions();
-    //     let transactionOfEntity : Buffer.Buffer<Transaction>(0);
-    //     for (transaction in transactionArr.vals()) {
-    //         let transactionEntityId = await transaction.getEntityID();
-    //         if (transactionEntityId == entityId) {
-    //             transactionOfEntity.add(transaction);
-    //         };
-    //     };
-    //     let transactionOfEntityArray = Buffer.toArray<Transaction>(transactionOfEntity);
-    //     return transactionOfEntityArray;
-    //     return null;
-    // };
+    public func getTransactionByEntityId(entityId : Nat) : async ?[Transaction] {
+        let transactionArr = await getAllTransactions();
+        let transactionOfEntity = Buffer.Buffer<Transaction>(0);
+        for (transaction in transactionArr.vals()) {
+            let transactionEntityId = await transaction.getEntityID();
+            if (transactionEntityId == entityId) {
+                transactionOfEntity.add(transaction);
+            };
+        };
+        if (transactionOfEntity.size()==0){return null};
+        let transactionOfEntityArray = Buffer.toArray<Transaction>(transactionOfEntity);
+        return ?transactionOfEntityArray;
+    };
 
-    // public func getAccumulatedByEntityId(entityId: Nat): async Float {
-    //     let transactionArr = await getAllTransactions();
-    //     let sum: Float= 0.0;
-    //     for (transaction in transactionArr.vals()) {
-    //         let transactionEntityId = await transaction.getEntityID();
-    //         if (transactionEntityId == entityId) {
-    //                let addition = await transaction.getAmount();
-    //                 sum+=addition;
-    //             };
-    //         };
-    //     let transactionOfEntityArray=Buffer.toArray<Transaction>(transactionOfEntity);
-    //     return transactionOfEntityArray;
-    //     return null;
-    // };
-
-    // public func getAccumulatedForBeneficiary(beneficiary:Beneficiary): Nat{
-    //     let transactionArr = await getAllTransactions();
-    //     for (transaction in transactionArr.vals()) {
-    //         let transactionReceivers = (await transaction.getReceivers()).vals();
-    //         for (reciever in transactionReceivers){
-    //         if (transactionId == id) {
-    //             switch (?transaction) {
-    //                 case (null) { };
-    //                 case (transaction) { return transaction; };
-    //             }
-    //         }
-    //         }
-    //     };
-    // }
+    public func getAccumulatedByEntity(entityId:Nat): async Float {
+        let transactions=
+        switch (await getTransactionByEntityId(entityId)){
+            case (null) return 0.0;
+            case (?y) y;
+        };
+        var sum: Float = 0.0;
+        for (transaction in transactions.vals()){
+            let amount = await transaction.getAmount();
+            sum+= amount.amountBTC;
+        };
+        return sum;
+    };
+    
+    public func getAccumulatedByBeneficiary(benificiary: Types.Benificiary): async Float {
+        let transactionArr = await getAllTransactions();
+        var sum: Float= 0.0;
+        for (transaction in transactionArr.vals()) {
+            let receivers = await transaction.getReceivers();
+            for (receiver in receivers.vals()){
+                if (receiver.benificiary==benificiary){
+                    sum += receiver.amount.amountBTC;
+                };
+            };
+            };
+        return sum;
+    };
 
 };

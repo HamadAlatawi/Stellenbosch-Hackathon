@@ -131,7 +131,7 @@ module Types {
         amountInSatoshi : Satoshi;
     };
 
-    public type Beneficiary = {
+    public type Benificiary = {
         #entity;
         #token;
         #education;
@@ -142,7 +142,7 @@ module Types {
     public type Reciever = {
         amount : Amount;
         percentage : Float;
-        benificiary : Beneficiary;
+        benificiary : Benificiary;
     };
 
     public type Status = {
