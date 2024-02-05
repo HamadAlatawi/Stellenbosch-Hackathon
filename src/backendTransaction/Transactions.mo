@@ -2,6 +2,7 @@ import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import List "mo:base/List";
 import Nat "mo:base/Nat";
+import Text "mo:base/Text";
 
 import Types "../commons/Types";
 import MyDateTime "MyDateTime";
@@ -11,29 +12,15 @@ actor class Transactions() {
     type Transaction = Transaction.Transaction;
     stable var transactionArray : [Transaction] = [];
     var transactionBuffer = Buffer.fromArray<Transaction>(transactionArray);
-    stable var transactionID = 0;
 
-    public func createTransaction(source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) : async Transaction {
+    public func createTransaction(transactionID : Text, source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) : async Transaction {
         let dateTime = await MyDateTime.MyDateTime();
         let trans = await Transaction.Transaction(transactionID, source, amount, dateTime, receivers, entityID, status, lastCanisterBalanceInSatoshi, lastBlockInCanisterHeight);
         return trans;
     };
 
-    public func incrementID() : () {
-        transactionID += 1;
-    };
-
-    public query func getID() : async Nat {
-        return transactionID;
-    };
-
-    public func resetID() : () {
-        transactionID := 0;
-    };
-
     public func storeTransaction(transaction : Transaction) : async () {
         transactionBuffer.add(transaction);
-        incrementID();
         transactionArray := Buffer.toArray<Transaction>(transactionBuffer);
     };
 
@@ -41,7 +28,7 @@ actor class Transactions() {
         return transactionArray;
     };
 
-    public func getTransactionById(id : Nat) : async ?Transaction {
+    public func getTransactionById(id : Text) : async ?Transaction {
         let transactionArr = await getAllTransactions();
         for (transaction in transactionArr.vals()) {
             let transactionId = await transaction.getID();

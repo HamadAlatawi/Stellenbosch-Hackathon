@@ -4,6 +4,7 @@ import type { IDL } from '@dfinity/candid';
 
 export interface BasicBitcoin {
   'get_balance' : ActorMethod<[BitcoinAddress], Satoshi__1>,
+  'get_blocks' : ActorMethod<[BitcoinAddress__1], Array<Block>>,
   'get_current_fee_percentiles' : ActorMethod<[], BigUint64Array | bigint[]>,
   'get_last_utxo_block_height' : ActorMethod<[BitcoinAddress__1], number>,
   'get_p2pkh_address' : ActorMethod<[], BitcoinAddress>,
@@ -12,7 +13,9 @@ export interface BasicBitcoin {
 }
 export type BitcoinAddress = string;
 export type BitcoinAddress__1 = string;
+export interface Block { 'height' : BlockHeight, 'value' : Satoshi }
 export type BlockHash = Uint8Array | number[];
+export type BlockHeight = number;
 export interface GetUtxosResponse {
   'next_page' : [] | [Page],
   'tip_height' : number,

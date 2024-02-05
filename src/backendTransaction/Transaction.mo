@@ -8,11 +8,11 @@ import Time "mo:base/Time";
 import Types "../commons/Types";
 import MyDateTime "MyDateTime";
 
-actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime : MyDateTime.MyDateTime, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) {
+actor class Transaction(id : Text, source : Text, amount : Types.Amount, dateTime : MyDateTime.MyDateTime, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) {
     type MyDateTime = MyDateTime.MyDateTime;
     type Utxo = Types.Utxo;
 
-    var transactionID : Nat = id;
+    var transactionID : Text = id;
     var sourceBTCAddy : Text = source;
     var transactionAmount : Types.Amount = amount;
     var transactionDateTime : MyDateTime = dateTime;
@@ -20,7 +20,7 @@ actor class Transaction(id : Nat, source : Text, amount : Types.Amount, dateTime
     var transactionEntityID : Nat = entityID;
     var transactionStatus : Types.Status = status;
 
-    public query func getID() : async Nat {
+    public query func getID() : async Text {
         return transactionID;
     };
 

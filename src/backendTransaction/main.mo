@@ -8,6 +8,7 @@ import Nat "mo:base/Nat";
 import Nat32 "mo:base/Nat32";
 import Time "mo:base/Time";
 import { recurringTimer; setTimer } "mo:base/Timer";
+import Text "mo:base/Text";
 
 import BitcoinApi "../backend/BitcoinApi";
 import Types "../commons/Types";
@@ -22,33 +23,19 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
     type Block = Types.Block;
     stable var transactionArray : [Transaction] = [];
     var transactionBuffer = Buffer.fromArray<Transaction>(transactionArray);
-    stable var transactionID = 0;
     let canisterBitcoinAddress = address;
     let intervalSecondsForTimer = 86400; // Set your desired interval here
     stable var processedBlocksArr : [BlockHeight] = [];
     var processedBlocksBuffer = Buffer.fromArray<BlockHeight>(processedBlocksArr);
 
-    public func createTransaction(source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) : async Transaction {
+    public func createTransaction(transactionID : Text, source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) : async Transaction {
         let dateTime = await MyDateTime.MyDateTime();
         let trans = await Transaction.Transaction(transactionID, source, amount, dateTime, receivers, entityID, status, lastCanisterBalanceInSatoshi, lastBlockInCanisterHeight);
         return trans;
     };
 
-    public func incrementID() : () {
-        transactionID += 1;
-    };
-
-    public query func getID() : async Nat {
-        return transactionID;
-    };
-
-    public func resetID() : () {
-        transactionID := 0;
-    };
-
     public func storeTransaction(transaction : Transaction) : async () {
         transactionBuffer.add(transaction);
-        incrementID();
         transactionArray := Buffer.toArray<Transaction>(transactionBuffer);
     };
 
@@ -56,7 +43,7 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
         return transactionArray;
     };
 
-    public func getTransactionById(id : Nat) : async ?Transaction {
+    public func getTransactionById(id : Text) : async ?Transaction {
         let transactionArr = await getAllTransactions();
         for (transaction in transactionArr.vals()) {
             let transactionId = await transaction.getID();
@@ -70,11 +57,11 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
         return null;
     };
 
-    public func createAndAddTransaction(sourceAddress : Types.BitcoinAddress, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat) : async () {
+    public func createAndAddTransaction(transactionID : Text, sourceAddress : Types.BitcoinAddress, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat) : async () {
         var lastBalance = await BasicBitcoin.get_balance(canisterBitcoinAddress);
         var lastBlockHeight = await BasicBitcoin.get_last_utxo_block_height(canisterBitcoinAddress);
         let status : Types.Status = #pending;
-        var transaction = await createTransaction(sourceAddress, amount, receivers, entityID, status, lastBalance, lastBlockHeight);
+        var transaction = await createTransaction(transactionID, sourceAddress, amount, receivers, entityID, status, lastBalance, lastBlockHeight);
         await storeTransaction(transaction);
     };
 
@@ -90,14 +77,13 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
     };
 
     public func updateTransactionStatus() : async () {
-        var utxoResponse = await BasicBitcoin.get_utxos(canisterBitcoinAddress);
-        var utxos = utxoResponse.utxos;
-        var unprocessedUtxos = getUnprocessed(utxo);
+        var utxoResponse = await BasicBitcoin.get_blocks(canisterBitcoinAddress);
+        var unprocessedUtxos = await getUnprocessed(utxoResponse);
         var currentBalance = await BasicBitcoin.get_balance(canisterBitcoinAddress);
         var currentTime = Time.now();
         var pendingTransactions = await getTransactionByStatus(#pending);
         for (transaction in pendingTransactions.vals()) {
-            label processUtxos for (utxo in utxos.vals()) {
+            label processUtxos for (utxo in unprocessedUtxos.vals()) {
                 let status = await transaction.updateTransactionStatus(utxo.height, utxo.value, currentBalance, currentTime);
                 switch status {
                     case (#confirmed) {
@@ -122,8 +108,8 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
         processedBlocksArr;
     };
 
-    public func getUnprocessed(utxos : [Utxo]) : async [Utxo] {
-        var utxoBuf = Buffer.Buffer<Utxo>(utxos.size());
+    public func getUnprocessed(utxos : [Block]) : async [Block] {
+        var utxoBuf = Buffer.Buffer<Block>(utxos.size());
         for (utxo in utxos.vals()) {
             var height = utxo.height;
             let found = await isProcessed(height);
@@ -142,16 +128,5 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
         };
         return false;
     };
-
-    // public func filterProcessedUtxos(utxos : [Utxo]) : async [Utxo] {
-    //     var buffer = Buffer.Buffer<Utxo>(utxos.size());
-    //     for (utxo in utxos.vals()) {
-    //         let blockIsProcessed = Array.any(processedBlocksArr, func(x : BlockHeight) { x == utxo.height });
-    //         if (not blockIsProcessed) {
-    //             buffer.add(utxo);
-    //         };
-    //     };
-    //     return Buffer.toArray(buffer);
-    // };
-    //ignore recurringTimer(#seconds intervalSecondsForTimer, updateTransactionStatus);
+    // ignore recurringTimer(#seconds intervalSecondsForTimer, updateTransactionStatus);
 };

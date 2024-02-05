@@ -6,11 +6,13 @@ export const idlFactory = ({ IDL }) => {
   });
   const BitcoinAddress = IDL.Text;
   const Satoshi__1 = IDL.Nat64;
-  const MillisatoshiPerVByte = IDL.Nat64;
   const BitcoinAddress__1 = IDL.Text;
+  const BlockHeight = IDL.Nat32;
+  const Satoshi = IDL.Nat64;
+  const Block = IDL.Record({ 'height' : BlockHeight, 'value' : Satoshi });
+  const MillisatoshiPerVByte = IDL.Nat64;
   const Page = IDL.Vec(IDL.Nat8);
   const BlockHash = IDL.Vec(IDL.Nat8);
-  const Satoshi = IDL.Nat64;
   const OutPoint = IDL.Record({
     'txid' : IDL.Vec(IDL.Nat8),
     'vout' : IDL.Nat32,
@@ -32,6 +34,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const BasicBitcoin = IDL.Service({
     'get_balance' : IDL.Func([BitcoinAddress], [Satoshi__1], []),
+    'get_blocks' : IDL.Func([BitcoinAddress__1], [IDL.Vec(Block)], []),
     'get_current_fee_percentiles' : IDL.Func(
         [],
         [IDL.Vec(MillisatoshiPerVByte)],

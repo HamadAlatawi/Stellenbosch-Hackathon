@@ -31,13 +31,20 @@ type GetUtxosResponse =
    tip_height: nat32;
    utxos: vec Utxo;
  };
+type BlockHeight = nat32;
 type BlockHash = vec nat8;
+type Block = 
+ record {
+   height: BlockHeight;
+   value: Satoshi;
+ };
 type BitcoinAddress__1 = text;
 type BitcoinAddress = text;
 type BasicBitcoin = 
  service {
    /// Returns the balance of the given Bitcoin address.
    get_balance: (BitcoinAddress) -> (Satoshi__1);
+   get_blocks: (BitcoinAddress__1) -> (vec Block);
    /// Returns the 100 fee percentiles measured in millisatoshi/vbyte.
    /// Percentiles are computed from the last 10,000 transactions (if available).
    get_current_fee_percentiles: () -> (vec MillisatoshiPerVByte);

@@ -75,4 +75,10 @@ actor class BasicBitcoin(_network : Types.Network) {
     };
     return lastHeight;
   };
+
+  public func get_blocks(address : Types.BitcoinAddress) : async [Types.Block] {
+    let utxosRes = await get_utxos(address);
+    let utxos = utxosRes.utxos;
+    let blocks : [Types.Block] = Array.map(utxos, func(x : Types.Utxo) : Types.Block { return { value = x.value; height = x.height } });
+  };
 };
