@@ -139,7 +139,7 @@ module Types {
         #development;
         #infrastructure;
     };
-    
+
     public type Reciever = {
         amount : Amount;
         percentage : Float;
@@ -158,4 +158,8 @@ module Types {
     };
 
     public type BlockHeight = Nat32;
+    public type Block = {
+        value : Satoshi;
+        height : BlockHeight;
+    };
 };
