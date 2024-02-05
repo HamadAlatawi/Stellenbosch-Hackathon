@@ -1,5 +1,6 @@
-import Curves "../../motoko-bitcoin/src/ec/Curves";
 import Nat64 "mo:base/Nat64";
+
+import Curves "../../motoko-bitcoin/src/ec/Curves";
 
 module Types {
     public type SendRequest = {

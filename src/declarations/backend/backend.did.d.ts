@@ -1,6 +1,5 @@
 import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
-import type { IDL } from '@dfinity/candid';
 
 export interface BasicBitcoin {
   'get_balance' : ActorMethod<[BitcoinAddress], Satoshi__1>,
@@ -37,4 +36,3 @@ export interface Utxo {
   'outpoint' : OutPoint,
 }
 export interface _SERVICE extends BasicBitcoin {}
-export declare const idlFactory: IDL.InterfaceFactory;

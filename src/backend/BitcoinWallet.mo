@@ -8,27 +8,26 @@
 //! * Caching spent UTXOs so that they are not reused in future transactions.
 //! * Option to set the fee.
 
-import Debug "mo:base/Debug";
 import Array "mo:base/Array";
-import Nat8 "mo:base/Nat8";
+import Blob "mo:base/Blob";
+import Debug "mo:base/Debug";
+import Iter "mo:base/Iter";
 import Nat32 "mo:base/Nat32";
 import Nat64 "mo:base/Nat64";
-import Iter "mo:base/Iter";
-import Blob "mo:base/Blob";
+import Nat8 "mo:base/Nat8";
 
-import EcdsaTypes "../../motoko-bitcoin/src/ecdsa/Types";
-import P2pkh "../../motoko-bitcoin/src/bitcoin/P2pkh";
-import Bitcoin "../../motoko-bitcoin/src/bitcoin/Bitcoin";
 import Address "../../motoko-bitcoin/src/bitcoin/Address";
-import Transaction "../../motoko-bitcoin/src/bitcoin/Transaction";
+import Bitcoin "../../motoko-bitcoin/src/bitcoin/Bitcoin";
+import P2pkh "../../motoko-bitcoin/src/bitcoin/P2pkh";
 import Script "../../motoko-bitcoin/src/bitcoin/Script";
-import Publickey "../../motoko-bitcoin/src/ecdsa/Publickey";
-import Der "../../motoko-bitcoin/src/ecdsa/Der";
+import Transaction "../../motoko-bitcoin/src/bitcoin/Transaction";
 import Affine "../../motoko-bitcoin/src/ec/Affine";
-
+import Der "../../motoko-bitcoin/src/ecdsa/Der";
+import Publickey "../../motoko-bitcoin/src/ecdsa/Publickey";
+import EcdsaTypes "../../motoko-bitcoin/src/ecdsa/Types";
 import Types "../commons/Types";
-import EcdsaApi "EcdsaApi";
 import BitcoinApi "BitcoinApi";
+import EcdsaApi "EcdsaApi";
 import Utils "Utils";
 
 module {
