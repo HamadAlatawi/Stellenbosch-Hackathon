@@ -52,6 +52,13 @@ module Types {
         #regtest;
     };
 
+    public type TransactionDetails = {
+        senderAddress : BitcoinAddress;
+        recipientAddress : BitcoinAddress;
+        amount: Satoshi;
+        confirmation : Nat;
+    };
+
     /// The type of Bitcoin network as defined by the Bitcoin Motoko library
     /// (Note the difference in casing compared to `Network`)
     public type NetworkCamelCase = {

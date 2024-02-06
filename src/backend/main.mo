@@ -1,4 +1,7 @@
 import Text "mo:base/Text";
+import Blob "mo:base/Blob";
+import Nat8 "mo:base/Nat8";
+
 
 import BitcoinWallet "BitcoinWallet";
 import BitcoinApi "BitcoinApi";
@@ -12,6 +15,7 @@ actor class BasicBitcoin(_network : Types.Network) {
   type Network = Types.Network;
   type BitcoinAddress = Types.BitcoinAddress;
   type Satoshi = Types.Satoshi;
+  type TransactionDetails = Types.TransactionDetails;
 
   // The Bitcoin network to connect to.
   //
@@ -57,5 +61,56 @@ actor class BasicBitcoin(_network : Types.Network) {
   public func send(request : SendRequest) : async Text {
     Utils.bytesToText(await BitcoinWallet.send(NETWORK, DERIVATION_PATH, KEY_NAME, request.destination_address, request.amount_in_satoshi))
   };
-};
 
+  // Method to retrieve and process transaction details TODO run using Motoko Timer
+  public func processTransaction(transactionId : Text, network: Types.Network) : async Types.TransactionDetails {
+      let transactionDetails = await getTransactionDetails(transactionId, network);
+      let processedTransaction = await parseTransactionDetails(transactionDetails);
+      //updateTransactionObject(processedTransaction);
+      return processedTransaction;
+  };
+
+  // Function to fetch transaction details from the Bitcoin network using the canisters address.
+  private func getTransactionDetails(transactionId : Text, network: Types.Network) : async Types.GetUtxosResponse {
+      let address = await get_p2pkh_address();
+      let transactionDetails = await get_utxos(address);
+      return transactionDetails;
+  };
+
+  private func parseTransactionDetails(utxosResponse : Types.GetUtxosResponse) : async Types.TransactionDetails {
+      let utxo = utxosResponse.utxos[0];
+      let txidBlob = utxo.outpoint.txid;
+      var txidText = "";
+      for (byte : Nat8 in txidBlob.vals()) {
+          txidText := Text.concat(txidText, Nat8.toText(byte));
+      };
+      let senderAddress = txidText;
+      let recipientAddress = "dummy_recipient_address" : Types.BitcoinAddress;
+      let amount = utxo.value;
+      let confirmations = 1;
+      return {
+          senderAddress = senderAddress;
+          recipientAddress = recipientAddress;
+          amount = amount;
+          confirmation = confirmations;
+      };
+  };
+
+  // Function to update the transaction object in the backend database
+  private func updateTransactionObject(transaction : Types.TransactionDetails) : async () {
+      // Update the transaction object in the backend database
+      // Implement your database logic here
+  };
+
+  // Function to find transaction details corresponding to the given transaction ID
+  private func findTransactionDetails(transactionId : Text, utxos : Text) : Types.TransactionDetails {
+      // Implement logic to find the transaction details from the list of UTXOs
+      // For simplicity, returning a dummy transaction details object here
+      return {
+          senderAddress = "Sender Address";
+          recipientAddress = "dummy_recipient_address";
+          amount = 1000;
+          confirmation = 6;
+      };
+  };
+};
