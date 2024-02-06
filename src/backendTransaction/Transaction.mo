@@ -8,14 +8,15 @@ import Time "mo:base/Time";
 import Types "../commons/Types";
 import MyDateTime "MyDateTime";
 
-actor class Transaction(id : Text, source : Text, amount : Types.Amount, dateTime : MyDateTime.MyDateTime, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) {
-    type MyDateTime = MyDateTime.MyDateTime;
+actor class Transaction(id : Text, source : Text, amount : Types.Amount, dateTime : Types.DateTime, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) {
+    type DateTime = Types.DateTime;
     type Utxo = Types.Utxo;
+    let hourInNanoSecounds : Int = 86400000000000;
 
     var transactionID : Text = id;
     var sourceBTCAddy : Text = source;
     var transactionAmount : Types.Amount = amount;
-    var transactionDateTime : MyDateTime = dateTime;
+    var transactionDateTime : DateTime = dateTime;
     var transactionReceivers : [Types.Reciever] = receivers;
     var transactionEntityID : Nat = entityID;
     var transactionStatus : Types.Status = status;
@@ -24,7 +25,7 @@ actor class Transaction(id : Text, source : Text, amount : Types.Amount, dateTim
         return transactionID;
     };
 
-    public query func getSource() : async Text {
+    public query func getSourceAddress() : async Text {
         return sourceBTCAddy;
     };
 
@@ -32,7 +33,7 @@ actor class Transaction(id : Text, source : Text, amount : Types.Amount, dateTim
         return transactionAmount;
     };
 
-    public query func getDateTime() : async MyDateTime {
+    public query func getDateTime() : async DateTime {
         return transactionDateTime;
     };
 
@@ -56,7 +57,7 @@ actor class Transaction(id : Text, source : Text, amount : Types.Amount, dateTim
         transactionAmount := newAmount;
     };
 
-    public func setDateTime(newDateTime : MyDateTime) : async () {
+    public func setDateTime(newDateTime : DateTime) : async () {
         transactionDateTime := newDateTime;
     };
 
@@ -73,7 +74,7 @@ actor class Transaction(id : Text, source : Text, amount : Types.Amount, dateTim
     };
 
     public func updateTransactionStatus(utxosHeight : Nat32, utxosValue : Types.Satoshi, canisterCurrentBalance : Types.Satoshi, timeOfCheck : Time.Time) : async Types.Status {
-        var aDaySince = await transactionDateTime.didADayPassSince(timeOfCheck);
+        var aDaySince = await didADayPassSince(timeOfCheck);
         var amountInSatoshi = transactionAmount.amountInSatoshi;
         if (canisterCurrentBalance > amountInSatoshi and not aDaySince) {
             var currentHeight = utxosHeight;
@@ -86,5 +87,14 @@ actor class Transaction(id : Text, source : Text, amount : Types.Amount, dateTim
             await setStatus(#rejected);
             return #rejected;
         };
+    };
+
+    public func getTimeElapsed(baseTime : Time.Time) : async Int {
+        return baseTime - transactionDateTime;
+    };
+
+    public func didADayPassSince(baseTime : Time.Time) : async Bool {
+        var difference = await getTimeElapsed(baseTime);
+        difference >= hourInNanoSecounds;
     };
 };

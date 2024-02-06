@@ -15,12 +15,15 @@ import Types "../commons/Types";
 import MyDateTime "MyDateTime";
 import Transaction "Transaction";
 import Transactions "Transactions";
+import Cycles "mo:base/ExperimentalCycles";
+import ExperimentalCycles "mo:base/ExperimentalCycles";
 
 actor class TransactionsMain(address : Types.BitcoinAddress) {
     type BlockHeight = Types.BlockHeight;
     type Transaction = Transaction.Transaction;
     type Utxo = Types.Utxo;
     type Block = Types.Block;
+    type TransactionType = Types.TransactionType;
     stable var transactionArray : [Transaction] = [];
     var transactionBuffer = Buffer.fromArray<Transaction>(transactionArray);
     let canisterBitcoinAddress = address;
@@ -29,7 +32,9 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
     var processedBlocksBuffer = Buffer.fromArray<BlockHeight>(processedBlocksArr);
 
     public func createTransaction(transactionID : Text, source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) : async Transaction {
-        let dateTime = await MyDateTime.MyDateTime();
+        let cycles = Cycles.add(14692307692);
+        let dateTime = Time.now();
+        let cycles2 = Cycles.add(14692307692);
         let trans = await Transaction.Transaction(transactionID, source, amount, dateTime, receivers, entityID, status, lastCanisterBalanceInSatoshi, lastBlockInCanisterHeight);
         return trans;
     };
@@ -43,18 +48,67 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
         return transactionArray;
     };
 
-    public func getTransactionById(id : Text) : async ?Transaction {
+    public func getAllTransactionTypes() : async ?[TransactionType] {
+        var transactions = await getAllTransactions();
+        return await getTransactionTypeListFrom(?transactions);
+    };
+
+    public func getTransactionById(id : Text) : async ?TransactionType {
         let transactionArr = await getAllTransactions();
         for (transaction in transactionArr.vals()) {
             let transactionId = await transaction.getID();
-            if (transactionId == id) {
+            if (Text.compare(id, transactionId) == #equal) {
                 switch (?transaction) {
                     case (null) {};
-                    case (transaction) { return transaction };
+                    case (?transaction) {
+                        var v = await getTransactionTypeFrom(transaction);
+                        return ?v;
+                    };
                 };
             };
         };
         return null;
+    };
+
+    public func getTransactionByEntityId(entityId : Nat) : async ?[Transaction] {
+        let transactionArr = await getAllTransactions();
+        let transactionOfEntity = Buffer.Buffer<Transaction>(0);
+        for (transaction in transactionArr.vals()) {
+            let transactionEntityId = await transaction.getEntityID();
+            if (transactionEntityId == entityId) {
+                transactionOfEntity.add(transaction);
+            };
+        };
+        if (transactionOfEntity.size() == 0) { return null };
+        let transactionOfEntityArray = Buffer.toArray<Transaction>(transactionOfEntity);
+        return ?transactionOfEntityArray;
+    };
+
+    public func getAccumulatedByEntity(entityId : Nat) : async Float {
+        let transactions = switch (await getTransactionByEntityId(entityId)) {
+            case (null) return 0.0;
+            case (?y) y;
+        };
+        var sum : Float = 0.0;
+        for (transaction in transactions.vals()) {
+            let amount = await transaction.getAmount();
+            sum += amount.amountBTC;
+        };
+        return sum;
+    };
+
+    public func getAccumulatedByBeneficiary(benificiary : Types.Beneficiary) : async Float {
+        let transactionArr = await getAllTransactions();
+        var sum : Float = 0.0;
+        for (transaction in transactionArr.vals()) {
+            let receivers = await transaction.getReceivers();
+            for (receiver in receivers.vals()) {
+                if (receiver.benificiary == benificiary) {
+                    sum += receiver.amount.amountBTC;
+                };
+            };
+        };
+        return sum;
     };
 
     public func createAndAddTransaction(transactionID : Text, sourceAddress : Types.BitcoinAddress, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat) : async () {
@@ -127,6 +181,36 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
             };
         };
         return false;
+    };
+
+    public func getTransactionTypeFrom(transaction : Transaction) : async TransactionType {
+        return {
+            transactionID = await transaction.getID();
+            sourceBTCAddy = await transaction.getSourceAddress();
+            transactionAmount = await transaction.getAmount();
+            transactionDateTime = await transaction.getDateTime();
+            transactionReceivers = await transaction.getReceivers();
+            transactionEntityID = await transaction.getEntityID();
+            transactionStatus = await transaction.getStatus();
+        };
+    };
+
+    public func getTransactionTypeListFrom(transactions : ?[Transaction]) : async ?[TransactionType] {
+        switch (transactions) {
+            case (null) { null };
+            case (?transactions) {
+                let transactionTypeBuffer = Buffer.Buffer<TransactionType>(0);
+                for (transaction in transactions.vals()) {
+                    transactionTypeBuffer.add(await getTransactionTypeFrom(transaction));
+                };
+                return ?Buffer.toArray(transactionTypeBuffer);
+            };
+        };
+    };
+
+    public func clearTransactions() {
+        transactionArray := [];
+        transactionBuffer.clear();
     };
     // ignore recurringTimer(#seconds intervalSecondsForTimer, updateTransactionStatus);
 };

@@ -3,6 +3,7 @@ import Buffer "mo:base/Buffer";
 import List "mo:base/List";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
+import Time "mo:base/Time";
 
 import Types "../commons/Types";
 import MyDateTime "MyDateTime";
@@ -14,7 +15,7 @@ actor class Transactions() {
     var transactionBuffer = Buffer.fromArray<Transaction>(transactionArray);
 
     public func createTransaction(transactionID : Text, source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) : async Transaction {
-        let dateTime = await MyDateTime.MyDateTime();
+        let dateTime = Time.now();
         let trans = await Transaction.Transaction(transactionID, source, amount, dateTime, receivers, entityID, status, lastCanisterBalanceInSatoshi, lastBlockInCanisterHeight);
         return trans;
     };
