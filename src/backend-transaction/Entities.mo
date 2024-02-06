@@ -4,6 +4,7 @@ import Nat "mo:base/Nat";
 import Buffer "mo:base/Buffer";
 import Array "mo:base/Array";
 import Types "../commons/Types";
+import Cycles "mo:base/ExperimentalCycles";
 
 actor Entities{
     type Entity=Entity.Entity;
@@ -11,6 +12,7 @@ actor Entities{
     var entityBuffer=Buffer.fromArray<Entity>(entityArray);
     stable var entityID=0;
     public func createEntity(name: Text, category:Types.Category): async Entity{
+        let cycles= Cycles.add(14692307692);
         let ent= await Entity.Entity(entityID,name,category);
         incrementID();
         return ent;
