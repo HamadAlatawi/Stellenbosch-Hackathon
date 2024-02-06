@@ -53,7 +53,7 @@
       on:click={donate}
       builders={[builder]}
       variant="outline"
-      class="mx-5 bg-gray-700 text-white hover:bg-gray-900 hover:text-white font-bold py-2 px-4 rounded"
+      class="mx-5 bg-stone-800 text-white hover:bg-stone-900 hover:text-white font-bold py-2 px-4 rounded"
       >Donate</Button
     >
   </Sheet.Trigger>
@@ -75,58 +75,57 @@
       <h4 class="text-base flex">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
+          viewBox="0 0 320 512"
           class="w-6 h-6 mx-1"
+          ><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path
+            d="M48 32C48 14.3 62.3 0 80 0s32 14.3 32 32V64h32V32c0-17.7 14.3-32 32-32s32 14.3 32 32V64c0 1.5-.1 3.1-.3 4.5C254.1 82.2 288 125.1 288 176c0 24.2-7.7 46.6-20.7 64.9c31.7 19.8 52.7 55 52.7 95.1c0 61.9-50.1 112-112 112v32c0 17.7-14.3 32-32 32s-32-14.3-32-32V448H112v32c0 17.7-14.3 32-32 32s-32-14.3-32-32V448H41.7C18.7 448 0 429.3 0 406.3V288 265.7 224 101.6C0 80.8 16.8 64 37.6 64H48V32zM64 224H176c26.5 0 48-21.5 48-48s-21.5-48-48-48H64v96zm112 64H64v96H208c26.5 0 48-21.5 48-48s-21.5-48-48-48H176z"
+          /></svg
         >
-          <path
-            d="M21 6.375c0 2.692-4.03 4.875-9 4.875S3 9.067 3 6.375 7.03 1.5 12 1.5s9 2.183 9 4.875Z"
-          />
-          <path
-            d="M12 12.75c2.685 0 5.19-.586 7.078-1.609a8.283 8.283 0 0 0 1.897-1.384c.016.121.025.244.025.368C21 12.817 16.97 15 12 15s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.285 8.285 0 0 0 1.897 1.384C6.809 12.164 9.315 12.75 12 12.75Z"
-          />
-          <path
-            d="M12 16.5c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 0 0 1.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 0 0 1.897 1.384C6.809 15.914 9.315 16.5 12 16.5Z"
-          />
-          <path
-            d="M12 20.25c2.685 0 5.19-.586 7.078-1.609a8.282 8.282 0 0 0 1.897-1.384c.016.121.025.244.025.368 0 2.692-4.03 4.875-9 4.875s-9-2.183-9-4.875c0-.124.009-.247.025-.368a8.284 8.284 0 0 0 1.897 1.384C6.809 19.664 9.315 20.25 12 20.25Z"
-          />
-        </svg>
         {entity.raise}
       </h4>
     </div>
 
-    <h4 class="mt-3">Donate Now</h4>
-    <p class="text-xs mb-3">Adjust the slider to choose the percentage of your donation allocated towards supporting the cause</p>
+    <h4 class="mt-10">Donate Now</h4>
+    <p class="text-xs mb-3">
+      Adjust the slider to choose the percentage of your donation allocated
+      towards supporting the cause
+    </p>
 
     <Input
       bind:value={numberInput}
       type="number"
       min="0.001"
       step="0.001"
-      style="padding-left: 32px; margin: 10px auto;"
+      style="padding-left: 32px; margin: 20px auto;"
     />
-    <div class="mt-5 mb-5">
+    <div class="mt-5 mb-5 rounded border-2 p-5">
       {#each sliders as slider, index (index)}
-        <div class="slider-box">
-          <div class="slider-header mb-3">
-            <div class="slider-label">{sliderNames[index]}</div>
-            <div class="slider-info">
-              <span class="slider-percentage"
-                >{calculatePercentage(slider)}</span
+      <div class="text-sm">{sliderNames[index]}</div>
+        <div class="py-5 flex align-center justify-between">
+          <div class="text-sm mb-3">{calculatePercentage(slider)}</div>
+
+          <div class="flex justify-between mb-3 items-center">
+            <span class="text-base flex text-sm">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 320 512"
+                class="w-6 h-6 mx-1"
+                ><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path
+                  d="M48 32C48 14.3 62.3 0 80 0s32 14.3 32 32V64h32V32c0-17.7 14.3-32 32-32s32 14.3 32 32V64c0 1.5-.1 3.1-.3 4.5C254.1 82.2 288 125.1 288 176c0 24.2-7.7 46.6-20.7 64.9c31.7 19.8 52.7 55 52.7 95.1c0 61.9-50.1 112-112 112v32c0 17.7-14.3 32-32 32s-32-14.3-32-32V448H112v32c0 17.7-14.3 32-32 32s-32-14.3-32-32V448H41.7C18.7 448 0 429.3 0 406.3V288 265.7 224 101.6C0 80.8 16.8 64 37.6 64H48V32zM64 224H176c26.5 0 48-21.5 48-48s-21.5-48-48-48H64v96zm112 64H64v96H208c26.5 0 48-21.5 48-48s-21.5-48-48-48H176z"
+                /></svg
               >
-              <span class="slider-amount">{slider.toFixed(4)} BTC</span>
-            </div>
+              {slider.toFixed(8)}
+            </span>
           </div>
-          <Slider
-            value={[slider]}
-            min={0}
-            max={sliderMaxValues[index]}
-            on:change={(event) => updateSliders(index, event.detail)}
-            step={0.001}
-          />
-          <!-- Conditional divider removed for brevity -->
         </div>
+        <Slider
+          value={[slider]}
+          min={0}
+          max={sliderMaxValues[index]}
+          on:change={(event) => updateSliders(index, event.detail)}
+          step={0.001}
+          class="mb-5"
+        />
       {/each}
     </div>
     <Button>Donate</Button>
@@ -138,24 +137,6 @@
     width: 100%; /* Adjust as needed */
     height: auto;
     margin-bottom: 1rem;
-  }
-
-  .slider-box {
-    border: 1px solid #ddd;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-
-  .slider-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-
-  .slider-label {
-    font-weight: bold;
   }
 
   .slider-info {

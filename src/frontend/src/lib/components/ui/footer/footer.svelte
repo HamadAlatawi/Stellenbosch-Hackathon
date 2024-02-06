@@ -7,7 +7,6 @@
   };
   const frontendCanisterId = import.meta.env.VITE_FRONTEND_CANISTER_ID || "";
 
-  export let el: $$Props["el"] = undefined;
   let className: $$Props["class"] = undefined;
   export { className as class };
 
