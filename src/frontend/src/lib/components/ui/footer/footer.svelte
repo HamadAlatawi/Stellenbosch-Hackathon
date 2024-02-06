@@ -14,7 +14,7 @@
 </script>
 
 <footer
-  class={cn("mt-auto flex flex-col gap-2 p-4", className)}
+  class={cn("mt-auto flex flex-col gap-2 p-4 border-0 border-t-8 dark:border-white light:border-black", className)}
   {...$$restProps}
 >
   <div class="flex justify-between items-center flex-col mt-2">

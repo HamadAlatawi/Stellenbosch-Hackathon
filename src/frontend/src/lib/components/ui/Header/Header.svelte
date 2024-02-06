@@ -83,7 +83,7 @@
                 <a href="/?canisterId={frontendCanisterId}" on:click={goHome}>Home &#8594;</a>
                 <a href="/transaction?canisterId={frontendCanisterId}" on:click={Transaction}>Transactions &#8594;</a>
                 <a href="/entity?canisterId={frontendCanisterId}" on:click={Entity} >Entity &#8594;</a>
-                <a href="#" class="cursor-not-allowed pointer-events-auto text-neutral-500" aria-disabled="true">Learn More</a>
+                <a href="#home" class="cursor-not-allowed pointer-events-auto text-neutral-500" aria-disabled="true">Learn More</a>
             </div>
         </div>
         <div>
