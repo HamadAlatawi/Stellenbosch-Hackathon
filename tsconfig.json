@@ -13,7 +13,9 @@
 		"paths": {
 			"$lib":["./src/frontend/src/lib"],
 			"$lib/*":["./src/frontend/src/lib/*"]
-		}
+		},
+		"types": ["node"],
+		"lib": ["es6","esnext.bigint"]
 	}
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//

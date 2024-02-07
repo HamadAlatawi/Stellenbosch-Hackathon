@@ -34,7 +34,6 @@
         goto('/entity?canisterId=' + frontendCanisterId);
         sideNavBar = false;
         document.body.classList.toggle('nav-open', sideNavBar);
-
     }
 
     function Transaction() {
@@ -54,6 +53,16 @@
     function closeNav(){
         sideNavBar = false;
         document.body.classList.toggle('nav-open', sideNavBar);
+    }
+
+    function navigateToPageAndSection(){
+        goto('/?canisterId=' + frontendCanisterId);
+        const section = document.getElementById('impactSection');
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth' });
+        sideNavBar = false;
+        document.body.classList.toggle('nav-open', sideNavBar);
+        }
     }
 </script>
 
@@ -82,7 +91,7 @@
                 <a href="/?canisterId={frontendCanisterId}" on:click={goHome}>Home &#8594;</a>
                 <a href="/transaction?canisterId={frontendCanisterId}" on:click={Transaction}>Transactions &#8594;</a>
                 <a href="/entity?canisterId={frontendCanisterId}" on:click={Entity} >Entity &#8594;</a>
-                <a href="#" class="cursor-not-allowed pointer-events-auto text-neutral-500" aria-disabled="true">Learn More</a>
+                <a href="/?canisterId={frontendCanisterId}#impactSection" on:click={navigateToPageAndSection} class="pointer-events-auto text-neutral-500">Learn More</a>
             </div>
         </div>
         <div>
@@ -101,23 +110,20 @@
             <!-- Links -->
             <div class="!visible mt-2 hidden items-center lg:mt-0 lg:!flex lg:basis-auto" id="navbarSupportedContent2" data-te-collapse-item>
                 <ul class="list-style-none mr-auto flex flex-col pl-0 lg:mt-1 lg:flex-row gap-x-6" data-te-navbar-nav-ref>
-                    <!-- Home link -->
                     <li data-te-nav-item-ref>
                         <a class="active text-lg font-semibold disabled:text-black/30 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400" aria-current="page" href="/?canisterId={frontendCanisterId}" on:click={goHome} data-te-nav-link-ref>Home</a>
                     </li>
                     <Separator orientation="vertical" />
-                    <!-- Transaction link -->
                     <li data-te-nav-item-ref>
                       <a class="p-0 text-lg font-semibold text-stone-500 transition duration-200 hover:text-stone-700 hover:ease-in-out focus:text-stone-700 disabled:text-black/30 motion-reduce:transition-none dark:text-stone-200 dark:hover:text-stone-400 dark:focus:text-stone-400 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400" href="/transaction?canisterId={frontendCanisterId}" on:click={Transaction} data-te-nav-link-ref>Transactions</a>
                     </li>
                     <Separator orientation="vertical" />
-                    <!-- Features link -->
                     <li data-te-nav-item-ref>
                         <a class="p-0 text-lg font-semibold text-stone-500 transition duration-200 hover:text-stone-700 hover:ease-in-out focus:text-stone-700 disabled:text-black/30 motion-reduce:transition-none dark:text-stone-200 dark:hover:text-stone-400 dark:focus:text-stone-400 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400" href="/entity?canisterId={frontendCanisterId}" on:click={Entity} data-te-nav-link-ref>Entity</a>
                     </li>
                     <Separator orientation="vertical" />
                     <li data-te-nav-item-ref>
-                      <a  class="p-0 text-lg font-semibold cursor-not-allowed pointer-events-auto text-neutral-500" aria-disabled="true">Learn More</a>
+                        <a class="p-0 text-lg font-semibold text-stone-500 transition duration-200 hover:text-stone-700 hover:ease-in-out focus:text-stone-700 disabled:text-black/30 motion-reduce:transition-none dark:text-stone-200 dark:hover:text-stone-400 dark:focus:text-stone-400 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400" href="/?canisterId={frontendCanisterId}#impactSection" on:click={navigateToPageAndSection} data-te-nav-link-ref>Learn More</a>
                     </li>
                 </ul>
             </div>
@@ -143,7 +149,7 @@
   
           <Separator orientation="vertical" />
   
-          <Button class="mx-5">Donate</Button>
+          <Button class="mx-5" on:click={Entity}>Donate</Button>
         </div>
   
         <div class="col-span-4 lg:hidden content-end flex justify-end mr-3">

@@ -1,11 +1,13 @@
+import Array "mo:base/Array";
+import Float "mo:base/Float";
+import Int "mo:base/Int";
+import Iter "mo:base/Iter";
+import Nat32 "mo:base/Nat32";
 import Text "mo:base/Text";
-import Blob "mo:base/Blob";
-import Nat8 "mo:base/Nat8";
 
-
-import BitcoinWallet "BitcoinWallet";
+import Types "../commons/Types";
 import BitcoinApi "BitcoinApi";
-import Types "Types";
+import BitcoinWallet "BitcoinWallet";
 import Utils "Utils";
 
 actor class BasicBitcoin(_network : Types.Network) {
@@ -15,7 +17,6 @@ actor class BasicBitcoin(_network : Types.Network) {
   type Network = Types.Network;
   type BitcoinAddress = Types.BitcoinAddress;
   type Satoshi = Types.Satoshi;
-  type TransactionDetails = Types.TransactionDetails;
 
   // The Bitcoin network to connect to.
   //
@@ -32,85 +33,52 @@ actor class BasicBitcoin(_network : Types.Network) {
     // For local development, we use a special test key with dfx.
     case (#regtest) "dfx_test_key";
     // On the IC we're using a test ECDSA key.
-    case _ "test_key_1"
+    case _ "test_key_1";
   };
 
   /// Returns the balance of the given Bitcoin address.
   public func get_balance(address : BitcoinAddress) : async Satoshi {
-    await BitcoinApi.get_balance(NETWORK, address)
+    await BitcoinApi.get_balance(NETWORK, address);
   };
 
   /// Returns the UTXOs of the given Bitcoin address.
   public func get_utxos(address : BitcoinAddress) : async GetUtxosResponse {
-    await BitcoinApi.get_utxos(NETWORK, address)
+    await BitcoinApi.get_utxos(NETWORK, address);
   };
 
   /// Returns the 100 fee percentiles measured in millisatoshi/vbyte.
   /// Percentiles are computed from the last 10,000 transactions (if available).
   public func get_current_fee_percentiles() : async [MillisatoshiPerVByte] {
-    await BitcoinApi.get_current_fee_percentiles(NETWORK)
+    await BitcoinApi.get_current_fee_percentiles(NETWORK);
   };
 
   /// Returns the P2PKH address of this canister at a specific derivation path.
   public func get_p2pkh_address() : async BitcoinAddress {
-    await BitcoinWallet.get_p2pkh_address(NETWORK, KEY_NAME, DERIVATION_PATH)
+    await BitcoinWallet.get_p2pkh_address(NETWORK, KEY_NAME, DERIVATION_PATH);
   };
 
   /// Sends the given amount of bitcoin from this canister to the given address.
   /// Returns the transaction ID.
   public func send(request : SendRequest) : async Text {
-    Utils.bytesToText(await BitcoinWallet.send(NETWORK, DERIVATION_PATH, KEY_NAME, request.destination_address, request.amount_in_satoshi))
+    Utils.bytesToText(await BitcoinWallet.send(NETWORK, DERIVATION_PATH, KEY_NAME, request.destination_address, request.amount_in_satoshi));
   };
 
-  // Method to retrieve and process transaction details TODO run using Motoko Timer
-  public func processTransaction(transactionId : Text, network: Types.Network) : async Types.TransactionDetails {
-      let transactionDetails = await getTransactionDetails(transactionId, network);
-      let processedTransaction = await parseTransactionDetails(transactionDetails);
-      //updateTransactionObject(processedTransaction);
-      return processedTransaction;
-  };
-
-  // Function to fetch transaction details from the Bitcoin network using the canisters address.
-  private func getTransactionDetails(transactionId : Text, network: Types.Network) : async Types.GetUtxosResponse {
-      let address = await get_p2pkh_address();
-      let transactionDetails = await get_utxos(address);
-      return transactionDetails;
-  };
-
-  private func parseTransactionDetails(utxosResponse : Types.GetUtxosResponse) : async Types.TransactionDetails {
-      let utxo = utxosResponse.utxos[0];
-      let txidBlob = utxo.outpoint.txid;
-      var txidText = "";
-      for (byte : Nat8 in txidBlob.vals()) {
-          txidText := Text.concat(txidText, Nat8.toText(byte));
+  public func get_last_utxo_block_height(address : Types.BitcoinAddress) : async Nat32 {
+    let utxosRes = await get_utxos(address);
+    let utxos = utxosRes.utxos;
+    var lastHeight : Nat32 = 0;
+    for (utxo in utxos.vals()) {
+      var height = utxo.height;
+      if (height > lastHeight) {
+        lastHeight := utxo.height;
       };
-      let senderAddress = txidText;
-      let recipientAddress = "dummy_recipient_address" : Types.BitcoinAddress;
-      let amount = utxo.value;
-      let confirmations = 1;
-      return {
-          senderAddress = senderAddress;
-          recipientAddress = recipientAddress;
-          amount = amount;
-          confirmation = confirmations;
-      };
+    };
+    return lastHeight;
   };
 
-  // Function to update the transaction object in the backend database
-  private func updateTransactionObject(transaction : Types.TransactionDetails) : async () {
-      // Update the transaction object in the backend database
-      // Implement your database logic here
-  };
-
-  // Function to find transaction details corresponding to the given transaction ID
-  private func findTransactionDetails(transactionId : Text, utxos : Text) : Types.TransactionDetails {
-      // Implement logic to find the transaction details from the list of UTXOs
-      // For simplicity, returning a dummy transaction details object here
-      return {
-          senderAddress = "Sender Address";
-          recipientAddress = "dummy_recipient_address";
-          amount = 1000;
-          confirmation = 6;
-      };
+  public func get_blocks(address : Types.BitcoinAddress) : async [Types.Block] {
+    let utxosRes = await get_utxos(address);
+    let utxos = utxosRes.utxos;
+    let blocks : [Types.Block] = Array.map(utxos, func(x : Types.Utxo) : Types.Block { return { value = x.value; height = x.height } });
   };
 };

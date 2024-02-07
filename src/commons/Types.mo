@@ -1,3 +1,6 @@
+import Nat64 "mo:base/Nat64";
+import Time "mo:base/Time";
+
 import Curves "../../motoko-bitcoin/src/ec/Curves";
 
 module Types {
@@ -44,19 +47,12 @@ module Types {
     public type Page = [Nat8];
 
     public let CURVE = Curves.secp256k1;
-    
+
     /// The type of Bitcoin network the dapp will be interacting with.
     public type Network = {
         #mainnet;
         #testnet;
         #regtest;
-    };
-
-    public type TransactionDetails = {
-        senderAddress : BitcoinAddress;
-        recipientAddress : BitcoinAddress;
-        amount: Satoshi;
-        confirmation : Nat;
     };
 
     /// The type of Bitcoin network as defined by the Bitcoin Motoko library
@@ -67,18 +63,18 @@ module Types {
         #Regtest;
     };
 
-    public func network_to_network_camel_case(network: Network) : NetworkCamelCase {
+    public func network_to_network_camel_case(network : Network) : NetworkCamelCase {
         switch (network) {
             case (#regtest) {
-                #Regtest
+                #Regtest;
             };
             case (#testnet) {
-                #Testnet
+                #Testnet;
             };
             case (#mainnet) {
-                #Mainnet
+                #Mainnet;
             };
-        }
+        };
     };
 
     /// A reference to a transaction output.
@@ -131,4 +127,52 @@ module Types {
         transaction : [Nat8];
         network : Network;
     };
-}
+
+    public type Amount = {
+        amountBTC : Float;
+        amountInSatoshi : Satoshi;
+    };
+
+    public type Beneficiary = {
+        donation : Text
+    };
+
+    public type Reciever = {
+        amount : Amount;
+        percentage : Float;
+        benificiary : Beneficiary;
+    };
+
+    public type Status = {
+        #confirmed;
+        #pending;
+        #rejected;
+    };
+
+    public type Category = {
+        #school;
+        #student;
+    };
+
+    public type BlockHeight = Nat32;
+    public type Block = {
+        value : Satoshi;
+        height : BlockHeight;
+    };
+    public type DateTime = Time.Time;
+    public type TransactionType = {
+        transactionID : Text;
+        sourceBTCAddy : Text;
+        transactionAmount : Amount;
+        transactionDateTime : DateTime;
+        transactionReceivers : [Reciever];
+        transactionEntityID : Nat;
+        transactionStatus : Status;
+    };
+
+    public type EntityType = {
+        id:Nat;
+        name:Text;
+        category:Category;
+    };
+};

@@ -1,8 +1,8 @@
-import Result "mo:base/Result";
 import Debug "mo:base/Debug";
 import Iter "mo:base/Iter";
 import Nat8 "mo:base/Nat8";
 import Prelude "mo:base/Prelude";
+import Result "mo:base/Result";
 import Text "mo:base/Text";
 
 module {
@@ -75,4 +75,3 @@ module {
         Text.join("", Iter.map<Nat8, Text>(Iter.fromArray(bytes), func (n) { nat8ToText(n) }))
     };
 }
-

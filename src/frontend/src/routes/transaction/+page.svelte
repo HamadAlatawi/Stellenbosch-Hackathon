@@ -7,179 +7,33 @@
     import * as Drawer from "$lib/components/ui/drawer";
     import { Input } from "$lib/components/ui/input";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+    import { createActor as createActorBackendTransaction } from '../../../../declarations/backendTransaction';
+
 
     let showSkeleton = true;
     let innerWidth : any;
 
-    let invoices = [
-    { 
-        invoiceNumber: 'INV001', 
-        amount: '$250.00', 
-        date: '01/15/24', 
-        recipient: 'John Doe', 
-        sender: 'Jane Smith', 
-        country: 'USA' 
-    },
-    { 
-        invoiceNumber: 'INV002', 
-        amount: '$150.00', 
-        date: '01/16/24', 
-        recipient: 'Alice Johnson', 
-        sender: 'Bob Brown', 
-        country: 'Canada' 
-    },
-    { 
-        invoiceNumber: 'INV003', 
-        amount: '$350.00', 
-        date: '01/17/24', 
-        recipient: 'Michael Davis', 
-        sender: 'Emily Wilson', 
-        country: 'UK' 
-    },
-    { 
-        invoiceNumber: 'INV004', 
-        amount: '$450.00', 
-        date: '01/18/24', 
-        recipient: 'Samantha Clark', 
-        sender: 'Daniel Taylor', 
-        country: 'Australia' 
-    },
-    { 
-        invoiceNumber: 'INV005', 
-        amount: '$550.00', 
-        date: '01/19/24', 
-        recipient: 'Ethan Martinez', 
-        sender: 'Olivia Brown', 
-        country: 'Germany' 
-    },
-    { 
-        invoiceNumber: 'INV006', 
-        amount: '$200.00', 
-        date: '01/20/24', 
-        recipient: 'Sophia Anderson', 
-        sender: 'Matthew Thompson', 
-        country: 'France' 
-    },
-    { 
-        invoiceNumber: 'INV007', 
-        amount: '$300.00', 
-        date: '01/21/24', 
-        recipient: 'William Rodriguez', 
-        sender: 'Ava White', 
-        country: 'Spain' 
-    },
-    { 
-        invoiceNumber: 'INV008', 
-        amount: '$700.00', 
-        date: '01/22/24', 
-        recipient: 'Emma Harris', 
-        sender: 'James Martin', 
-        country: 'Italy' 
-    },
-    { 
-        invoiceNumber: 'INV009', 
-        amount: '$800.00', 
-        date: '01/23/24', 
-        recipient: 'Noah Garcia', 
-        sender: 'Isabella Garcia', 
-        country: 'Brazil' 
-    },
-    { 
-        invoiceNumber: 'INV010', 
-        amount: '$900.00', 
-        date: '01/24/24', 
-        recipient: 'Mia Moore', 
-        sender: 'Liam Clark', 
-        country: 'China' 
-    },
-    { 
-        invoiceNumber: 'INV011', 
-        amount: '$1000.00', 
-        date: '01/25/24', 
-        recipient: 'Benjamin Jackson', 
-        sender: 'Charlotte Anderson', 
-        country: 'India' 
-    },
-    { 
-        invoiceNumber: 'INV012', 
-        amount: '$1100.00', 
-        date: '01/26/24', 
-        recipient: 'Harper Lee', 
-        sender: 'Elijah Scott', 
-        country: 'Japan' 
-    },
-    { 
-        invoiceNumber: 'INV013', 
-        amount: '$1200.00', 
-        date: '01/27/24', 
-        recipient: 'Amelia Martinez', 
-        sender: 'Logan Green', 
-        country: 'Russia' 
-    },
-    { 
-        invoiceNumber: 'INV014', 
-        amount: '$1300.00', 
-        date: '01/28/24', 
-        recipient: 'Evelyn Walker', 
-        sender: 'Lucas Perez', 
-        country: 'South Africa' 
-    },
-    { 
-        invoiceNumber: 'INV015', 
-        amount: '$1400.00', 
-        date: '01/29/24', 
-        recipient: 'Avery Evans', 
-        sender: 'Zoe King', 
-        country: 'Mexico' 
-    },
-    { 
-        invoiceNumber: 'INV016', 
-        amount: '$1500.00', 
-        date: '01/30/24', 
-        recipient: 'Nora White', 
-        sender: 'Gabriel Rivera', 
-        country: 'Argentina' 
-    },
-    { 
-        invoiceNumber: 'INV017', 
-        amount: '$1600.00', 
-        date: '01/31/24', 
-        recipient: 'Riley Hughes', 
-        sender: 'Madison Scott', 
-        country: 'Netherlands' 
-    },
-    { 
-        invoiceNumber: 'INV018', 
-        amount: '$1700.00', 
-        date: '02/01/24', 
-        recipient: 'Carter Wright', 
-        sender: 'Hannah Nelson', 
-        country: 'Sweden' 
-    },
-    { 
-        invoiceNumber: 'INV019', 
-        amount: '$1800.00', 
-        date: '02/02/24', 
-        recipient: 'Ella Brown', 
-        sender: 'David Turner', 
-        country: 'Switzerland' 
-    },
-    { 
-        invoiceNumber: 'INV020', 
-        amount: '$1900.00', 
-        date: '02/03/24', 
-        recipient: 'Jackson Baker', 
-        sender: 'Victoria Carter', 
-        country: 'Norway' 
-    }
-];
-
     let position = "";
     
-    onMount(() => {
-        setTimeout(() => {
+    let invoiceList: any[] = [];
+
+    onMount(async () => {
+        try {
+			// Canister IDs are automatically expanded to .env config - see vite.config.ts
+			const canisterId = import.meta.env.VITE_BACKENDTRANSACTION_CANISTER_ID;
+
+			// We pass the host instead of using a proxy to support NodeJS >= v17 (ViteJS issue: https://github.com/vitejs/vite/issues/4794)
+			const host = import.meta.env.VITE_HOST;
+
+			// Create an actor to interact with the IC for a particular canister ID
+			const actor = createActorBackendTransaction(canisterId, { agentOptions: { host } });
+
+            invoiceList = await actor.getAllTransactionTypes();
             showSkeleton = false;
-        }, 2000);
+			// Call the IC
+		} catch (err: unknown) {
+			console.error(err);
+		};
     });
 </script>
 
@@ -233,7 +87,7 @@
 </section>
 
 
-<section class="grid grid-cols-12 flex justify-center items-center h-screen w-full mt-10">
+<section class="grid grid-cols-12 flex justify-center items-center w-full my-10">
     {#if showSkeleton}
         <div class="col-span-1"></div>
         <div class="col-span-10">
@@ -247,7 +101,6 @@
                             <Table.Head class="w-1/10">Date</Table.Head>
                             <Table.Head class="w-1/5">Recipient</Table.Head>
                             <Table.Head class="w-1/5">Sender</Table.Head>
-                            <Table.Head class="w-1/10">Country</Table.Head>
                         {/if}
                         <Table.Head class="{innerWidth <= 800 ? 'w-[35%]' : 'w-1/5'} text-right">More Details</Table.Head>
                     </Table.Row>
@@ -267,9 +120,6 @@
                                 </Table.Cell>
                                 <Table.Cell>
                                     <Skeleton class="w-[45%] h-[27px]" />
-                                </Table.Cell>
-                                <Table.Cell>
-                                    <Skeleton class="w-[60%] h-[27px]" />
                                 </Table.Cell>
                                 <Table.Cell>
                                     <Skeleton class="w-[45%] h-[27px]" />
@@ -323,21 +173,20 @@
                             <Table.Head class="w-1/10">Date</Table.Head>
                             <Table.Head class="w-1/5">Recipient</Table.Head>
                             <Table.Head class="w-1/5">Sender</Table.Head>
-                            <Table.Head class="w-1/10">Country</Table.Head>
                         {/if}
                         <Table.Head class="w-1/5 text-right">More Details</Table.Head>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
-                    {#each invoices as invoice}
+                    {#each invoiceList as invoiceArray}
+                        {#each invoiceArray as invoice}
                         <Table.Row>
-                            <Table.Cell class="font-medium">{invoice.invoiceNumber}</Table.Cell>
-                            <Table.Cell>{invoice.amount}</Table.Cell>
+                            <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
+                            <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
                             {#if innerWidth > 800}
-                                <Table.Cell>{invoice.date}</Table.Cell>
-                                <Table.Cell>{invoice.recipient}</Table.Cell>
-                                <Table.Cell>{invoice.sender}</Table.Cell>
-                                <Table.Cell>{invoice.country}</Table.Cell>
+                                <Table.Cell>{new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
+                                <Table.Cell>{invoice.transactionEntityID}</Table.Cell>
+                                <Table.Cell>{invoice.sourceBTCAddy}</Table.Cell>
                             {/if}
                             <Table.Cell class="text-right">
                                 <Drawer.Root>
@@ -347,16 +196,15 @@
                                     <Drawer.Content>
                                       <div class="mx-auto w-full max-w-sm">
                                         <Drawer.Header>
-                                          <Drawer.Title>Transaction: {invoice.invoiceNumber}</Drawer.Title>
-                                          <Drawer.Description>Transaction Status: {invoice.status}</Drawer.Description>
-                                          <Drawer.Description>Transaction Status: {invoice.method}</Drawer.Description>
-                                          <Drawer.Description>Transaction Status: {invoice.amount}</Drawer.Description>
+                                          <Drawer.Title>Transaction: {invoice.transactionID}</Drawer.Title>
+                                          <Drawer.Description>Transaction Status: {invoice.transactionStatus}</Drawer.Description>
+                                          <Drawer.Description>Transaction EntityID: {invoice.transactionEntityID}</Drawer.Description>
+                                          <Drawer.Description>Transaction Amount Satoshi: {invoice.transactionAmount.amountInSatoshi}</Drawer.Description>
+                                          <Drawer.Description>Transaction Amount BTC: {invoice.transactionAmount.amountBTC}</Drawer.Description>
+                                          <Drawer.Description>Sender Address: {invoice.sourceBTCAddy}</Drawer.Description>
+                                          <Drawer.Description>Transaction Date: {new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Drawer.Description>
                                         </Drawer.Header>
-                                        <div class="grid grid-cols-12 p-4 pb-0 w-full">
-                                            <div class="col-span-12 w-full">sdfg2134sdf</div>
-                                        </div>
                                         <Drawer.Footer>
-                                          <Button>Submit</Button>
                                           <Drawer.Close asChild let:builder>
                                             <Button builders={[builder]} variant="outline">Cancel</Button>
                                           </Drawer.Close>
@@ -366,6 +214,7 @@
                                   </Drawer.Root>
                             </Table.Cell>
                         </Table.Row> 
+                        {/each}
                   {/each}
                 </Table.Body>
             </Table.Root>

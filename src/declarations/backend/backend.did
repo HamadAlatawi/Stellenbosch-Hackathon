@@ -4,13 +4,6 @@ type Utxo =
    outpoint: OutPoint;
    value: Satoshi;
  };
-type TransactionDetails = 
- record {
-   amount: Satoshi;
-   confirmation: nat;
-   recipientAddress: BitcoinAddress;
-   senderAddress: BitcoinAddress;
- };
 type SendRequest = 
  record {
    amount_in_satoshi: Satoshi;
@@ -38,16 +31,23 @@ type GetUtxosResponse =
    tip_height: nat32;
    utxos: vec Utxo;
  };
+type BlockHeight = nat32;
 type BlockHash = vec nat8;
+type Block = 
+ record {
+   height: BlockHeight;
+   value: Satoshi;
+ };
 type BitcoinAddress__1 = text;
 type BitcoinAddress = text;
 type BasicBitcoin = 
  service {
-   get_balance: (BitcoinAddress__1) -> (Satoshi__1);
+   get_balance: (BitcoinAddress) -> (Satoshi__1);
+   get_blocks: (BitcoinAddress__1) -> (vec Block);
    get_current_fee_percentiles: () -> (vec MillisatoshiPerVByte);
-   get_p2pkh_address: () -> (BitcoinAddress__1);
-   get_utxos: (BitcoinAddress__1) -> (GetUtxosResponse);
-   processTransaction: (text, Network) -> (TransactionDetails);
+   get_last_utxo_block_height: (BitcoinAddress__1) -> (nat32);
+   get_p2pkh_address: () -> (BitcoinAddress);
+   get_utxos: (BitcoinAddress) -> (GetUtxosResponse);
    send: (SendRequest) -> (text);
  };
 service : (Network) -> BasicBitcoin

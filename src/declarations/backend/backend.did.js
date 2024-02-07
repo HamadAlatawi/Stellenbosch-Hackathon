@@ -4,12 +4,15 @@ export const idlFactory = ({ IDL }) => {
     'regtest' : IDL.Null,
     'testnet' : IDL.Null,
   });
-  const BitcoinAddress__1 = IDL.Text;
+  const BitcoinAddress = IDL.Text;
   const Satoshi__1 = IDL.Nat64;
+  const BitcoinAddress__1 = IDL.Text;
+  const BlockHeight = IDL.Nat32;
+  const Satoshi = IDL.Nat64;
+  const Block = IDL.Record({ 'height' : BlockHeight, 'value' : Satoshi });
   const MillisatoshiPerVByte = IDL.Nat64;
   const Page = IDL.Vec(IDL.Nat8);
   const BlockHash = IDL.Vec(IDL.Nat8);
-  const Satoshi = IDL.Nat64;
   const OutPoint = IDL.Record({
     'txid' : IDL.Vec(IDL.Nat8),
     'vout' : IDL.Nat32,
@@ -25,31 +28,25 @@ export const idlFactory = ({ IDL }) => {
     'tip_block_hash' : BlockHash,
     'utxos' : IDL.Vec(Utxo),
   });
-  const BitcoinAddress = IDL.Text;
-  const TransactionDetails = IDL.Record({
-    'confirmation' : IDL.Nat,
-    'recipientAddress' : BitcoinAddress,
-    'amount' : Satoshi,
-    'senderAddress' : BitcoinAddress,
-  });
   const SendRequest = IDL.Record({
     'destination_address' : IDL.Text,
     'amount_in_satoshi' : Satoshi,
   });
   const BasicBitcoin = IDL.Service({
-    'get_balance' : IDL.Func([BitcoinAddress__1], [Satoshi__1], []),
+    'get_balance' : IDL.Func([BitcoinAddress], [Satoshi__1], []),
+    'get_blocks' : IDL.Func([BitcoinAddress__1], [IDL.Vec(Block)], []),
     'get_current_fee_percentiles' : IDL.Func(
         [],
         [IDL.Vec(MillisatoshiPerVByte)],
         [],
       ),
-    'get_p2pkh_address' : IDL.Func([], [BitcoinAddress__1], []),
-    'get_utxos' : IDL.Func([BitcoinAddress__1], [GetUtxosResponse], []),
-    'processTransaction' : IDL.Func(
-        [IDL.Text, Network],
-        [TransactionDetails],
+    'get_last_utxo_block_height' : IDL.Func(
+        [BitcoinAddress__1],
+        [IDL.Nat32],
         [],
       ),
+    'get_p2pkh_address' : IDL.Func([], [BitcoinAddress], []),
+    'get_utxos' : IDL.Func([BitcoinAddress], [GetUtxosResponse], []),
     'send' : IDL.Func([SendRequest], [IDL.Text], []),
   });
   return BasicBitcoin;

@@ -2,16 +2,19 @@ import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 
 export interface BasicBitcoin {
-  'get_balance' : ActorMethod<[BitcoinAddress__1], Satoshi__1>,
+  'get_balance' : ActorMethod<[BitcoinAddress], Satoshi__1>,
+  'get_blocks' : ActorMethod<[BitcoinAddress__1], Array<Block>>,
   'get_current_fee_percentiles' : ActorMethod<[], BigUint64Array | bigint[]>,
-  'get_p2pkh_address' : ActorMethod<[], BitcoinAddress__1>,
-  'get_utxos' : ActorMethod<[BitcoinAddress__1], GetUtxosResponse>,
-  'processTransaction' : ActorMethod<[string, Network], TransactionDetails>,
+  'get_last_utxo_block_height' : ActorMethod<[BitcoinAddress__1], number>,
+  'get_p2pkh_address' : ActorMethod<[], BitcoinAddress>,
+  'get_utxos' : ActorMethod<[BitcoinAddress], GetUtxosResponse>,
   'send' : ActorMethod<[SendRequest], string>,
 }
 export type BitcoinAddress = string;
 export type BitcoinAddress__1 = string;
+export interface Block { 'height' : BlockHeight, 'value' : Satoshi }
 export type BlockHash = Uint8Array | number[];
+export type BlockHeight = number;
 export interface GetUtxosResponse {
   'next_page' : [] | [Page],
   'tip_height' : number,
@@ -29,12 +32,6 @@ export type Satoshi__1 = bigint;
 export interface SendRequest {
   'destination_address' : string,
   'amount_in_satoshi' : Satoshi,
-}
-export interface TransactionDetails {
-  'confirmation' : bigint,
-  'recipientAddress' : BitcoinAddress,
-  'amount' : Satoshi,
-  'senderAddress' : BitcoinAddress,
 }
 export interface Utxo {
   'height' : number,

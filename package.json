@@ -23,7 +23,9 @@
     "deploy:ic": "dfx deploy --network=ic",
     "generate": "dfx generate && node ./update.types.mjs",
     "startdfx": "dfx start --clean --background",
-    "deploy": "dfx deploy backend --argument '(variant { regtest })' && dfx deploy frontend"
+    "deploy": "dfx deploy backend --argument '(variant { regtest })' && dfx deploy frontend",
+    "deployTransactionCanister": "dfx deploy backendTransaction --argument '(\"mkcCrvHP6MudTdux1vNCFrhoZiu5Ue3pjE\")'",
+    "deployBackend": "dfx deploy backend --argument '(variant { regtest })' && dfx deploy backendTransaction --argument '(\"mkcCrvHP6MudTdux1vNCFrhoZiu5Ue3pjE\")'"
   },
   "dependencies": {
     "@dfinity/agent": "^0.19.3",
@@ -35,11 +37,13 @@
     "clsx": "^2.1.0",
     "mode-watcher": "^0.1.2",
     "radix-icons-svelte": "^1.2.1",
+    "svelte-sonner": "^0.3.12",
     "tailwind-merge": "^2.2.1",
     "tailwind-variants": "^0.1.20",
     "vaul-svelte": "^0.1.0"
   },
   "devDependencies": {
+    "@svelte-put/qr": "^1.0.3",
     "@sveltejs/adapter-auto": "^2.0.0",
     "@sveltejs/adapter-static": "^2.0.3",
     "@sveltejs/kit": "^1.27.4",
