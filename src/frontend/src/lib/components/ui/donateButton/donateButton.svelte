@@ -9,6 +9,11 @@
 
   let numberInput = 0.001;
   let sliders = [0, 0, 0, 0];
+  $: percentages = sliders.map(value => {
+    return numberInput > 0
+      ? ((value / numberInput) * 100).toFixed(1) + "%"
+      : "0.0%";
+  });
   let sliderNames = [
     "Backing the Token",
     "Teacher Education and Support",
@@ -32,14 +37,12 @@
       toast("Value exceeds maximum allowed.");
     } else {
       sliders[index] = newValue;
+      numberInput > 0
+      ? percentages[index] = ((value / numberInput) * 100).toFixed(1) + "%"
+      : percentages[index] = 0.0 + "%";
     }
   }
 
-  const calculatePercentage = (value: number) => {
-    return numberInput > 0
-      ? ((value / numberInput) * 100).toFixed(1) + "%"
-      : "0%";
-  };
 </script>
 
 <Sheet.Root>
@@ -100,7 +103,7 @@
         <div class="border-0 border-b-2 border-white mb-5 light:border-black">
           <div class="text-sm">{sliderNames[index]}</div>
           <div class="pt-5 flex align-center justify-between">
-            <div class="text-sm mb-3">{calculatePercentage(slider)}</div>
+            <div class="text-sm mb-3">{percentages[index]}</div>
 
             <div class="flex justify-between mb-3 items-center">
               <span
