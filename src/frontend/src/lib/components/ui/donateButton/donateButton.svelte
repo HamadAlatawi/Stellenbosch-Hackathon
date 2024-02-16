@@ -6,6 +6,7 @@
   import { toast } from "svelte-sonner";
   import { Reload } from "radix-icons-svelte";
   import { qr } from '@svelte-put/qr/svg';
+  import Bitcoin from '$lib/images/Bitcoin.webp'
   import { createActor as createActorBackend } from '../../../../../../declarations/backend';
   import { createActor as createActorBackendTransaction } from '../../../../../../declarations/backendTransaction';
 
@@ -278,6 +279,7 @@
             <svg
               use:qr={{
                 data: bitcoinAddy,
+                logo: Bitcoin,
                 shape: 'circle',
               }}
             />

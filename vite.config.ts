@@ -11,7 +11,7 @@ import path from "path";
 // dfx deploy = local
 // dfx deploy --network ic = ic
 const network = process.env.DFX_NETWORK ?? 'local';
-const host = network === 'local' ? 'http://localhost:8000' : 'https://ic0.io';
+const host = network === 'local' ? 'http://localhost:8000' : 'https://icp-api.io';
 
 const readCanisterIds = ({ prefix }: { prefix?: string }): Record<string, string> => {
 	const canisterIdsJsonFile =

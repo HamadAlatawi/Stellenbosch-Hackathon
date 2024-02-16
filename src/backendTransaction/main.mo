@@ -41,7 +41,7 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
 
     public func createTransaction(transactionID : Text, source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) : async Transaction {
         let dateTime = Time.now();
-        let cycles2 = Cycles.add(14692307692);
+        let cycles2 = Cycles.add(200000000000);
         let trans = await Transaction.Transaction(transactionID, source, amount, dateTime, receivers, entityID, status, lastCanisterBalanceInSatoshi, lastBlockInCanisterHeight);
         return trans;
     };
@@ -250,7 +250,7 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
     };
 
     public func createEntity(name : Text, category : Types.Category) : async Entity {
-        let cycles = Cycles.add(14692307692);
+        let cycles = Cycles.add(200000000000);
         let ent = await Entity.Entity(entityID, name, category);
         incrementID();
         return ent;

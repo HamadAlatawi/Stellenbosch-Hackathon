@@ -13,7 +13,7 @@ actor Entities {
     stable var entityID = 0;
     
     public func createEntity(name : Text, category : Types.Category) : async Entity {
-        let cycles = Cycles.add(14692307692);
+        let cycles = Cycles.add(200000000000);
         let ent = await Entity.Entity(entityID, name, category);
         incrementID();
         return ent;

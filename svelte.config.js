@@ -25,6 +25,9 @@ const config = {
 			fallback: 'index.html',
 			precompress: false
 		}),
+		csrf: {
+            checkOrigin: false
+        },
 		files: {
 			assets: filesPath('static'),
 			hooks: {

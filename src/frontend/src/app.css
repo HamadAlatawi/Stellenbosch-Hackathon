@@ -228,10 +228,9 @@ body.nav-open {
   animation: slideIn 0.4s ease forwards;
 }
 
-/* Not sure if this is smooth or not on mobile phones. If it's not smooth turn on else turn off. */
-/* body:not(.nav-open) {
+body:not(.nav-open) {
   animation: slideOut 0.4s ease forwards;
-} */
+}
 
 body.nav-open .nonNav:not(.thisIsNav) {
   overflow: hidden;
