@@ -24,8 +24,9 @@
     "generate": "dfx generate && node ./update.types.mjs",
     "startdfx": "dfx start --clean --background",
     "deploy": "dfx deploy backend --argument '(variant { regtest })' && dfx deploy frontend",
-    "deployTransactionCanister": "dfx deploy backendTransaction --argument '(\"mu4YFimKUYUfFTi6JQ3mCegi5L83MXUNxg\")'",
-    "deployBackend": "dfx deploy backend --argument '(variant { regtest })' && dfx deploy backendTransaction --argument '(\"mkcCrvHP6MudTdux1vNCFrhoZiu5Ue3pjE\")'"
+    "deployTransactionCanister": "dfx deploy backendTransaction --argument '(\"mhSxsK26bfPNYawng9wRY8usSmKomkHUU4\")'",
+    "deployBackend": "dfx deploy backend --argument '(variant { regtest })' && dfx deploy backendTransaction --argument '(\"mhSxsK26bfPNYawng9wRY8usSmKomkHUU4\")'",
+    "startBTC": "./bin/bitcoind -conf=$(pwd)/bitcoin.conf -datadir=$(pwd)/data --port=18444"
   },
   "dependencies": {
     "@dfinity/agent": "^0.19.3",

@@ -39,6 +39,7 @@
     />
   </svelte:head>
   <svelte:window bind:innerWidth />
+  
   <main class="min-h-screen">
     <section class="grid grid-cols-12 flex my-6 md:my-12 lg:my-20 text-center">
         <div class="hidden lg:flex col-span-1"></div>
