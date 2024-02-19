@@ -1,5 +1,6 @@
 import Nat64 "mo:base/Nat64";
 import Time "mo:base/Time";
+import Int "mo:base/Int";
 
 import Curves "../../motoko-bitcoin/src/ec/Curves";
 
@@ -128,13 +129,24 @@ module Types {
         network : Network;
     };
 
+    public type Currency = {
+        #Satoshi;
+        #Bitcoin;
+        #Etheruem;
+    };
+
+    public type GeneralAmount = {
+        currency : Currency;
+        amount : Float;
+    };
+
     public type Amount = {
         amountBTC : Float;
         amountInSatoshi : Satoshi;
     };
 
     public type Beneficiary = {
-        donation : Text
+        donation : Text;
     };
 
     public type Reciever = {
@@ -171,8 +183,30 @@ module Types {
     };
 
     public type EntityType = {
-        id:Nat;
-        name:Text;
-        category:Category;
+        id : Nat;
+        name : Text;
+        category : Category;
+    };
+
+    public type Transaction = {
+        getTransactionId : query () -> async Text;
+        getStatus : query () -> async Types.Status;
+        getAmounts : query () -> async [GeneralAmount];
+        getReceivedTime : query () -> async DateTime;
+        getReceivers : query () -> async [Reciever];
+        getEntityId : query () -> async Nat;
+        getTimeElapsed : DateTime -> async Int;
+        didADayPassSinceTheTransaction : DateTime -> async Bool;
+        confirmTransaction : query () -> async Types.Status;
+    };
+    
+    public type BitcoinTransactionDetails = {
+        transactionId : Text;
+        status : Status;
+        amounts : [GeneralAmount];
+        receivedTime : DateTime;
+        recievers : [Reciever];
+        entityId : Nat;
+        sourceAddress : Text;
     };
 };

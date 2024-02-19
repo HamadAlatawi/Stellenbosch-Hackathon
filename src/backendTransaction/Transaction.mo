@@ -6,7 +6,6 @@ import Nat32 "mo:base/Nat32";
 import Time "mo:base/Time";
 
 import Types "../commons/Types";
-import MyDateTime "MyDateTime";
 
 actor class Transaction(id : Text, source : Text, amount : Types.Amount, dateTime : Types.DateTime, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) {
     type DateTime = Types.DateTime;

@@ -5,7 +5,6 @@ import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Types "../commons/Types";
-import MyDateTime "MyDateTime";
 import Transaction "Transaction";
 
 actor class Transactions() {

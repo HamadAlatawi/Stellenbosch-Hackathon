@@ -10,7 +10,6 @@ import { recurringTimer; setTimer } "mo:base/Timer";
 import Text "mo:base/Text";
 import BitcoinApi "../backend/BitcoinApi";
 import Types "../commons/Types";
-import MyDateTime "MyDateTime";
 import Transaction "Transaction";
 import Transactions "Transactions";
 import Cycles "mo:base/ExperimentalCycles";
@@ -25,6 +24,8 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
     type TransactionType = Types.TransactionType;
     type Entity = Entity.Entity;
     type EntityType = Types.EntityType;
+
+    
     stable var entityID = 0;
     stable var entityArray : [Entity] = [];
     var entityBuffer = Buffer.fromArray<Entity>(entityArray);
@@ -33,11 +34,9 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
     var transactionBuffer = Buffer.fromArray<Transaction>(transactionArray);
 
     let canisterBitcoinAddress = address;
-    let intervalSecondsForTimer = 86400; // Set your desired interval here
+    let intervalSecondsForTimer = 86400;
     stable var processedBlocksArr : [BlockHeight] = [];
     var processedBlocksBuffer = Buffer.fromArray<BlockHeight>(processedBlocksArr);
-    
-    
 
     public func createTransaction(transactionID : Text, source : Text, amount : Types.Amount, receivers : [Types.Reciever], entityID : Nat, status : Types.Status, lastCanisterBalanceInSatoshi : Types.Satoshi, lastBlockInCanisterHeight : Nat32) : async Transaction {
         let dateTime = Time.now();
@@ -74,17 +73,16 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
         return null;
     };
 
-
-
     public func getTransactionTypeById(id : Text) : async ?TransactionType {
         let transaction = await getTransactionById(id);
-        switch(transaction){
-            case (null){return null;};
-            case (?transaction){
-                let transactionType= await getTransactionTypeFrom(transaction);
-                return ?transactionType;}
-        }
-        
+        switch (transaction) {
+            case (null) { return null };
+            case (?transaction) {
+                let transactionType = await getTransactionTypeFrom(transaction);
+                return ?transactionType;
+            };
+        };
+
     };
 
     public func getTransactionsByEntityId(entityId : Nat) : async ?[Transaction] {
@@ -101,11 +99,14 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
         return ?transactionOfEntityArray;
     };
 
-    public func getTransactionTypesByEntityId(id:Nat): async ?[TransactionType]{
-        let arr= await getTransactionsByEntityId(id);
-        switch(arr) {
-            case(null) {return null;};
-            case(?arr) {let typesArr=await getTransactionTypeListFrom(?arr); return typesArr; };
+    public func getTransactionTypesByEntityId(id : Nat) : async ?[TransactionType] {
+        let arr = await getTransactionsByEntityId(id);
+        switch (arr) {
+            case (null) { return null };
+            case (?arr) {
+                let typesArr = await getTransactionTypeListFrom(?arr);
+                return typesArr;
+            };
         };
     };
 
@@ -155,10 +156,10 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
         return Buffer.toArray(buffer);
     };
 
-    public func getTransactionTypeByStatus (status: Types.Status): async ?[TransactionType]{
-        let arr=await getTransactionByStatus(status);
-         let typesArr=await getTransactionTypeListFrom(?arr); 
-         return typesArr; 
+    public func getTransactionTypeByStatus(status : Types.Status) : async ?[TransactionType] {
+        let arr = await getTransactionByStatus(status);
+        let typesArr = await getTransactionTypeListFrom(?arr);
+        return typesArr;
     };
 
     public func updateTransactionStatus() : async () {
@@ -244,9 +245,9 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
         transactionBuffer.clear();
     };
 
-    public func createAndAddEntity(name : Text, category : Types.Category): async () {
-        var entity = await createEntity (name, category);
-        await storeEntity(entity); 
+    public func createAndAddEntity(name : Text, category : Types.Category) : async () {
+        var entity = await createEntity(name, category);
+        await storeEntity(entity);
     };
 
     public func createEntity(name : Text, category : Types.Category) : async Entity {
@@ -278,7 +279,7 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
     };
 
     public func getAllEntitiesTypes() : async ?[EntityType] {
-        let arr=await getAllEntities();
+        let arr = await getAllEntities();
         return await getEntityTypeListFrom(?arr);
     };
 
@@ -296,26 +297,28 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
         return null;
     };
 
-    public func getEntityTypeById(id : Nat): async ?EntityType {
+    public func getEntityTypeById(id : Nat) : async ?EntityType {
         let entity = await getEntityById(id);
         switch (entity) {
-                    case (null) {return null;};
-                    case (?entity) { let entType= await getEntityTypeFrom(entity);
-                                    return ?entType;};
-    }; 
-    };
-
-    public func getEntityTypeFrom(entity: Entity): async EntityType {
-        return{
-            id= await entity.getID();
-            name= await entity.getName();
-            category=await entity.getCategory();
+            case (null) { return null };
+            case (?entity) {
+                let entType = await getEntityTypeFrom(entity);
+                return ?entType;
+            };
         };
     };
 
-    public func getEntityTypeListFrom(entities: ?[Entity]) : async ?[EntityType] {
+    public func getEntityTypeFrom(entity : Entity) : async EntityType {
+        return {
+            id = await entity.getID();
+            name = await entity.getName();
+            category = await entity.getCategory();
+        };
+    };
+
+    public func getEntityTypeListFrom(entities : ?[Entity]) : async ?[EntityType] {
         switch (entities) {
-            case (null) {null};
+            case (null) { null };
             case (?entities) {
                 let entityTypeBuffer = Buffer.Buffer<EntityType>(0);
                 for (entity in entities.vals()) {
@@ -325,10 +328,11 @@ actor class TransactionsMain(address : Types.BitcoinAddress) {
             };
         };
     };
+
     public func clearEntities() {
         entityArray := [];
         entityBuffer.clear();
-    }; 
-    
+    };
+
     // ignore recurringTimer(#seconds intervalSecondsForTimer, updateTransactionStatus);
 };
