@@ -9,6 +9,7 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
     import { createActor as createActorBackendTransaction } from '../../../../declarations/backendTransaction';
     import { Reload } from "radix-icons-svelte";
+    import { sortStore } from '$lib/data/stores/stores';
 
     let actor : any = null;
     let count = 0;
@@ -20,6 +21,7 @@
     let defaultResults = false;
     let SearchResults = false;
     let transactionIDinput = "";
+    let sorted = false;
     
 
 
@@ -56,7 +58,7 @@
             defaultResults = false;
             SearchResults = false;
             showSkeleton = true;
-            invoiceList = [await actor.getTransactionTypeById(transactionID)];
+            invoiceList = await actor.getTransactionTypeById(transactionID);
             showSkeleton = false;
             SearchResults = true;
             console.log(invoiceList)
@@ -68,6 +70,7 @@
 
     const resetResults = async () => {
         try {
+            position = "Filter...";
             defaultResults = false;
             transactionIDinput = "";
             SearchResults = false;
@@ -94,36 +97,71 @@
 		};
     };
 
-    async function handleSorting(sort: string) {
+    async function handleSorting(sort: string, event? : number) {
+        console.log(event)
+        if(typeof event === "undefined"){
+            event = 1;
+        }
+        $sortStore = sort;
+            console.log($sortStore, event)
+        pageChange = true;
         switch (sort) {
             case "ID ASC":
-                // Sorting logic for ID in ascending order
+                $sortStore = "ID ASC";
+                console.log($sortStore)
+                invoiceList = await actor.sortTransactionTypes(event, 20, "ID", true);
+                defaultResults = false;
+                console.log(invoiceList)
                 break;
             case "Amount ASC":
-                // Sorting logic for Amount in ascending order
+                $sortStore = "Amount ASC";
+                console.log($sortStore)
+                invoiceList = await actor.sortTransactionTypes(event, 20, "Amount", true);
+                sorted = true;
                 break;
             case "Recepient ASC":
-                // Sorting logic for Recepient in ascending order
+                $sortStore = "Recepient ASC";
+                console.log($sortStore)
+                invoiceList = await actor.sortTransactionTypes(event, 20, "Recipient", true);
+                sorted = true;
                 break;
             case "Sender ASC":
-                // Sorting logic for Sender in ascending order
+                $sortStore = "Sender ASC";
+                console.log($sortStore)
+                invoiceList = await actor.sortTransactionTypes(event, 20, "Sender", true);
+                sorted = true;
                 break;
             case "ID DESC":
-                // Sorting logic for ID in descending order
+                $sortStore = "ID DESC";
+                console.log($sortStore)
+                invoiceList = await actor.sortTransactionTypes(event, 20, "ID", false);
+                sorted = true;
                 break;
             case "Amount DESC":
-                // Sorting logic for Amount in descending order
+                $sortStore = "Amount DESC";
+                console.log($sortStore)
+                invoiceList = await actor.sortTransactionTypes(event, 20, "Amount", false);
+                sorted = true;
                 break;
             case "Recepient DESC":
-                // Sorting logic for Recepient in descending order
+                $sortStore = "Recepient DESC";
+                console.log($sortStore)
+                invoiceList = await actor.sortTransactionTypes(event, 20, "Recipient", false);
+                sorted = true;
                 break;
             case "Sender DESC":
-                // Sorting logic for Sender in descending order
+                $sortStore = "Sender DESC";
+                console.log($sortStore)
+                invoiceList = await actor.sortTransactionTypes(event, 20, "Sender", false);
+                sorted = true;
                 break;
             default:
                 console.error("Unknown sorting option:", sort);
                 break;
         }
+        currentPage = event;
+        pageChange = false;
+        sorted = true;
     }
 
     
@@ -155,7 +193,13 @@
     <div class="col-span-10 md:col-span-5 flex justify-end">
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild let:builder>
-              <Button class="w-full md:w-[150px]" variant="outline" builders={[builder]}>{position ? position : "Filter..." }</Button>
+                <Button disabled={pageChange || SearchResults} class="w-full md:w-[150px]" variant="{SearchResults ? "ghost" : "outline"}" builders={[builder]}>
+                    {#if !pageChange && !SearchResults}
+                        {position ? position : "Filter..." }
+                    {:else if pageChange && !SearchResults}
+                        <Reload class="h-4 w-4 animate-spin" />
+                    {/if}
+                </Button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content class="w-4/5 md:w-56">
               <DropdownMenu.Label>Filter Ascending</DropdownMenu.Label>
@@ -236,7 +280,7 @@
         <div class="col-span-1"></div>
     {:else}
         {#if defaultResults}
-            {#if invoiceList[0].length > 0}
+            {#if invoiceList.length > 0}
                 <div class="col-span-1"></div>
                 <div class="col-span-10">
                     <Table.Root>
@@ -254,53 +298,51 @@
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
-                            {#each invoiceList as invoiceArray}
-                                {#each invoiceArray as invoice}
-                                <Table.Row>
-                                    <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
-                                    <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
-                                    {#if innerWidth > 800}
-                                        <Table.Cell>{new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
-                                        <Table.Cell>{invoice.transactionReceivers[0].benificiary.donation}</Table.Cell>
-                                        <Table.Cell>{invoice.sourceBTCAddy}</Table.Cell>
-                                    {/if}
-                                    <Table.Cell class="text-right">
-                                        <Drawer.Root>
-                                            <Drawer.Trigger asChild let:builder>
-                                            <Button builders={[builder]} variant="outline" class="h-7">View Details</Button>
-                                            </Drawer.Trigger>
-                                            <Drawer.Content>
-                                            <div class="mx-auto w-full max-w-sm break-all">
-                                                <Drawer.Header>
-                                                <Drawer.Title class="mb-5 leading-7">Transaction: {invoice.transactionID}</Drawer.Title>
-                                                <Drawer.Description>Transaction Status: 
-                                                    {#if 'pending' in invoice.transactionStatus}
-                                                    Pending
-                                                    {:else if 'rejected' in invoice.transactionStatus}
-                                                        Rejected
-                                                    {:else}
-                                                        Confirmed
-                                                    {/if}     
-                                                </Drawer.Description>
-                                                <Drawer.Description>Transaction Recipient: {invoice.transactionReceivers[0].benificiary.donation}</Drawer.Description>
-                                                <Drawer.Description>Transaction EntityID: {invoice.transactionEntityID}</Drawer.Description>
-                                                <Drawer.Description>Transaction Amount Satoshi: {invoice.transactionAmount.amountInSatoshi}</Drawer.Description>
-                                                <Drawer.Description>Transaction Amount BTC: {invoice.transactionAmount.amountBTC}</Drawer.Description>
-                                                <Drawer.Description>Sender Address: {invoice.sourceBTCAddy}</Drawer.Description>
-                                                <Drawer.Description>Transaction Date: {new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Drawer.Description>
-                                                </Drawer.Header>
-                                                <Drawer.Footer>
-                                                <Drawer.Close asChild let:builder>
-                                                    <Button builders={[builder]} variant="outline">Cancel</Button>
-                                                </Drawer.Close>
-                                                </Drawer.Footer>
-                                            </div>
-                                            </Drawer.Content>
-                                        </Drawer.Root>
-                                    </Table.Cell>
-                                </Table.Row> 
-                                {/each}
-                        {/each}
+                            {#each invoiceList as invoice}
+                            <Table.Row>
+                                <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
+                                <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
+                                {#if innerWidth > 800}
+                                    <Table.Cell>{new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
+                                    <Table.Cell>{invoice.transactionReceivers[0].benificiary.donation}</Table.Cell>
+                                    <Table.Cell>{invoice.sourceBTCAddy}</Table.Cell>
+                                {/if}
+                                <Table.Cell class="text-right">
+                                    <Drawer.Root>
+                                        <Drawer.Trigger asChild let:builder>
+                                        <Button builders={[builder]} variant="outline" class="h-7">View Details</Button>
+                                        </Drawer.Trigger>
+                                        <Drawer.Content>
+                                        <div class="mx-auto w-full max-w-sm break-all">
+                                            <Drawer.Header>
+                                            <Drawer.Title class="mb-5 leading-7">Transaction: {invoice.transactionID}</Drawer.Title>
+                                            <Drawer.Description>Transaction Status: 
+                                                {#if 'pending' in invoice.transactionStatus}
+                                                Pending
+                                                {:else if 'rejected' in invoice.transactionStatus}
+                                                    Rejected
+                                                {:else}
+                                                    Confirmed
+                                                {/if}     
+                                            </Drawer.Description>
+                                            <Drawer.Description>Transaction Recipient: {invoice.transactionReceivers[0].benificiary.donation}</Drawer.Description>
+                                            <Drawer.Description>Transaction EntityID: {invoice.transactionEntityID}</Drawer.Description>
+                                            <Drawer.Description>Transaction Amount Satoshi: {invoice.transactionAmount.amountInSatoshi}</Drawer.Description>
+                                            <Drawer.Description>Transaction Amount BTC: {invoice.transactionAmount.amountBTC}</Drawer.Description>
+                                            <Drawer.Description>Sender Address: {invoice.sourceBTCAddy}</Drawer.Description>
+                                            <Drawer.Description>Transaction Date: {new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Drawer.Description>
+                                            </Drawer.Header>
+                                            <Drawer.Footer>
+                                            <Drawer.Close asChild let:builder>
+                                                <Button builders={[builder]} variant="outline">Cancel</Button>
+                                            </Drawer.Close>
+                                            </Drawer.Footer>
+                                        </div>
+                                        </Drawer.Content>
+                                    </Drawer.Root>
+                                </Table.Cell>
+                            </Table.Row> 
+                            {/each}
                         </Table.Body>
                     </Table.Root>
                     <Pagination.Root class="mt-10" count={count} perPage={20} let:pages let:range currentPage={currentPage} onPageChange={defaultPageChange}>
@@ -335,15 +377,15 @@
                     </Pagination.Root>
                 </div>
                 <div class="col-span-1"></div>
-            {:else if invoiceList[0].length <= 0}
+            {:else if invoiceList.length <= 0}
             <div class="col-span-1"></div>
                 <div class="col-span-10">
                     <p>No Results Found.</p>
                 </div>
                 <div class="col-span-1"></div>
             {/if}
-        {:else if SearchResults}
-            {#if invoiceList[0].length > 0}
+        {:else if sorted}
+            {#if invoiceList.length > 0}
                 <div class="col-span-1"></div>
                 <div class="col-span-10">
                     <Table.Root>
@@ -361,58 +403,161 @@
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
-                            {#each invoiceList as invoiceArray}
-                                {#each invoiceArray as invoice}
-                                <Table.Row>
-                                    <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
-                                    <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
-                                    {#if innerWidth > 800}
-                                        <Table.Cell>{new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
-                                        <Table.Cell>{invoice.transactionReceivers[0].benificiary.donation}</Table.Cell>
-                                        <Table.Cell>{invoice.sourceBTCAddy}</Table.Cell>
+                            {#each invoiceList as invoice}
+                            <Table.Row>
+                                <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
+                                <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
+                                {#if innerWidth > 800}
+                                    <Table.Cell>{new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
+                                    <Table.Cell>{invoice.transactionReceivers[0].benificiary.donation}</Table.Cell>
+                                    <Table.Cell>{invoice.sourceBTCAddy}</Table.Cell>
+                                {/if}
+                                <Table.Cell class="text-right">
+                                    <Drawer.Root>
+                                        <Drawer.Trigger asChild let:builder>
+                                        <Button builders={[builder]} variant="outline" class="h-7">View Details</Button>
+                                        </Drawer.Trigger>
+                                        <Drawer.Content>
+                                        <div class="mx-auto w-full max-w-sm break-all">
+                                            <Drawer.Header>
+                                            <Drawer.Title class="mb-5 leading-7">Transaction: {invoice.transactionID}</Drawer.Title>
+                                            <Drawer.Description>Transaction Status: 
+                                                {#if 'pending' in invoice.transactionStatus}
+                                                Pending
+                                                {:else if 'rejected' in invoice.transactionStatus}
+                                                    Rejected
+                                                {:else}
+                                                    Confirmed
+                                                {/if}     
+                                            </Drawer.Description>
+                                            <Drawer.Description>Transaction Recipient: {invoice.transactionReceivers[0].benificiary.donation}</Drawer.Description>
+                                            <Drawer.Description>Transaction EntityID: {invoice.transactionEntityID}</Drawer.Description>
+                                            <Drawer.Description>Transaction Amount Satoshi: {invoice.transactionAmount.amountInSatoshi}</Drawer.Description>
+                                            <Drawer.Description>Transaction Amount BTC: {invoice.transactionAmount.amountBTC}</Drawer.Description>
+                                            <Drawer.Description>Sender Address: {invoice.sourceBTCAddy}</Drawer.Description>
+                                            <Drawer.Description>Transaction Date: {new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Drawer.Description>
+                                            </Drawer.Header>
+                                            <Drawer.Footer>
+                                            <Drawer.Close asChild let:builder>
+                                                <Button builders={[builder]} variant="outline">Cancel</Button>
+                                            </Drawer.Close>
+                                            </Drawer.Footer>
+                                        </div>
+                                        </Drawer.Content>
+                                    </Drawer.Root>
+                                </Table.Cell>
+                            </Table.Row> 
+                            {/each}
+                        </Table.Body>
+                    </Table.Root>
+                    <Pagination.Root class="mt-10" count={count} perPage={20} let:pages let:range currentPage={currentPage} onPageChange={(event) => handleSorting($sortStore, event)}>
+                        <Pagination.Content>
+                        <Pagination.Item>
+                            <Pagination.PrevButton />
+                        </Pagination.Item>
+                        {#each pages as page (page.key)}
+                            {#if page.type === "ellipsis"}
+                            <Pagination.Item>
+                                <Pagination.Ellipsis />
+                            </Pagination.Item>
+                            {:else}
+                            <Pagination.Item isVisible={currentPage == page.value} >
+                                <Pagination.Link {page} isActive={currentPage == page.value}>
+                                    {#if currentPage == page.value || !pageChange}
+                                        {page.value}
+                                    {:else if pageChange && currentPage != page.value}
+                                        <Reload class="h-4 w-4 animate-spin" />
                                     {/if}
-                                    <Table.Cell class="text-right">
-                                        <Drawer.Root>
-                                            <Drawer.Trigger asChild let:builder>
-                                            <Button builders={[builder]} variant="outline" class="h-7">View Details</Button>
-                                            </Drawer.Trigger>
-                                            <Drawer.Content>
-                                            <div class="mx-auto w-full max-w-sm break-all">
-                                                <Drawer.Header>
-                                                <Drawer.Title class="mb-5 leading-7">Transaction: {invoice.transactionID}</Drawer.Title>
-                                                <Drawer.Description>Transaction Status: 
-                                                    {#if 'pending' in invoice.transactionStatus}
-                                                    Pending
-                                                    {:else if 'rejected' in invoice.transactionStatus}
-                                                        Rejected
-                                                    {:else}
-                                                        Confirmed
-                                                    {/if}     
-                                                </Drawer.Description>                                                
-                                                <Drawer.Description>Transaction Recipient: {invoice.transactionReceivers[0].benificiary.donation}</Drawer.Description>
-                                                <Drawer.Description>Transaction EntityID: {invoice.transactionEntityID}</Drawer.Description>
-                                                <Drawer.Description>Transaction Amount Satoshi: {invoice.transactionAmount.amountInSatoshi}</Drawer.Description>
-                                                <Drawer.Description>Transaction Amount BTC: {invoice.transactionAmount.amountBTC}</Drawer.Description>
-                                                <Drawer.Description>Sender Address: {invoice.sourceBTCAddy}</Drawer.Description>
-                                                <Drawer.Description>Transaction Date: {new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Drawer.Description>
-                                                </Drawer.Header>
-                                                <Drawer.Footer>
-                                                <Drawer.Close asChild let:builder>
-                                                    <Button builders={[builder]} variant="outline">Cancel</Button>
-                                                </Drawer.Close>
-                                                </Drawer.Footer>
-                                            </div>
-                                            </Drawer.Content>
-                                        </Drawer.Root>
-                                    </Table.Cell>
-                                </Table.Row> 
-                                {/each}
+                                </Pagination.Link>
+                            </Pagination.Item>
+                            {/if}
                         {/each}
+                        <Pagination.Item>
+                            <Pagination.NextButton />
+                        </Pagination.Item>
+                        </Pagination.Content>
+                        <p class="text-center text-xs mt-2 text-muted-foreground">
+                            Showing {range.start} - {range.end}
+                        </p>
+                    </Pagination.Root>
+                </div>
+                <div class="col-span-1"></div>
+            {:else if invoiceList.length <= 0}
+            <div class="col-span-1"></div>
+                <div class="col-span-10">
+                    <p>No Results Found.</p>
+                </div>
+                <div class="col-span-1"></div>
+            {/if}
+        {:else if SearchResults}
+            {#if invoiceList.length > 0}
+                <div class="col-span-1"></div>
+                <div class="col-span-10">
+                    <Table.Root>
+                        <Table.Caption>Donation Transaction Explorer</Table.Caption>
+                        <Table.Header>
+                            <Table.Row class="max-[400px]:text-xs max-[500px]:text-md">
+                                <Table.Head class="w-1/10">ID</Table.Head>
+                                <Table.Head class="w-1/10">Amount</Table.Head>
+                                {#if innerWidth > 800}
+                                    <Table.Head class="w-1/10">Date</Table.Head>
+                                    <Table.Head class="w-1/5">Recipient</Table.Head>
+                                    <Table.Head class="w-1/5">Sender</Table.Head>
+                                {/if}
+                                <Table.Head class="w-1/5 text-right">More Details</Table.Head>
+                            </Table.Row>
+                        </Table.Header>
+                        <Table.Body>
+                            {#each invoiceList as invoice}
+                            <Table.Row>
+                                <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
+                                <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
+                                {#if innerWidth > 800}
+                                    <Table.Cell>{new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
+                                    <Table.Cell>{invoice.transactionReceivers[0].benificiary.donation}</Table.Cell>
+                                    <Table.Cell>{invoice.sourceBTCAddy}</Table.Cell>
+                                {/if}
+                                <Table.Cell class="text-right">
+                                    <Drawer.Root>
+                                        <Drawer.Trigger asChild let:builder>
+                                        <Button builders={[builder]} variant="outline" class="h-7">View Details</Button>
+                                        </Drawer.Trigger>
+                                        <Drawer.Content>
+                                        <div class="mx-auto w-full max-w-sm break-all">
+                                            <Drawer.Header>
+                                            <Drawer.Title class="mb-5 leading-7">Transaction: {invoice.transactionID}</Drawer.Title>
+                                            <Drawer.Description>Transaction Status: 
+                                                {#if 'pending' in invoice.transactionStatus}
+                                                Pending
+                                                {:else if 'rejected' in invoice.transactionStatus}
+                                                    Rejected
+                                                {:else}
+                                                    Confirmed
+                                                {/if}     
+                                            </Drawer.Description>                                                
+                                            <Drawer.Description>Transaction Recipient: {invoice.transactionReceivers[0].benificiary.donation}</Drawer.Description>
+                                            <Drawer.Description>Transaction EntityID: {invoice.transactionEntityID}</Drawer.Description>
+                                            <Drawer.Description>Transaction Amount Satoshi: {invoice.transactionAmount.amountInSatoshi}</Drawer.Description>
+                                            <Drawer.Description>Transaction Amount BTC: {invoice.transactionAmount.amountBTC}</Drawer.Description>
+                                            <Drawer.Description>Sender Address: {invoice.sourceBTCAddy}</Drawer.Description>
+                                            <Drawer.Description>Transaction Date: {new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Drawer.Description>
+                                            </Drawer.Header>
+                                            <Drawer.Footer>
+                                            <Drawer.Close asChild let:builder>
+                                                <Button builders={[builder]} variant="outline">Cancel</Button>
+                                            </Drawer.Close>
+                                            </Drawer.Footer>
+                                        </div>
+                                        </Drawer.Content>
+                                    </Drawer.Root>
+                                </Table.Cell>
+                            </Table.Row> 
+                            {/each}
                         </Table.Body>
                     </Table.Root>
                 </div>
                 <div class="col-span-1"></div>
-            {:else if invoiceList[0].length <= 0}
+            {:else if invoiceList.length <= 0}
             <div class="col-span-1"></div>
                 <div class="col-span-10">
                     <p>No Results Found.</p>

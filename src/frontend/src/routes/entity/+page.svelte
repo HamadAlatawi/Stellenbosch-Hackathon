@@ -112,38 +112,40 @@
         <div class="col-span-10 flex justify-end">
           {#if viewMode === "card"}
             <div
-              class="mt-6 grid grid-cols-1 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8 mx-5"
+              class="mt-6 grid grid-cols-1 gap-x-6 lg:grid-cols-2 xl:grid-cols-4 xl:gap-x-8 mx-5"
             >
             {#each filteredEntities as entity}
             <div
-              class="group relative max-w-md mx-auto bg-stone-900 rounded-xl shadow-lg overflow-hidden md:max-w-2xl my-10 border-8 border-stone-900 dark:border-stone-900"
+              class="group relative max-w-md mx-auto bg-stone-900 dark:bg-transparent rounded-xl shadow-lg overflow-hidden md:max-w-2xl my-10 border-4 border-stone-900 dark:border-stone-100 p-4"
             >
+            <div class="px-2 mt-4 flex justify-between flex-col">
+              <div class="mb-3">
+                <div class="flex justify-between mb-2">
+                  <h3 class="text-stone-100 font-semibold">
+                    {entity.name}
+                  </h3>
+                  <h4 class="text-stone-100 flex font-semibold">
+                    <svg width="22" height="22" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M69.4498 101.067C96.1161 101.066 96.1191 63.7353 69.4519 63.7313M69.4498 101.067L37.4594 101.065M69.4498 101.067L69.457 111.734M48.1204 63.7342L69.4572 63.7304C96.1244 63.7344 96.1265 26.3988 69.455 26.401L37.4541 26.4005M69.4497 26.4019L69.4531 15.7326M48.114 111.734L48.1153 15.7311" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  {entity.raise}
+                </h4>
+                </div>
+              </div>
+            </div>
               <div
                 class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-lg bg-stone-200 group-hover:opacity-75"
               >
                 <img
-                  src={entity.image ||
-                    "https://www.google.com/url?sa=i&url=https%3A%2F%2Fstock.adobe.com%2Fsearch%3Fk%3Dperson&psig=AOvVaw08AqwGaHwVbtOKCkCxYa38&ust=1707054467295000&source=images&cd=vfe&opi=89978449&ved=0CBMQjRxqFwoTCKjn0Munj4QDFQAAAAAdAAAAABAE"}
+                  src={entity.image}
                   alt={entity.name}
-                  class="h-full w-full object-cover object-center transition-transform duration-300 ease-in-out transform hover:scale-110"
+                  class="h-full w-full object-cover object-top transition-transform duration-300 ease-in-out transform hover:scale-110"
                   style="max-height: 30vh"
                 />
               </div>
-              <div class="mt-4 flex justify-between p-4 flex-col">
+              <div class="mt-4 flex justify-between px-2 py-4 flex-col">
                 <div class="mb-3">
-                  <div class="flex justify-between mb-3">
-                    <h3 class="text-stone-300">
-                      {entity.name}
-                    </h3>
-                    <h4 class="text-stone-300 flex">
-                        <svg width="22" height="22" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M69.4498 101.067C96.1161 101.066 96.1191 63.7353 69.4519 63.7313M69.4498 101.067L37.4594 101.065M69.4498 101.067L69.457 111.734M48.1204 63.7342L69.4572 63.7304C96.1244 63.7344 96.1265 26.3988 69.455 26.401L37.4541 26.4005M69.4497 26.4019L69.4531 15.7326M48.114 111.734L48.1153 15.7311" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      {entity.raise}
-                    </h4>
-                  </div>
-  
-                  <p class="mt-1 text-sm text-stone-100">
+                  <p class="mt-1 text-sm text-stone-100 font-medium">
                     {entity.story.length > 100
                       ? entity.story.substring(0, 147) + "..."
                       : entity.story}

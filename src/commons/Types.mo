@@ -160,6 +160,7 @@ module Types {
         height : BlockHeight;
     };
     public type DateTime = Time.Time;
+    
     public type TransactionType = {
         transactionID : Text;
         sourceBTCAddy : Text;

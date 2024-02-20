@@ -194,7 +194,7 @@
     <Button
       builders={[builder]}
       variant="outline"
-      class="mx-5 bg-stone-800 text-white hover:bg-stone-900 hover:text-white font-bold py-2 px-4 rounded"
+      class="mx-5 text-white bg-transparent hover:bg-stone-100 hover:text-black font-bold py-2 px-4 rounded"
       >Donate</Button
     >
   </Sheet.Trigger>

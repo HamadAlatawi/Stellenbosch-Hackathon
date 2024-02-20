@@ -64,7 +64,7 @@
 		},
 		{
 			"id": 3,
-			"name": "Golden Sunrise Academy",
+			"name": "Golden Sunrise",
 			"raise": 0.40058974,
 			"image": School2,
 			"story": "Golden Sunrise Academy offers education to children from low-income families in Dhaka, Bangladesh. The school lacks proper sanitation facilities and needs funds for classroom expansion and teacher training to enhance the quality of education."
