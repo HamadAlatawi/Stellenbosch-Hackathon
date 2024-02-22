@@ -7,7 +7,7 @@
 
 	let className: $$Props["class"] = undefined;
 	export let count: $$Props["count"] = 0;
-	export let perPage: $$Props["perPage"] = 10;
+	export let perPage: $$Props["perPage"] = 20;
 	export let page: $$Props["page"] = 1;
 	export let siblingCount: $$Props["siblingCount"] = 1;
 

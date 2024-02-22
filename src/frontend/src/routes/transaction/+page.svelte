@@ -8,7 +8,7 @@
     import { Input } from "$lib/components/ui/input";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
     import { createActor as createActorBackendTransaction } from '../../../../declarations/backendTransaction';
-    import { Reload } from "radix-icons-svelte";
+    import { Reload, ChevronDown, ChevronUp } from "radix-icons-svelte";
     import { sortStore } from '$lib/data/stores/stores';
 
     let actor : any = null;
@@ -117,42 +117,49 @@
                 $sortStore = "Amount ASC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "Amount", true);
+                defaultResults = false;
                 sorted = true;
                 break;
-            case "Recepient ASC":
-                $sortStore = "Recepient ASC";
+            case "Recipient ASC":
+                $sortStore = "Recipient ASC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "Recipient", true);
+                defaultResults = false;
                 sorted = true;
                 break;
             case "Sender ASC":
                 $sortStore = "Sender ASC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "Sender", true);
+                defaultResults = false;
                 sorted = true;
                 break;
             case "ID DESC":
                 $sortStore = "ID DESC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "ID", false);
+                defaultResults = false;
                 sorted = true;
                 break;
             case "Amount DESC":
                 $sortStore = "Amount DESC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "Amount", false);
+                defaultResults = false;
                 sorted = true;
                 break;
-            case "Recepient DESC":
-                $sortStore = "Recepient DESC";
+            case "Recipient DESC":
+                $sortStore = "Recipient DESC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "Recipient", false);
+                defaultResults = false;
                 sorted = true;
                 break;
             case "Sender DESC":
                 $sortStore = "Sender DESC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "Sender", false);
+                defaultResults = false;
                 sorted = true;
                 break;
             default:
@@ -184,7 +191,7 @@
     <div class="col-span-1"></div>
     <div class="col-span-10 mb-10 md:mb-0 md:col-span-5 flex items-center space-x-2 md:max-w-sm">
         <form class="flex w-full md:w-full items-center space-x-2">
-            <Input type="text" placeholder="Search for Recepient" bind:value={transactionIDinput} />
+            <Input type="text" placeholder="Search for Recipient" bind:value={transactionIDinput} />
             <Button type="submit" disabled={showSkeleton} on:click="{()=> getTransaction(transactionIDinput)}">Search</Button>
         </form>
     </div>
@@ -207,13 +214,13 @@
               <DropdownMenu.RadioGroup bind:value={position} class="mb-1">
                 <DropdownMenu.RadioItem value="ID Asc..." on:click={() => handleSorting("ID ASC")}>ID</DropdownMenu.RadioItem>
                 <DropdownMenu.RadioItem value="Amount Asc..." on:click={() => handleSorting("Amount ASC")}>Amount</DropdownMenu.RadioItem>
-                <DropdownMenu.RadioItem value="Recepient Asc..." on:click={() => handleSorting("Recepient ASC")}>Recepient</DropdownMenu.RadioItem>
+                <DropdownMenu.RadioItem value="Recipient Asc..." on:click={() => handleSorting("Recipient ASC")}>Recipient</DropdownMenu.RadioItem>
                 <DropdownMenu.RadioItem value="Sender Asc..." on:click={() => handleSorting("Sender ASC")}>Sender</DropdownMenu.RadioItem>
                 <DropdownMenu.Separator />
                 <DropdownMenu.Label>Filter Descending</DropdownMenu.Label>
                 <DropdownMenu.RadioItem value="ID Desc..." on:click={() => handleSorting("ID DESC")}>ID</DropdownMenu.RadioItem>
                 <DropdownMenu.RadioItem value="Amount Desc..." on:click={() => handleSorting("Amount DESC")}>Amount</DropdownMenu.RadioItem>
-                <DropdownMenu.RadioItem value="Recepient Desc..." on:click={() => handleSorting("Recepient DESC")}>Recepient</DropdownMenu.RadioItem>
+                <DropdownMenu.RadioItem value="Recipient Desc..." on:click={() => handleSorting("Recipient DESC")}>Recipient</DropdownMenu.RadioItem>
                 <DropdownMenu.RadioItem value="Sender Desc..." on:click={() => handleSorting("Sender DESC")}>Sender</DropdownMenu.RadioItem>
               </DropdownMenu.RadioGroup>
             </DropdownMenu.Content>
@@ -345,36 +352,38 @@
                             {/each}
                         </Table.Body>
                     </Table.Root>
-                    <Pagination.Root class="mt-10" count={count} perPage={20} let:pages let:range currentPage={currentPage} onPageChange={defaultPageChange}>
-                        <Pagination.Content>
-                        <Pagination.Item>
-                            <Pagination.PrevButton />
-                        </Pagination.Item>
-                        {#each pages as page (page.key)}
-                            {#if page.type === "ellipsis"}
+                    {#if !SearchResults}
+                        <Pagination.Root class="mt-10" count={count} perPage={20} let:pages let:range currentPage={currentPage} onPageChange={defaultPageChange}>
+                            <Pagination.Content>
                             <Pagination.Item>
-                                <Pagination.Ellipsis />
+                                <Pagination.PrevButton />
                             </Pagination.Item>
-                            {:else}
-                            <Pagination.Item isVisible={currentPage == page.value}>
-                                <Pagination.Link {page} isActive={currentPage == page.value}>
-                                    {#if currentPage == page.value || !pageChange}
-                                        {page.value}
-                                    {:else if pageChange && currentPage != page.value}
-                                        <Reload class="h-4 w-4 animate-spin" />
-                                    {/if}
-                                </Pagination.Link>
+                            {#each pages as page (page.key)}
+                                {#if page.type === "ellipsis"}
+                                <Pagination.Item>
+                                    <Pagination.Ellipsis />
+                                </Pagination.Item>
+                                {:else}
+                                <Pagination.Item isVisible={currentPage == page.value}>
+                                    <Pagination.Link {page} isActive={currentPage == page.value}>
+                                        {#if currentPage == page.value || !pageChange}
+                                            {page.value}
+                                        {:else if (pageChange && currentPage != page.value) ||(pageChange && currentPage > page.value+1) ||(pageChange && currentPage < page.value+1)}
+                                            <Reload class="h-4 w-4 animate-spin" />
+                                        {/if}
+                                    </Pagination.Link>
+                                </Pagination.Item>
+                                {/if}
+                            {/each}
+                            <Pagination.Item>
+                                <Pagination.NextButton />
                             </Pagination.Item>
-                            {/if}
-                        {/each}
-                        <Pagination.Item>
-                            <Pagination.NextButton />
-                        </Pagination.Item>
-                        </Pagination.Content>
-                        <p class="text-center text-xs mt-2 text-muted-foreground">
-                            Showing {range.start} - {range.end}
-                        </p>
-                    </Pagination.Root>
+                            </Pagination.Content>
+                            <p class="text-center text-xs mt-2 text-muted-foreground">
+                                Showing {range.start} - {range.end}
+                            </p>
+                        </Pagination.Root>
+                    {/if}
                 </div>
                 <div class="col-span-1"></div>
             {:else if invoiceList.length <= 0}
@@ -392,14 +401,38 @@
                         <Table.Caption>Donation Transaction Explorer</Table.Caption>
                         <Table.Header>
                             <Table.Row class="max-[400px]:text-xs max-[500px]:text-md">
-                                <Table.Head class="w-1/10">ID</Table.Head>
-                                <Table.Head class="w-1/10">Amount</Table.Head>
-                                {#if innerWidth > 800}
-                                    <Table.Head class="w-1/10">Date</Table.Head>
-                                    <Table.Head class="w-1/5">Recipient</Table.Head>
-                                    <Table.Head class="w-1/5">Sender</Table.Head>
+                                {#if $sortStore == "ID ASC"}
+                                    <Table.Head class=" flex items-center bg-stone-100">ID <ChevronUp /> </Table.Head>
+                                {:else if $sortStore == "ID DESC"}
+                                    <Table.Head class=" flex items-center bg-stone-100">ID <ChevronDown/> </Table.Head>
+                                {:else}
+                                    <Table.Head class="">ID</Table.Head>
                                 {/if}
-                                <Table.Head class="w-1/5 text-right">More Details</Table.Head>
+                                {#if $sortStore == "Amount ASC"}
+                                    <Table.Head class=" flex items-center bg-stone-100">Amount <ChevronUp /> </Table.Head>
+                                {:else if $sortStore == "Amount DESC"}
+                                    <Table.Head class=" flex items-center bg-stone-100">Amount <ChevronDown/></Table.Head>
+                                {:else}
+                                    <Table.Head class="">Amount</Table.Head>
+                                {/if}
+                                {#if innerWidth > 800}
+                                    <Table.Head class="">Date</Table.Head>
+                                    {#if $sortStore == "Recipient ASC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">Recipient <ChevronUp /></Table.Head>
+                                    {:else if $sortStore == "Recipient DESC"}
+                                        <Table.Head class="flex items-center bg-stone-100">Recipient <ChevronDown/></Table.Head>
+                                    {:else}
+                                        <Table.Head class="">Recipient</Table.Head>
+                                    {/if}
+                                    {#if $sortStore == "Sender ASC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">Sender <ChevronUp /></Table.Head>
+                                    {:else if $sortStore == "Sender DESC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">Sender <ChevronDown/></Table.Head>
+                                    {:else}
+                                        <Table.Head class="">Sender</Table.Head>
+                                    {/if}
+                                {/if}
+                                <Table.Head class=" text-right">More Details</Table.Head>
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
@@ -450,36 +483,38 @@
                             {/each}
                         </Table.Body>
                     </Table.Root>
-                    <Pagination.Root class="mt-10" count={count} perPage={20} let:pages let:range currentPage={currentPage} onPageChange={(event) => handleSorting($sortStore, event)}>
-                        <Pagination.Content>
-                        <Pagination.Item>
-                            <Pagination.PrevButton />
-                        </Pagination.Item>
-                        {#each pages as page (page.key)}
-                            {#if page.type === "ellipsis"}
+                    {#if !SearchResults}
+                        <Pagination.Root class="mt-10" count={count} perPage={20} let:pages let:range currentPage={currentPage} onPageChange={(event) => handleSorting($sortStore, event)}>
+                            <Pagination.Content>
                             <Pagination.Item>
-                                <Pagination.Ellipsis />
+                                <Pagination.PrevButton />
                             </Pagination.Item>
-                            {:else}
-                            <Pagination.Item isVisible={currentPage == page.value} >
-                                <Pagination.Link {page} isActive={currentPage == page.value}>
-                                    {#if currentPage == page.value || !pageChange}
-                                        {page.value}
-                                    {:else if pageChange && currentPage != page.value}
-                                        <Reload class="h-4 w-4 animate-spin" />
-                                    {/if}
-                                </Pagination.Link>
+                            {#each pages as page (page.key)}
+                                {#if page.type === "ellipsis"}
+                                <Pagination.Item>
+                                    <Pagination.Ellipsis />
+                                </Pagination.Item>
+                                {:else}
+                                <Pagination.Item isVisible={currentPage == page.value} >
+                                    <Pagination.Link {page} isActive={currentPage == page.value}>
+                                        {#if currentPage == page.value || !pageChange}
+                                            {page.value}
+                                        {:else if pageChange && currentPage != page.value}
+                                            <Reload class="h-4 w-4 animate-spin" />
+                                        {/if}
+                                    </Pagination.Link>
+                                </Pagination.Item>
+                                {/if}
+                            {/each}
+                            <Pagination.Item>
+                                <Pagination.NextButton />
                             </Pagination.Item>
-                            {/if}
-                        {/each}
-                        <Pagination.Item>
-                            <Pagination.NextButton />
-                        </Pagination.Item>
-                        </Pagination.Content>
-                        <p class="text-center text-xs mt-2 text-muted-foreground">
-                            Showing {range.start} - {range.end}
-                        </p>
-                    </Pagination.Root>
+                            </Pagination.Content>
+                            <p class="text-center text-xs mt-2 text-muted-foreground">
+                                Showing {range.start} - {range.end}
+                            </p>
+                        </Pagination.Root>
+                    {/if}
                 </div>
                 <div class="col-span-1"></div>
             {:else if invoiceList.length <= 0}
