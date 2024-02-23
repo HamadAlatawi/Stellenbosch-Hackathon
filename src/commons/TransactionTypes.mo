@@ -1,19 +1,25 @@
 import Float "mo:base/Float";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
+import Int "mo:base/Int";
 
 module TransactionTypes {
     //STATICS
-    public let hourInNanoSecounds : Int = 86400000000000;
+    public let dayInNanoSecounds : Int = 86400000000000;
 
     //FUNCTIONS
-    public func getTimeElapsed(baseTime : DateTime, receivedTime : DateTime) : async Int {
+    public func getTimeElapsed(baseTime : DateTime, receivedTime : DateTime) : Int {
         return baseTime - receivedTime;
     };
 
-    public func didADayPassSince(baseTime : DateTime, receivedTime : DateTime) : async Bool {
-        var difference = await getTimeElapsed(baseTime, receivedTime);
-        difference >= hourInNanoSecounds;
+    public func didADayPassSince(baseTime : DateTime, receivedTime : DateTime) : Bool {
+        var difference = getTimeElapsed(baseTime, receivedTime);
+        difference >= dayInNanoSecounds;
+    };
+
+    public func daysPassedSince(baseTime : DateTime, receivedTime : DateTime) : Int {
+        var difference = getTimeElapsed(baseTime, receivedTime);
+        Int.div(difference, dayInNanoSecounds);
     };
 
     public func findAmountForCurrency(amounts : [Amount], currency : Currency) : Float {
@@ -38,7 +44,7 @@ module TransactionTypes {
     };
 
     public type Reciever = {
-        amount : Amount;
+        amounts : [Amount];
         percentage : Float;
         benificiary : Text;
     };

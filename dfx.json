@@ -21,6 +21,16 @@
 			"main": "src/backendSorting/main.mo",
 			"type": "motoko",
 			"dependencies": ["backendTransaction"]
+		},
+		"backendTransactionStorage":{
+			"main": "src/backendTransactionStorage/TransactionStorage.mo",
+			"type": "motoko"
+		},
+		"backendTransactionSorting":{
+			"main": "src/backendTransactionStorage/TransactionSorting.mo",
+			"type": "motoko",
+			"dependencies": ["backendTransactionStorage"]
+
 		}
 	},
 	"defaults": {

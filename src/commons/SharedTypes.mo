@@ -1,5 +1,5 @@
-import ProofOfConceptTransaction "../transactions/ProofOfConceptTransaction";
-import BitcoinTransaction "../transactions/BitcoinTransaction";
+import ProofOfConceptTransaction "../backendTransactionStorage/transactions/ProofOfConceptTransaction";
+import BitcoinTransaction "../backendTransactionStorage/transactions/BitcoinTransaction";
 
 module SharedTypes {
     public type TransactionType = {

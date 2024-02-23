@@ -1,21 +1,22 @@
-import TransactionTypes "../commons/TransactionTypes";
 import BitcoinTransaction "BitcoinTransaction";
-import BitcoinApi "../backend/BitcoinApi";
 import ProofOfConceptTransaction "ProofOfConceptTransaction";
 import Error "mo:base/Error";
 import Text "mo:base/Text";
-import SharedTypes "../commons/SharedTypes";
+import TransactionTypes "../../commons/TransactionTypes";
+import Types "../../commons/Types";
+import SharedTypes "../../commons/SharedTypes";
 
-type BitcoinTransactionDetails = TransactionTypes.BitcoinTransactionDetails;
-type Amount = TransactionTypes.Amount;
-type DateTime = TransactionTypes.DateTime;
-type Reciever = TransactionTypes.Reciever;
-type Status = TransactionTypes.Status;
-type TransactionType = SharedTypes.TransactionType;
-type BitcoinTransaction = BitcoinTransaction.BitcoinTransaction;
-type TransactionTypeShared = TransactionTypes.TransactionTypeShared;
-type ProofOfConceptTransaction = ProofOfConceptTransaction.ProofOfConceptTransaction;
-actor class Transaction(transaction : TransactionType) {
+actor class Transaction(transaction : SharedTypes.TransactionType) {
+    type BitcoinTransactionDetails = TransactionTypes.BitcoinTransactionDetails;
+    type Amount = TransactionTypes.Amount;
+    type DateTime = TransactionTypes.DateTime;
+    type Reciever = TransactionTypes.Reciever;
+    type Status = TransactionTypes.Status;
+    type TransactionType = SharedTypes.TransactionType;
+    type BitcoinTransactionObj = BitcoinTransaction.BitcoinTransaction;
+    type TransactionTypeShared = TransactionTypes.TransactionTypeShared;
+    type ProofOfConceptTransaction = ProofOfConceptTransaction.ProofOfConceptTransaction;
+
     public func getTransactionId() : async Text {
         switch (transaction) {
             case (#BTC(transaction)) { await transaction.getTransactionId() };

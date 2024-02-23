@@ -1,10 +1,9 @@
 import Time "mo:base/Time";
 import CommonTransaction "CommonTransaction";
-import TransactionTypes "../commons/TransactionTypes";
+import TransactionTypes "../../commons/TransactionTypes";
 
-type CommonTransaction = CommonTransaction.CommonTransaction;
-
-actor class ProofOfConceptTransaction() : async CommonTransaction {
+actor class ProofOfConceptTransaction() : async CommonTransaction.CommonTransaction {
+    type CommonTransaction = CommonTransaction.CommonTransaction;
     public query func getTransactionId() : async Text {
         return "";
     };

@@ -1,16 +1,17 @@
-import TransactionTypes "../commons/TransactionTypes";
 import Time "mo:base/Time";
+import Int "mo:base/Int";
+import TransactionTypes "../../commons/TransactionTypes";
+import Types "../../commons/Types";
 import CommonTransaction "CommonTransaction";
-import Types "../commons/Types";
-type CommonTransaction = CommonTransaction.CommonTransaction;
-type BitcoinTransactionDetails = TransactionTypes.BitcoinTransactionDetails;
-type Amount = TransactionTypes.Amount;
-type DateTime = TransactionTypes.DateTime;
-type Reciever = TransactionTypes.Reciever;
-type Status = TransactionTypes.Status;
-type BitcoinAddress = Types.BitcoinAddress;
 
-actor class BitcoinTransaction(transactionDetails : BitcoinTransactionDetails) : async CommonTransaction {
+actor class BitcoinTransaction(transactionDetails : TransactionTypes.BitcoinTransactionDetails) : async CommonTransaction.CommonTransaction {
+    type BitcoinTransactionDetails = TransactionTypes.BitcoinTransactionDetails;
+    type Amount = TransactionTypes.Amount;
+    type DateTime = TransactionTypes.DateTime;
+    type Reciever = TransactionTypes.Reciever;
+    type Status = TransactionTypes.Status;
+    type BitcoinAddress = Types.BitcoinAddress;
+
     let receivedTime : DateTime = Time.now();
     let transactionId : Text = transactionDetails.commonTransactionDetails.transactionId;
     let sourceBtcAddress : BitcoinAddress = transactionDetails.sourceBtcAddress;
@@ -53,8 +54,16 @@ actor class BitcoinTransaction(transactionDetails : BitcoinTransactionDetails) :
     };
 
     public func confirmTransaction(timeOfCheck : DateTime) : async Status {
-        //TODO: If not confirmed Update Transaction Status, use 
-        return #pending;
+        let zero : Int = 0;
+        let twoDays : Int = 2;
+        let daysPassedSince = TransactionTypes.daysPassedSince(timeOfCheck, receivedTime);
+        if (daysPassedSince != zero and daysPassedSince <= twoDays) {
+            //TODO: confirm logic
+            status := #confirmed;
+        } else if (daysPassedSince > twoDays) {
+            status := #rejected;
+        };
+        return status;
     };
 
     public func getTransactionDetails() : async BitcoinTransactionDetails {

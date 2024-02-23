@@ -4,55 +4,74 @@ import Buffer "mo:base/Buffer";
 import Text "mo:base/Text";
 import Error "mo:base/Error";
 import Float "mo:base/Float";
-import BitcoinTransaction "../transactions/BitcoinTransaction";
+import BitcoinTransaction "transactions/BitcoinTransaction";
 import Types "../commons/Types";
-import Transaction "../transactions/Transaction";
-import Transactions "../backendTransaction/Transactions";
+import Transaction "transactions/Transaction";
 import Cycles "mo:base/ExperimentalCycles";
-
-//TYPES
-type TransactionType = SharedTypes.TransactionType;
-type BitcoinTransaction = BitcoinTransaction.BitcoinTransaction;
-type BitcoinTransactionDetails = TransactionTypes.BitcoinTransactionDetails;
-type CommonTransactionDetails = TransactionTypes.CommonTransactionDetails;
-type Amount = TransactionTypes.Amount;
-type Reciever = TransactionTypes.Reciever;
-type Status = TransactionTypes.Status;
-type Transaction = Transaction.Transaction;
-type TransactionTypeShared = TransactionTypes.TransactionTypeShared;
+import ExperimentalCycles "mo:base/ExperimentalCycles";
+import Nat "mo:base/Nat";
+import Time "mo:base/Time";
+import EntityTypes "../commons/EntityTypes";
 
 actor class TransactionStorage() {
+    //TYPES
+    type TransactionType = SharedTypes.TransactionType;
+    type BitcoinTransaction = BitcoinTransaction.BitcoinTransaction;
+    type BitcoinTransactionDetails = TransactionTypes.BitcoinTransactionDetails;
+    type CommonTransactionDetails = TransactionTypes.CommonTransactionDetails;
+    type Amount = TransactionTypes.Amount;
+    type Reciever = TransactionTypes.Reciever;
+    type Status = TransactionTypes.Status;
+    type Transaction = Transaction.Transaction;
+    type TransactionTypeShared = TransactionTypes.TransactionTypeShared;
+    type Entity = EntityTypes.Entity;
+    type Category = EntityTypes.Category;
+
+    //Transaction Storage
     stable var transactionArray : [Transaction] = [];
     var transactionBuffer = Buffer.fromArray<Transaction>(transactionArray);
 
+    //Entities Storage
+    stable var entityId = 1;
+    stable var entityArray : [Entity] = [];
+    var entityBuffer = Buffer.fromArray<Entity>(entityArray);
+
     public func storeBtcTransaction(transactionId : Text, sourceAddress : Types.BitcoinAddress, amounts : [Amount], receivers : [Reciever], receivingEntityId : Nat) : async BitcoinTransactionDetails {
+        let entity = await getEntityById(receivingEntityId);
         let btcDetails : BitcoinTransactionDetails = {
             commonTransactionDetails = {
                 amounts = amounts;
                 receivers = receivers;
                 receivingEntityId = receivingEntityId;
-                //TODO: Get Entity Name from Entity Storage Canister
-                receivingEntityName = "";
+                receivingEntityName = entity.name;
                 status = #pending;
                 transactionId = transactionId;
             };
             sourceBtcAddress = sourceAddress;
         };
-        let cycles2 = Cycles.add(200000000000);
-        let t = await BitcoinTransaction.BitcoinTransaction(btcDetails);
-        let btcTransaction = await Transaction.Transaction(#BTC(t));
-        transactionBuffer.insert(0, btcTransaction);
+        let cycles1 = ExperimentalCycles.add(200000000000);
+        let btcTransaction = await BitcoinTransaction.BitcoinTransaction(btcDetails);
+        let cycles2 = ExperimentalCycles.add(200000000000);
+        let transaction = await Transaction.Transaction(#BTC(btcTransaction));
+        transactionBuffer.insert(0, transaction);
         transactionArray := Buffer.toArray<Transaction>(transactionBuffer);
-        return await btcTransaction.getBtcTransactionDetails();
+        return await transaction.getBtcTransactionDetails();
     };
 
-    public query func getAllTransactions() : async [Transaction] {
+    public func getAllTransactions() : async [Transaction] {
         return transactionArray;
     };
 
-    public func getTransactionById(id : Text) : async Transaction {
-        let transactionArr = await getAllTransactions();
-        for (transaction in transactionArr.vals()) {
+    public func getAllTransactionsSharedType() : async [TransactionTypeShared] {
+        let sharedTransactionsType = Buffer.Buffer<TransactionTypeShared>(0);
+        for (transaction in transactionArray.vals()) {
+            sharedTransactionsType.add(await transaction.getTransactionDetails());
+        };
+        return Buffer.toArray(sharedTransactionsType);
+    };
+
+    private func getTransactionById(id : Text) : async Transaction {
+        for (transaction in transactionArray.vals()) {
             let transactionId = await transaction.getTransactionId();
             if (Text.compare(id, transactionId) == #equal) {
                 switch (?transaction) {
@@ -70,9 +89,8 @@ actor class TransactionStorage() {
     };
 
     public func getTransactionsByEntityId(entityId : Nat) : async [TransactionTypeShared] {
-        let transactionArr = await getAllTransactions();
         let transactionOfEntity = Buffer.Buffer<TransactionTypeShared>(0);
-        for (transaction in transactionArr.vals()) {
+        for (transaction in transactionArray.vals()) {
             let transactionEntityId = await transaction.getEntityId();
             if (transactionEntityId == entityId) {
                 transactionOfEntity.add(await transaction.getTransactionDetails());
@@ -118,9 +136,9 @@ actor class TransactionStorage() {
 
         for (transaction in transactionArray.vals()) {
             let receivers = await transaction.getReceivers();
-            let amounts = await transaction.getAmounts();
             for (receiver in receivers.vals()) {
                 if (receiver.benificiary == benificiary) {
+                    let amounts = receiver.amounts;
                     var amountBtc = TransactionTypes.findAmountForCurrency(amounts, #bitcoin);
                     var amountSatoshi = TransactionTypes.findAmountForCurrency(amounts, #satoshi);
                     var amountPOC = TransactionTypes.findAmountForCurrency(amounts, #proofOfConcept);
@@ -150,7 +168,7 @@ actor class TransactionStorage() {
         await getTransactionTypeListFrom(transactionsByStatus);
     };
 
-    public func getTransactionTypeListFrom(transactions : [Transaction]) : async [TransactionTypeShared] {
+    private func getTransactionTypeListFrom(transactions : [Transaction]) : async [TransactionTypeShared] {
         var sharedTypeTransactions = Buffer.Buffer<TransactionTypeShared>(transactions.size());
         for (transaction in transactions.vals()) {
             sharedTypeTransactions.add(await transaction.getTransactionDetails());
@@ -161,5 +179,49 @@ actor class TransactionStorage() {
     public func clearTransactions() {
         transactionArray := [];
         transactionBuffer.clear();
+    };
+
+    public func confirmTransactions() : async () {
+        var currentTime = Time.now();
+        var pendingTransactions = await getTransactionByStatus(#pending);
+        for (transaction in pendingTransactions.vals()) {
+            ignore await transaction.confirmTransaction(currentTime);
+        };
+    };
+
+    // Entities Code
+    public func createAndAddEntity(name : Text, category : Category) : async Entity {
+        let entity : Entity = {
+            id = entityId;
+            name = name;
+            category = category;
+        };
+        incrementEntityId();
+        entityBuffer.add(entity);
+        entityArray := Buffer.toArray<Entity>(entityBuffer);
+        return entity;
+    };
+
+    public query func getAllEntities() : async [Entity] {
+        return entityArray;
+    };
+
+    public func getEntityById(id : Nat) : async Entity {
+        for (entity in entityArray.vals()) {
+            if (entity.id == id) {
+                return entity;
+            };
+        };
+        throw Error.reject("Entity with Id=" # Nat.toText(id) # " is not found!");
+    };
+
+    public func clearEntities() {
+        entityArray := [];
+        entityBuffer.clear();
+        entityId := 0;
+    };
+
+    private func incrementEntityId() : () {
+        entityId += 1;
     };
 };

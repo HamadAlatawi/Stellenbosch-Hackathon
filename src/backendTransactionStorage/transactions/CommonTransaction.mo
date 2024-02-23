@@ -1,4 +1,4 @@
-import TransactionTypes "../commons/TransactionTypes";
+import TransactionTypes "../../commons/TransactionTypes";
 import Time "mo:base/Time";
 
 actor class CommonTransaction() {
