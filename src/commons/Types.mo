@@ -199,7 +199,7 @@ module Types {
         didADayPassSinceTheTransaction : DateTime -> async Bool;
         confirmTransaction : query () -> async Types.Status;
     };
-    
+
     public type BitcoinTransactionDetails = {
         transactionId : Text;
         status : Status;
@@ -208,5 +208,19 @@ module Types {
         recievers : [Reciever];
         entityId : Nat;
         sourceAddress : Text;
+    };
+
+    public type CommonTransactionDetails = {
+        transactionId : Text;
+        status : Status;
+        amounts : [GeneralAmount];
+        receivedTime : DateTime;
+        recievers : [Reciever];
+        entityId : Nat;
+    };
+
+    public type TransactionTypeVariant = {
+        #bitcoin;
+        #etheruem;
     };
 };
