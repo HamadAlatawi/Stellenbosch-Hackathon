@@ -6,8 +6,10 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
     import { Sun, Moon } from "radix-icons-svelte";
     import { tweened } from 'svelte/motion';
+    import { frontendCanister } from "$lib/motokoImports/backend"
 
-    const frontendCanisterId = import.meta.env.VITE_FRONTEND_CANISTER_ID;
+
+    const frontendCanisterId = frontendCanister;
 
     let sideNavBar = false;
 

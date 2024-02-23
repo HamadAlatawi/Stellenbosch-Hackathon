@@ -7,8 +7,8 @@
   import { Reload } from "radix-icons-svelte";
   import { qr } from '@svelte-put/qr/svg';
   import Bitcoin from '$lib/images/Bitcoin.webp'
-  import { createActor as createActorBackend } from '../../../../../../declarations/backend';
-  import { createActor as createActorBackendTransaction } from '../../../../../../declarations/backendTransaction';
+  import { actorBackEnd, actorBackEndTransaction } from "$lib/motokoImports/backend"
+
 
   export let entity: any;
 
@@ -31,16 +31,7 @@
 
   const getBitcoinAddy = async () => {
 		try {
-			// Canister IDs are automatically expanded to .env config - see vite.config.ts
-			const canisterId = import.meta.env.VITE_BACKEND_CANISTER_ID;
-
-			// We pass the host instead of using a proxy to support NodeJS >= v17 (ViteJS issue: https://github.com/vitejs/vite/issues/4794)
-			const host = import.meta.env.VITE_HOST;
-
-			// Create an actor to interact with the IC for a particular canister ID
-			const actor = createActorBackend(canisterId, { agentOptions: { host } });
-
-			// Call the IC
+			const actor = actorBackEnd;
 			bitcoinAddy = await actor.get_p2pkh_address();
 		} catch (err: unknown) {
 			console.error(err);
@@ -50,16 +41,7 @@
   const createTransaction: (entityID: bigint) => Promise<void> = async (entityID: bigint) => {
     try {
       clicked = true;
-			// Canister IDs are automatically expanded to .env config - see vite.config.ts
-			const canisterId = import.meta.env.VITE_BACKENDTRANSACTION_CANISTER_ID;
-
-			// We pass the host instead of using a proxy to support NodeJS >= v17 (ViteJS issue: https://github.com/vitejs/vite/issues/4794)
-			const host = import.meta.env.VITE_HOST;
-
-			// Create an actor to interact with the IC for a particular canister ID
-			const actor = createActorBackendTransaction(canisterId, { agentOptions: { host } });
-
-			// Call the IC
+			const actor = actorBackEndTransaction;
 
       interface Amount {
           amountInSatoshi: bigint;
