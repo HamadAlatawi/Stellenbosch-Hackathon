@@ -7,9 +7,9 @@
     import * as Drawer from "$lib/components/ui/drawer";
     import { Input } from "$lib/components/ui/input";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-    import { createActor as createActorBackendTransaction } from '../../../../declarations/backendTransaction';
+    import { createActor as createActorBackendSorting } from '../../../../declarations/backendSorting';
     import { Reload, ChevronDown, ChevronUp } from "radix-icons-svelte";
-    import { sortStore } from '$lib/data/stores/stores';
+    import { sortStore, sortStoreTable } from '$lib/data/stores/stores';
 
     let actor : any = null;
     let count = 0;
@@ -32,13 +32,13 @@
     onMount(async () => {
         try {
 			// Canister IDs are automatically expanded to .env config - see vite.config.ts
-			const canisterId = import.meta.env.VITE_BACKENDTRANSACTION_CANISTER_ID;
+			const canisterId = import.meta.env.VITE_BACKENDSORTING_CANISTER_ID;
 
 			// We pass the host instead of using a proxy to support NodeJS >= v17 (ViteJS issue: https://github.com/vitejs/vite/issues/4794)
 			const host = import.meta.env.VITE_HOST;
 
 			// Create an actor to interact with the IC for a particular canister ID
-			actor = createActorBackendTransaction(canisterId, { agentOptions: { host } });
+			actor = createActorBackendSorting(canisterId, { agentOptions: { host } });
 
             const countBigInt = await actor.getCountOfAllTransactions();
 
@@ -110,6 +110,7 @@
                 $sortStore = "ID ASC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "ID", true);
+                $sortStoreTable = "ID ASC";
                 defaultResults = false;
                 console.log(invoiceList)
                 break;
@@ -117,6 +118,7 @@
                 $sortStore = "Amount ASC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "Amount", true);
+                $sortStoreTable = "Amount ASC";
                 defaultResults = false;
                 sorted = true;
                 break;
@@ -124,6 +126,7 @@
                 $sortStore = "Recipient ASC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "Recipient", true);
+                $sortStoreTable = "Recipient ASC";
                 defaultResults = false;
                 sorted = true;
                 break;
@@ -131,6 +134,7 @@
                 $sortStore = "Sender ASC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "Sender", true);
+                $sortStoreTable = "Sender ASC";
                 defaultResults = false;
                 sorted = true;
                 break;
@@ -138,6 +142,7 @@
                 $sortStore = "ID DESC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "ID", false);
+                $sortStoreTable = "ID DESC";
                 defaultResults = false;
                 sorted = true;
                 break;
@@ -145,6 +150,7 @@
                 $sortStore = "Amount DESC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "Amount", false);
+                $sortStoreTable = "Amount DESC";
                 defaultResults = false;
                 sorted = true;
                 break;
@@ -152,6 +158,7 @@
                 $sortStore = "Recipient DESC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "Recipient", false);
+                $sortStoreTable = "Recipient DESC";
                 defaultResults = false;
                 sorted = true;
                 break;
@@ -159,6 +166,7 @@
                 $sortStore = "Sender DESC";
                 console.log($sortStore)
                 invoiceList = await actor.sortTransactionTypes(event, 20, "Sender", false);
+                $sortStoreTable = "Sender DESC";
                 defaultResults = false;
                 sorted = true;
                 break;
@@ -401,35 +409,53 @@
                         <Table.Caption>Donation Transaction Explorer</Table.Caption>
                         <Table.Header>
                             <Table.Row class="max-[400px]:text-xs max-[500px]:text-md">
-                                {#if $sortStore == "ID ASC"}
-                                    <Table.Head class=" flex items-center bg-stone-100">ID <ChevronUp /> </Table.Head>
-                                {:else if $sortStore == "ID DESC"}
-                                    <Table.Head class=" flex items-center bg-stone-100">ID <ChevronDown/> </Table.Head>
-                                {:else}
-                                    <Table.Head class="">ID</Table.Head>
-                                {/if}
-                                {#if $sortStore == "Amount ASC"}
-                                    <Table.Head class=" flex items-center bg-stone-100">Amount <ChevronUp /> </Table.Head>
-                                {:else if $sortStore == "Amount DESC"}
-                                    <Table.Head class=" flex items-center bg-stone-100">Amount <ChevronDown/></Table.Head>
-                                {:else}
-                                    <Table.Head class="">Amount</Table.Head>
-                                {/if}
                                 {#if innerWidth > 800}
+                                    {#if $sortStoreTable == "ID ASC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">ID <ChevronUp /> </Table.Head>
+                                    {:else if $sortStoreTable == "ID DESC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">ID <ChevronDown/> </Table.Head>
+                                    {:else}
+                                        <Table.Head class="">ID</Table.Head>
+                                    {/if}
+                                    {#if $sortStoreTable == "Amount ASC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">Amount <ChevronUp /> </Table.Head>
+                                    {:else if $sortStoreTable == "Amount DESC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">Amount <ChevronDown/></Table.Head>
+                                    {:else}
+                                        <Table.Head class="">Amount</Table.Head>
+                                    {/if}
                                     <Table.Head class="">Date</Table.Head>
-                                    {#if $sortStore == "Recipient ASC"}
+                                    {#if $sortStoreTable == "Recipient ASC"}
                                         <Table.Head class=" flex items-center bg-stone-100">Recipient <ChevronUp /></Table.Head>
-                                    {:else if $sortStore == "Recipient DESC"}
+                                    {:else if $sortStoreTable == "Recipient DESC"}
                                         <Table.Head class="flex items-center bg-stone-100">Recipient <ChevronDown/></Table.Head>
                                     {:else}
                                         <Table.Head class="">Recipient</Table.Head>
                                     {/if}
-                                    {#if $sortStore == "Sender ASC"}
+                                    {#if $sortStoreTable == "Sender ASC"}
                                         <Table.Head class=" flex items-center bg-stone-100">Sender <ChevronUp /></Table.Head>
-                                    {:else if $sortStore == "Sender DESC"}
+                                    {:else if $sortStoreTable == "Sender DESC"}
                                         <Table.Head class=" flex items-center bg-stone-100">Sender <ChevronDown/></Table.Head>
                                     {:else}
                                         <Table.Head class="">Sender</Table.Head>
+                                    {/if}
+                                {:else if innerWidth < 800}
+                                    {#if $sortStoreTable == "ID ASC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">ID <ChevronUp /> </Table.Head>
+                                    {:else if $sortStoreTable == "ID DESC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">ID <ChevronDown/> </Table.Head>
+                                    {:else if $sortStoreTable == "Amount ASC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">Amount <ChevronUp /> </Table.Head>
+                                    {:else if $sortStoreTable == "Amount DESC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">Amount <ChevronDown/></Table.Head>
+                                    {:else if $sortStoreTable == "Recipient ASC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">Recipient <ChevronUp /></Table.Head>
+                                    {:else if $sortStoreTable == "Recipient DESC"}
+                                        <Table.Head class="flex items-center bg-stone-100">Recipient <ChevronDown/></Table.Head>
+                                    {:else if $sortStoreTable == "Sender ASC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">Sender <ChevronUp /></Table.Head>
+                                    {:else if $sortStoreTable == "Sender ASC"}
+                                        <Table.Head class=" flex items-center bg-stone-100">Sender <ChevronDown/></Table.Head>
                                     {/if}
                                 {/if}
                                 <Table.Head class=" text-right">More Details</Table.Head>
@@ -438,12 +464,22 @@
                         <Table.Body>
                             {#each invoiceList as invoice}
                             <Table.Row>
-                                <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
-                                <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
                                 {#if innerWidth > 800}
+                                    <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
+                                    <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
                                     <Table.Cell>{new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
                                     <Table.Cell>{invoice.transactionReceivers[0].benificiary.donation}</Table.Cell>
                                     <Table.Cell>{invoice.sourceBTCAddy}</Table.Cell>
+                                {:else if innerWidth < 800}
+                                    {#if $sortStoreTable == "ID ASC" || $sortStoreTable == "ID DESC"}
+                                        <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
+                                    {:else if $sortStoreTable == "Amount ASC" || $sortStoreTable == "Amount DESC"}
+                                        <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
+                                    {:else if $sortStoreTable == "Recipient ASC" || $sortStoreTable == "Recipient DESC"}
+                                        <Table.Cell>{invoice.transactionReceivers[0].benificiary.donation}</Table.Cell>
+                                    {:else if $sortStoreTable == "Sender ASC" || $sortStoreTable == "Sender DESC"}
+                                        <Table.Cell>{invoice.sourceBTCAddy}</Table.Cell>
+                                    {/if}   
                                 {/if}
                                 <Table.Cell class="text-right">
                                     <Drawer.Root>
