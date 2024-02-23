@@ -1,6 +1,6 @@
-import TransactionTypes "../commons/TransactionTypes";
 import Time "mo:base/Time";
 import CommonTransaction "CommonTransaction";
+import TransactionTypes "../commons/TransactionTypes";
 
 type CommonTransaction = CommonTransaction.CommonTransaction;
 
@@ -37,7 +37,16 @@ actor class ProofOfConceptTransaction() : async CommonTransaction {
         return #pending;
     };
 
-    public func getTransactionDetails() : async Any {
-        return "";
+    public func getTransactionDetails() : async TransactionTypes.POCTransactionDetails {
+        return {
+            commonTransactionDetails = {
+                amounts = await getAmounts();
+                receivers = await getReceivers();
+                receivingEntityId = await getEntityId();
+                receivingEntityName = await getEntityName();
+                status = await getStatus();
+                transactionId = await getTransactionId();
+            };
+        };
     };
 };

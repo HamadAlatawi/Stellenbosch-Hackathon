@@ -16,6 +16,15 @@ module TransactionTypes {
         difference >= hourInNanoSecounds;
     };
 
+    public func findAmountForCurrency(amounts : [Amount], currency : Currency) : Float {
+        for (amount in amounts.vals()) {
+            if (amount.currency == currency) {
+                return amount.amount;
+            };
+        };
+        return 0.0;
+    };
+
     // COMMON TRANSACTION  TYPES
     public type Amount = {
         amount : Float;
@@ -43,7 +52,7 @@ module TransactionTypes {
     public type TransactionType = {
         #BTC;
         #POC;
-    }; 
+    };
 
     public type DateTime = Time.Time;
 
@@ -62,5 +71,14 @@ module TransactionTypes {
     public type BitcoinTransactionDetails = {
         commonTransactionDetails : CommonTransactionDetails;
         sourceBtcAddress : Text;
+    };
+
+    public type POCTransactionDetails = {
+        commonTransactionDetails : CommonTransactionDetails;
+    };
+
+    public type TransactionTypeShared = {
+        #BTC : BitcoinTransactionDetails;
+        #POC : POCTransactionDetails;
     };
 };

@@ -1,16 +1,19 @@
 import TransactionTypes "../commons/TransactionTypes";
 import Time "mo:base/Time";
 import CommonTransaction "CommonTransaction";
+import Types "../commons/Types";
 type CommonTransaction = CommonTransaction.CommonTransaction;
 type BitcoinTransactionDetails = TransactionTypes.BitcoinTransactionDetails;
 type Amount = TransactionTypes.Amount;
 type DateTime = TransactionTypes.DateTime;
 type Reciever = TransactionTypes.Reciever;
 type Status = TransactionTypes.Status;
+type BitcoinAddress = Types.BitcoinAddress;
+
 actor class BitcoinTransaction(transactionDetails : BitcoinTransactionDetails) : async CommonTransaction {
     let receivedTime : DateTime = Time.now();
     let transactionId : Text = transactionDetails.commonTransactionDetails.transactionId;
-    let sourceBtcAddress : Text = transactionDetails.sourceBtcAddress;
+    let sourceBtcAddress : BitcoinAddress = transactionDetails.sourceBtcAddress;
     let amounts : [Amount] = transactionDetails.commonTransactionDetails.amounts;
     let receivers : [Reciever] = transactionDetails.commonTransactionDetails.receivers;
     let receivingEntityId : Nat = transactionDetails.commonTransactionDetails.receivingEntityId;
@@ -53,15 +56,6 @@ actor class BitcoinTransaction(transactionDetails : BitcoinTransactionDetails) :
         //TODO: If not confirmed Update Transaction Status, use 
         return #pending;
     };
-    
-    // public func getTimeElapsed(baseTime : DateTime) : async Int {
-    //     return baseTime - receivedTime;
-    // };
-
-    // public func didADayPassSince(baseTime : DateTime) : async Bool {
-    //     var difference = await getTimeElapsed(baseTime);
-    //     difference >= TransactionTypes.hourInNanoSecounds;
-    // };
 
     public func getTransactionDetails() : async BitcoinTransactionDetails {
         return {
