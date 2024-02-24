@@ -232,14 +232,13 @@ actor class TransactionStorage() {
         transactionBuffer.clear();
     };
 
-    public func confirmTransactions() : async Status {
+    public func confirmTransactions() : async () {
         var currentTime = Time.now();
         var pendingTransactions = await getTransactionByStatus(#pending);
-        var stat : Status = #pending;
         for (transaction in pendingTransactions.vals()) {
-            stat := await transaction.confirmTransaction(currentTime);
+            let stat = await transaction.confirmTransaction(currentTime);
         };
-        return stat;
+        return;
     };
 
     // Entities Code
