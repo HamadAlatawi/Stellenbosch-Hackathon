@@ -4,12 +4,10 @@
 	import LPImageDesktop from '$lib/images/LandingImageDesktop.webp'
     import LPImageMobile from '$lib/images/LandingImageMobile.webp'
 	import { mode } from "mode-watcher";
-	import DonateButton from "$lib/components/ui/donateButton/donateButton.svelte";
 	import LPImageDesktop2 from "$lib/images/LandingPage2Desktop.webp";
 	import LPImageMobile2 from "$lib/images/LandingPage2Mobile.webp";
-	import { entities } from "$lib/data/+page.svelte";
-	import { goto } from '$app/navigation';
-	import { frontendCanister } from "$lib/motokoImports/backend"
+	import EntitiesComponent from "$lib/components/ui/entityPage/EntitiesComponent.svelte";
+	import TransactionComponent from "$lib/components/ui/transactionPage/TransactionComponent.svelte";
 
 
 	let svgMode = $mode === "light" ? "white" : "black";
@@ -18,29 +16,13 @@
         svgMode = $mode === "light" ? "white" : "black";
     }
 
-	let searchTerm = "";
-
-
-	$: filteredEntities =
-      searchTerm === ""
-        ? entities
-        : entities.filter((entity) =>
-            entity.name.toLowerCase().includes(searchTerm.toLowerCase())
-	);
-
-	const frontendCanisterId = frontendCanister;
-
-	function Entity() {
-        goto('/entity?canisterId=' + frontendCanisterId);
-    }
-
-	function scrollToSection() {
-    const section = document.getElementById('impactSection');
-
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-    }
-  }
+	function scrollIntoView(target : string) {
+		const el = document.querySelector(target);
+		if (!el) return;
+		el.scrollIntoView({
+		behavior: 'smooth'
+		});
+  	}
 </script>
 
 <svelte:head>
@@ -48,8 +30,8 @@
 	<meta name="description" content="Donation Engine Home Page" />
 </svelte:head>
 
-<main class="mt-20 grid grid-cols-12 min-h-screen w-full justify-center">
-    <section class="col-span-12 grid grid-cols-12 gap-4">
+<main class="pt-20 grid grid-cols-12 min-h-screen w-full justify-center dark:bg-black" id="homeSection">
+    <section class="col-span-12 grid grid-cols-12 gap-4 ">
 		<div class="col-span-12 lg:col-span-6 px-5 md:px-20 lg:px-20 flex flex-col justify-center">
 			<div class="lg:text-left">
 				<h1 class="text-5xl mb-5 lg:mb-2 font-bold md:text-7xl lg:text-6xl xl:text-7xl text-center lg:text-start">EMPOWER THROUGH DONATIONS</h1>
@@ -60,8 +42,16 @@
 				</p>
 			</div>
 			<div class="flex justify-center lg:justify-start font-bold my-10">
-				<Button class="text-xl py-5 lg:py-6 px-5 sm:px-16 md:px-16 xl:px-20 mr-2" on:click={Entity}>Donate</Button>
-				<Button class="text-xl py-5 lg:py-6 px-5 sm:px-16 md:px-16 xl:px-20" variant="ghost" on:click={scrollToSection}>Learn More</Button>
+				<Button class="text-xl py-5 lg:py-6 px-5 sm:px-16 md:px-16 xl:px-20 mr-2" on:click={
+					() => {
+						scrollIntoView("#donateSection")
+					}
+				}>Donate</Button>
+				<Button class="text-xl py-5 lg:py-6 px-5 sm:px-16 md:px-16 xl:px-20" variant="ghost"on:click={
+					() => {
+						scrollIntoView("#impactSection")
+					}
+				}>Learn More</Button>
 			</div>
 		</div>			
 		<div class="col-span-2 lg:hidden"></div>
@@ -118,68 +108,33 @@
 			</div>
 		</div>
 	</section>
-	<section class="col-span-12 bg-stone-100 dark:bg-black grid grid-cols-12 gap-4 border-b-stone-500 dark:border-b-stone-100 border-b-8 border-t-stone-500 dark:border-t-stone-100 border-t-8">
+	<section class="col-span-12 bg-stone-100 dark:bg-black grid grid-cols-12 gap-4 border-y-stone-500 dark:border-y-stone-100 border-y-8" id="donateSection">
 		<div class="grid grid-cols-12 w-full col-span-12 my-16">
 			<div class="col-span-1"></div>
-			<div class="col-span-10 text-4xl mb-5 font-bold md:text-5xl lg:text-4xl xl:text-5xl text-center">Meet the Hopeful</div>
+			<div class="col-span-10 text-4xl mb-2 font-bold md:text-5xl lg:text-4xl xl:text-5xl text-center">Meet the Hopeful</div>
 			<div class="col-span-1"></div>
 			<div class="col-span-1"></div>
-			<div class="col-span-10 text-2xl mb-16 md:text-3xl lg:text-2xl xl:text-3xl text-center">Supporting the Students and Schools</div>
+			<div class="col-span-10 text-2xl mb-12 md:text-3xl lg:text-2xl xl:text-3xl text-center">Supporting the Students and Schools</div>
 			<div class="col-span-1"></div>
 			<div class="col-span-1 lg:col-span-4"></div>
-			<div class="col-span-10 lg:col-span-4 md:text-lg text-center">Get acquainted with the hopeful faces of students and the nurturing environments of schools as we highlight those in need of your generous support.</div>
+			<div class="col-span-10 lg:col-span-4 md:text-lg text-center font-medium">Get acquainted with the hopeful faces of students and the nurturing environments of schools as we highlight those in need of your generous support.</div>
 			<div class="col-span-1 lg:col-span-4"></div>
 			<div class="hidden lg:flex lg:col-span-1"></div>
-			<div class="col-span-12 lg:col-span-10">
-				<div
-				class="mt-6 grid grid-cols-1 gap-x-6 lg:grid-cols-2 xl:grid-cols-4 xl:gap-x-8 mx-5"
-			  >
-			{#each filteredEntities.slice(0, 8) as entity}
-			<div
-			class="group relative max-w-md mx-auto bg-stone-900 dark:bg-transparent rounded-xl shadow-lg overflow-hidden md:max-w-2xl my-10 border-4 border-stone-900 dark:border-stone-100 p-4"
-				>
-				<div class="px-2 mt-4 flex justify-between flex-col">
-					<div class="mb-3">
-					<div class="flex justify-between mb-2">
-						<h3 class="text-stone-100 font-semibold">
-						{entity.name}
-						</h3>
-						<h4 class="text-stone-100 flex font-semibold">
-						<svg width="22" height="22" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path d="M69.4498 101.067C96.1161 101.066 96.1191 63.7353 69.4519 63.7313M69.4498 101.067L37.4594 101.065M69.4498 101.067L69.457 111.734M48.1204 63.7342L69.4572 63.7304C96.1244 63.7344 96.1265 26.3988 69.455 26.401L37.4541 26.4005M69.4497 26.4019L69.4531 15.7326M48.114 111.734L48.1153 15.7311" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-						</svg>
-						{entity.raise}
-					</h4>
-					</div>
-					</div>
-				</div>
-					<div
-					class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-t-lg bg-stone-200 group-hover:opacity-75"
-					>
-					<img
-						src={entity.image}
-						alt={entity.name}
-						class="h-full w-full object-cover object-top transition-transform duration-300 ease-in-out transform hover:scale-110"
-						style="max-height: 30vh"
-					/>
-					</div>
-					<div class="mt-4 flex justify-between px-2 py-4 flex-col">
-					<div class="mb-3">
-						<p class="mt-1 text-sm text-stone-100 font-medium">
-						{entity.story.length > 100
-							? entity.story.substring(0, 147) + "..."
-							: entity.story}
-						</p>
-					</div>
-					<DonateButton {entity} />
-					</div>
-				</div>
-				{/each}
-			  </div>
+			<div class="col-span-1 lg:hidden"></div>
+			<div class="col-span-10 lg:col-span-10 ">
+				<EntitiesComponent />
+			</div>
+			<div class="col-span-1 lg:hidden"></div>
+		</div>
+	</section>
+	<section class="col-span-12 grid grid-cols-12 gap-4 mt-16 lg:mt-28 border-b-stone-500 dark:border-b-stone-100 border-b-8" id="transactionSection">
+		<div class="grid grid-cols-12 w-full col-span-12 my-16">
+			<div class="col-span-12 lg:col-span-12" >
+				<TransactionComponent />
 			</div>
 		</div>
 	</section>
-	<section class="col-span-12 grid grid-cols-12 gap-4 mt-16 lg:mt-28" >
+	<section class="col-span-12 grid grid-cols-12 gap-4 mt-16 lg:mt-28 " >
 		<div class="grid grid-cols-12 w-full col-span-12 mb-16">
 			<div class="col-span-1"></div>
 			<div class="col-span-10 text-4xl mb-5 font-black md:text-5xl lg:text-4xl xl:text-5xl text-center">The Impact of Your Donation</div>
@@ -188,7 +143,7 @@
 			<div class="col-span-10 lg:col-span-4 md:text-lg text-center">Discover the tangible difference your donation makes in empowering students and schools for a brighter future.</div>
 			<div class="col-span-1 lg:col-span-4"></div>
 		</div>
-		<div class="grid grid-cols-12 w-full col-span-12 place-items-center">
+		<div class="grid grid-cols-12 w-full col-span-12 place-items-center" id="impactSection">
 			<div class="col-span-12 lg:col-span-6 px-5 md:px-20 lg:px-20 flex flex-col justify-center gap-y-16">
 				<div class="flex">
 					<div class="grid grid-cols-12">
@@ -208,7 +163,7 @@
 				</div>
 				<div class="flex">
 					<div class="grid grid-cols-12">
-						<div class="col-span-12 md:col-span-2" id="impactSection">
+						<div class="col-span-12 md:col-span-2" >
 							<div class="w-16 h-16 bg-stone-800 dark:bg-stone-100 rounded-md flex items-center justify-center ml-5 lg:ml-0">
 								<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
 									<path d="M33.3333 26.6666V11.6666C33.3333 10.7825 32.9821 9.93468 32.357 9.30956C31.7319 8.68444 30.884 8.33325 30 8.33325H9.99995C9.1159 8.33325 8.26805 8.68444 7.64293 9.30956C7.01781 9.93468 6.66662 10.7825 6.66662 11.6666V26.6666M33.3333 26.6666H6.66662M33.3333 26.6666L35.4666 30.9166C35.5951 31.1716 35.6559 31.4553 35.6433 31.7405C35.6306 32.0258 35.5449 32.303 35.3943 32.5456C35.2438 32.7882 35.0334 32.988 34.7834 33.1259C34.5334 33.2639 34.2521 33.3352 33.9666 33.3333H6.03329C5.74777 33.3352 5.46653 33.2639 5.21653 33.1259C4.96653 32.988 4.75616 32.7882 4.60558 32.5456C4.45501 32.303 4.36928 32.0258 4.35662 31.7405C4.34396 31.4553 4.40479 31.1716 4.53329 30.9166L6.66662 26.6666" stroke="{svgMode}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

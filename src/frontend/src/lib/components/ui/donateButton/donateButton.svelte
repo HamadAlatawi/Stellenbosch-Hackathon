@@ -11,6 +11,7 @@
 
 
   export let entity: any;
+  export let viewMode : any;
 
   let clicked = false;
   let page1 = true;
@@ -173,12 +174,21 @@
 
 <Sheet.Root>
   <Sheet.Trigger asChild let:builder>
-    <Button
-      builders={[builder]}
-      variant="outline"
-      class="mx-5 text-white bg-transparent hover:bg-stone-100 hover:text-black font-bold py-2 px-4 rounded"
-      >Donate</Button
-    >
+    {#if viewMode == "card"}
+      <Button
+        builders={[builder]}
+        variant="outline"
+        class="mx-5 text-white hover:text-black hover:bg-stone-100  bg-transparent font-semibold py-2 px-4 rounded"
+        >Donate</Button
+      >
+    {:else}
+      <Button
+        builders={[builder]}
+        variant="outline"
+        class="mx-5 text-black hover:text-white hover:bg-stone-900 bg-transparent font-semibold py-2 px-4 rounded"
+        >Donate</Button
+      >
+    {/if}
   </Sheet.Trigger>
   <Sheet.Content class="{page3 ? 'bg-black' : ''}" side="right" style="overflow: auto; max-width: 30rem;">
     <Sheet.Header>
@@ -187,7 +197,7 @@
     {#if page1}
       <img
       src={entity.image}
-      alt="Donation Image"
+      alt="Donation entity"
       class="donation-image rounded-lg mt-3"
     />
     <h4>{entity.name}</h4>
@@ -223,7 +233,7 @@
 
             <div class="flex justify-between mb-3 items-center">
               <span
-                class="text-base flex text-sm dark:bg-white dark:p-1 dark:rounded dark:text-black"
+                class="flex text-sm dark:bg-white dark:p-1 dark:rounded dark:text-black"
               >
                 {slider.toFixed(8)}
               </span>
@@ -302,7 +312,7 @@
         </div>
     </div>        
     {:else if page3}
-    <div class="grid col-span-12 flex justify-center items-center text-center mt-20">
+    <div class="grid col-span-12 justify-center items-center text-center mt-20">
       <div class="col-span-12">
         <p class="font-bold text-2xl mb-5 text-white">Payment Received</p>
         <svg width="350" height="350" viewBox="0 0 115 115" fill="none" xmlns="http://www.w3.org/2000/svg">

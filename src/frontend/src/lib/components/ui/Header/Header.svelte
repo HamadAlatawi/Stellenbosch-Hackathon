@@ -1,15 +1,10 @@
 <script>
-    import { goto } from '$app/navigation';
     import { Button } from "$lib/components/ui/button";
     import { setMode, resetMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
     import { Sun, Moon } from "radix-icons-svelte";
     import { tweened } from 'svelte/motion';
-    import { frontendCanister } from "$lib/motokoImports/backend"
-
-
-    const frontendCanisterId = frontendCanister;
 
     let sideNavBar = false;
 
@@ -33,23 +28,21 @@
     }
 
     function Entity() {
-        goto('/entity?canisterId=' + frontendCanisterId);
         sideNavBar = false;
         document.body.classList.toggle('nav-open', sideNavBar);
+        scrollIntoView("#donateSection")
     }
 
     function Transaction() {
-        goto('/transaction?canisterId=' + frontendCanisterId);
         sideNavBar = false;
         document.body.classList.toggle('nav-open', sideNavBar);
-
+        scrollIntoView("#transactionSection")
     }
 
     function goHome(){
-        goto('/?canisterId=' + frontendCanisterId);
         sideNavBar = false;
         document.body.classList.toggle('nav-open', sideNavBar);
-
+        scrollIntoView("#homeSection")
     }
 
     function closeNav(){
@@ -58,14 +51,18 @@
     }
 
     function navigateToPageAndSection(){
-        goto('/?canisterId=' + frontendCanisterId);
-        const section = document.getElementById('impactSection');
-        if (section) {
-            section.scrollIntoView({ behavior: 'smooth' });
         sideNavBar = false;
         document.body.classList.toggle('nav-open', sideNavBar);
-        }
+        scrollIntoView("#impactSection")
     }
+
+    function scrollIntoView(target) {
+		const el = document.querySelector(target);
+		if (!el) return;
+		el.scrollIntoView({
+		behavior: 'smooth'
+		});
+  	}
 </script>
 
 <header>
@@ -86,54 +83,49 @@
                     <DropdownMenu.Item on:click={() => resetMode()}>System</DropdownMenu.Item>
                 </DropdownMenu.Content>
             </DropdownMenu.Root>
-            <button class="flex justify-end justify-center h-full text-6xl text-black dark:text-white cursor-pointer" on:click={closeNav} aria-label="Close Navigation">&times;</button>
+            <button class="flex justify-center h-full text-6xl text-black dark:text-white cursor-pointer" on:click={closeNav} aria-label="Close Navigation">&times;</button>
         </div>
         <div class="h-[75%]">
-            <div class="grid grid-rows-4 grid-flow-col gap-10 flex justify-center items-center content-center h-full text-4xl font-semibold">
-                <a href="/?canisterId={frontendCanisterId}" on:click={goHome}>Home &#8594;</a>
-                <a href="/transaction?canisterId={frontendCanisterId}" on:click={Transaction}>Transactions &#8594;</a>
-                <a href="/entity?canisterId={frontendCanisterId}" on:click={Entity} >Entity &#8594;</a>
-                <a href="/?canisterId={frontendCanisterId}#impactSection" on:click={navigateToPageAndSection} class="pointer-events-auto text-neutral-500">Learn More</a>
+            <div class="grid grid-rows-4 grid-flow-col gap-10 justify-center items-center content-center h-full text-4xl font-semibold">
+                <a href="#homeSection" on:click|preventDefault={goHome}>Home &#8594;</a>
+                <a href="#transactionSection" on:click|preventDefault={Transaction}>Transactions &#8594;</a>
+                <a href="#donationSection" on:click|preventDefault={Entity} >Entity &#8594;</a>
+                <a href="#impactSection" on:click|preventDefault={navigateToPageAndSection} class="pointer-events-auto text-neutral-500">Learn More</a>
             </div>
         </div>
         <div>
         </div>
     </div>
-    <nav class="border-b-stone-900 bg-white lg:border-stone-900 border-b-[8px] grid grid-cols-12 lg:grid-cols-12 gap-4 flex w-full flex-nowrap items-center justify-between bg-white py-4 text-stone-500 hover:text-stone-500 focus:text-stone-700 dark:bg-[#0C0A09] lg:flex-wrap lg:justify-start lg:py-6 data-te-navbar-ref dark:border-white">
+    <nav class="border-b-stone-900 lg:border-stone-900 border-b-[8px] grid grid-cols-12 lg:grid-cols-12 gap-4 w-full flex-nowrap items-center justify-between bg-white py-4 text-stone-500 hover:text-stone-500 focus:text-stone-700 dark:bg-[#0C0A09] lg:flex-wrap lg:justify-start lg:py-6 data-te-navbar-ref dark:border-white">
         <div class="col-span-8 lg:col-span-3">
-            <!-- Header -->
             <div class="ml-2 lg:ml-10">
-                <a class="text-2xl 2xL:text-4xl font-semibold text-stone-800 dark:text-stone-200" href="/?canisterId={frontendCanisterId}" on:click={goHome}>Donation Engine</a>
+                <a class="text-2xl 2xL:text-4xl font-semibold text-stone-800 dark:text-stone-200" href="#homeSection" on:click|preventDefault={goHome}>Donation Engine</a>
             </div>
         </div>
   
-        <!-- Second Column (col-6) -->
         <div class="hidden lg:flex lg:col-span-6 justify-center items-center text-center">
-            <!-- Links -->
             <div class="!visible mt-2 hidden items-center lg:mt-0 lg:!flex lg:basis-auto" id="navbarSupportedContent2" data-te-collapse-item>
                 <ul class="list-style-none mr-auto flex flex-col pl-0 lg:mt-1 lg:flex-row gap-x-6" data-te-navbar-nav-ref>
                     <li data-te-nav-item-ref>
-                        <a class="active text-lg font-semibold disabled:text-black/30 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400" aria-current="page" href="/?canisterId={frontendCanisterId}" on:click={goHome} data-te-nav-link-ref>Home</a>
+                        <a class="active text-lg font-semibold disabled:text-black/30 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400" aria-current="page" href="#homeSection" on:click={goHome} data-te-nav-link-ref>Home</a>
                     </li>
                     <Separator orientation="vertical" />
                     <li data-te-nav-item-ref>
-                      <a class="p-0 text-lg font-semibold text-stone-500 transition duration-200 hover:text-stone-700 hover:ease-in-out focus:text-stone-700 disabled:text-black/30 motion-reduce:transition-none dark:text-stone-200 dark:hover:text-stone-400 dark:focus:text-stone-400 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400" href="/transaction?canisterId={frontendCanisterId}" on:click={Transaction} data-te-nav-link-ref>Transactions</a>
+                      <a class="p-0 text-lg font-semibold text-stone-500 transition duration-200 hover:text-stone-700 hover:ease-in-out focus:text-stone-700 disabled:text-black/30 motion-reduce:transition-none dark:text-stone-200 dark:hover:text-stone-400 dark:focus:text-stone-400 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400" href="#transactionSection" on:click|preventDefault={Transaction} data-te-nav-link-ref>Transactions</a>
                     </li>
                     <Separator orientation="vertical" />
                     <li data-te-nav-item-ref>
-                        <a class="p-0 text-lg font-semibold text-stone-500 transition duration-200 hover:text-stone-700 hover:ease-in-out focus:text-stone-700 disabled:text-black/30 motion-reduce:transition-none dark:text-stone-200 dark:hover:text-stone-400 dark:focus:text-stone-400 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400" href="/entity?canisterId={frontendCanisterId}" on:click={Entity} data-te-nav-link-ref>Entity</a>
+                        <a class="p-0 text-lg font-semibold text-stone-500 transition duration-200 hover:text-stone-700 hover:ease-in-out focus:text-stone-700 disabled:text-black/30 motion-reduce:transition-none dark:text-stone-200 dark:hover:text-stone-400 dark:focus:text-stone-400 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400" href="#donationSection" on:click|preventDefault={Entity} data-te-nav-link-ref>Entity</a>
                     </li>
                     <Separator orientation="vertical" />
                     <li data-te-nav-item-ref>
-                        <a class="p-0 text-lg font-semibold text-stone-500 transition duration-200 hover:text-stone-700 hover:ease-in-out focus:text-stone-700 disabled:text-black/30 motion-reduce:transition-none dark:text-stone-200 dark:hover:text-stone-400 dark:focus:text-stone-400 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400" href="/?canisterId={frontendCanisterId}#impactSection" on:click={navigateToPageAndSection} data-te-nav-link-ref>Learn More</a>
+                        <a class="p-0 text-lg font-semibold text-stone-500 transition duration-200 hover:text-stone-700 hover:ease-in-out focus:text-stone-700 disabled:text-black/30 motion-reduce:transition-none dark:text-stone-200 dark:hover:text-stone-400 dark:focus:text-stone-400 lg:px-2 [&.active]:text-black/90 dark:[&.active]:text-stone-400" href="#impactSection" on:click|preventDefault={navigateToPageAndSection} data-te-nav-link-ref>Learn More</a>
                     </li>
                 </ul>
             </div>
         </div>
   
-        <!-- Third Column (col-4) -->
         <div class="hidden lg:flex col-span-3 items-end justify-end mr-5">
-          <!-- Dropdown Menu -->
           <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild let:builder>
                   <Button builders={[builder]} variant="outline" size="icon">
