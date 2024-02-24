@@ -1,5 +1,5 @@
 <script context=module>
-    import Person1 from "$lib/images/people/person.webp";
+    import Person1 from "$lib/images/people/person1.webp";
 	import School1 from "$lib/images/school/1.webp";
 	import Person2 from "$lib/images/people/person2.webp";
 	import School2 from "$lib/images/school/2.webp";
@@ -37,7 +37,7 @@
 	import School18 from "$lib/images/school/18.webp";
 	import Person19 from "$lib/images/people/person19.webp";
 	import School19 from "$lib/images/school/19.webp";
-	import Person20 from "$lib/images/people/person1.webp";
+	import Person20 from "$lib/images/people/person20.webp";
 	import School20 from "$lib/images/school/20.webp";
 
 	export const entities = [
@@ -49,7 +49,7 @@
 			"story": "Carlos is passionate about environmental conservation and dreams of becoming an environmental scientist. He advocates for sustainable practices in his community and hopes to protect the planet for future generations."
 		},
 		{
-			"id": 0,
+			"id": 1,
 			"name": "Rainbow Hope School",
 			"raise": 0.95620098,
 			"image": School1,
@@ -182,13 +182,6 @@
 			"story": "Pioneer Prep School aims to break the cycle of poverty by providing education to disadvantaged children in Kathmandu, Nepal. The school lacks proper infrastructure and sanitation facilities. Donations will help upgrade classrooms, install clean water systems, and provide scholarships for needy students."
 		},
 		{
-			"id": 19,
-			"name": "Pioneer Prep School",
-			"raise": 0.63248956,
-			"image": School10,
-			"story": "Pioneer Prep School aims to break the cycle of poverty by providing education to disadvantaged children in Kathmandu, Nepal. The school lacks proper infrastructure and sanitation facilities. Donations will help upgrade classrooms, install clean water systems, and provide scholarships for needy students."
-		},
-		{
 			"id": 20,
 			"name": "Joyful Learning Academy",
 			"raise": 0.78451236,
@@ -267,10 +260,10 @@
 		},
 		{
 			"id": 31,
-			"name": "Mariana Costa",
+			"name": "Diego Costa",
 			"raise": 1.45236987,
 			"image": Person16,
-			"story": "Mariana is a talented artist with aspirations of becoming a fashion designer. She is inspired by Brazilian culture and dreams of creating fashion lines that celebrate diversity and inclusivity."
+			"story": "Diego is a talented artist with aspirations of becoming a fashion designer. She is inspired by Brazilian culture and dreams of creating fashion lines that celebrate diversity and inclusivity."
 		},
 		{
 			"id": 32,
@@ -295,10 +288,10 @@
 		},
 		{
 			"id": 35,
-			"name": "Amira Mahmoud",
+			"name": "Ahmed Mahmoud",
 			"raise": 1.25478963,
 			"image": Person18,
-			"story": "Amira is a compassionate humanitarian with aspirations of becoming a doctor. She volunteers at local clinics and dreams of providing medical care to underserved communities."
+			"story": "Ahmed is a compassionate humanitarian with aspirations of becoming a doctor. She volunteers at local clinics and dreams of providing medical care to underserved communities."
 		},
 		{
 			"id": 36,
@@ -323,10 +316,10 @@
 		},
 		{
 			"id": 39,
-			"name": "Lila Smith",
+			"name": "Jaden Smith",
 			"raise": 1.35698124,
 			"image": Person20,
-			"story": "Lila is a budding scientist with aspirations of becoming an inventor. She is curious about the world around her and dreams of creating innovative technologies that improve people's lives."
+			"story": "Jaden is a budding scientist with aspirations of becoming an inventor. She is curious about the world around her and dreams of creating innovative technologies that improve people's lives."
 		}
 	];
 </script>
