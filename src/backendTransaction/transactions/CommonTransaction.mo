@@ -35,14 +35,6 @@ actor class CommonTransaction() {
         return #pending;
     };
 
-    // public func getTimeElapsed(baseTime : TransactionTypes.DateTime) : async Int {
-    //     return 0;
-    // };
-
-    // public func didADayPassSince(baseTime : TransactionTypes.DateTime) : async Bool {
-    //     return false;
-    // };
-
     public func getTransactionDetails() : async Any {
         return "";
     };
