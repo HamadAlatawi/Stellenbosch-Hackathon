@@ -3,8 +3,6 @@ import Time "mo:base/Time";
 
 actor class CommonTransaction() {
 
-
-
     public query func getTransactionId() : async Text {
         return "";
     };

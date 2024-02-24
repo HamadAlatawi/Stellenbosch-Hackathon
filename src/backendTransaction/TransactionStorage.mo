@@ -3,15 +3,16 @@ import SharedTypes "../commons/SharedTypes";
 import Buffer "mo:base/Buffer";
 import Text "mo:base/Text";
 import Error "mo:base/Error";
-import Float "mo:base/Float";
 import BitcoinTransaction "transactions/BitcoinTransaction";
 import Types "../commons/Types";
 import Transaction "transactions/Transaction";
 import Cycles "mo:base/ExperimentalCycles";
 import ExperimentalCycles "mo:base/ExperimentalCycles";
-import Nat "mo:base/Nat";
 import Time "mo:base/Time";
+import Nat "mo:base/Nat";
 import Array "mo:base/Array";
+import Blob "mo:base/Blob";
+import Float "mo:base/Float";
 import EntityTypes "../commons/EntityTypes";
 import ProofOfConceptTransaction "transactions/ProofOfConceptTransaction";
 
@@ -41,7 +42,7 @@ actor class TransactionStorage() {
     stable var entityArray : [Entity] = [];
     var entityBuffer = Buffer.fromArray<Entity>(entityArray);
 
-    public func storeBtcTransaction(transactionId : Text, sourceAddress : Types.BitcoinAddress, amounts : [Amount], receivers : [Reciever], receivingEntityId : Nat) : async BitcoinTransactionDetails {
+    public func storeBtcTransaction(transactionId : Text, sourceAddress : Types.BitcoinAddress, amounts : [Amount], receivers : [Reciever], receivingEntityId : Nat, receivingAddress : Types.BitcoinAddress) : async BitcoinTransactionDetails {
         let entity = await getEntityById(receivingEntityId);
         let btcDetails : BitcoinTransactionDetails = {
             commonTransactionDetails = {
@@ -54,6 +55,7 @@ actor class TransactionStorage() {
                 receivedTime = Time.now();
             };
             sourceBtcAddress = sourceAddress;
+            receivingAddress = receivingAddress;
         };
         let cycles1 = ExperimentalCycles.add(200000000000);
         let btcTransaction = await BitcoinTransaction.BitcoinTransaction(btcDetails);
@@ -230,12 +232,14 @@ actor class TransactionStorage() {
         transactionBuffer.clear();
     };
 
-    public func confirmTransactions() : async () {
+    public func confirmTransactions() : async Status {
         var currentTime = Time.now();
         var pendingTransactions = await getTransactionByStatus(#pending);
+        var stat : Status = #pending;
         for (transaction in pendingTransactions.vals()) {
-            ignore await transaction.confirmTransaction(currentTime);
+            stat := await transaction.confirmTransaction(currentTime);
         };
+        return stat;
     };
 
     // Entities Code
@@ -267,7 +271,7 @@ actor class TransactionStorage() {
     public func clearEntities() {
         entityArray := [];
         entityBuffer.clear();
-        entityId := 0;
+        entityId := 1;
     };
 
     private func incrementEntityId() : () {

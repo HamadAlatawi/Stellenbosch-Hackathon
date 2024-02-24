@@ -2,10 +2,12 @@ import Float "mo:base/Float";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Int "mo:base/Int";
+import Types "Types";
 
 module TransactionTypes {
     //STATICS
     public let dayInNanoSecounds : Int = 86400000000000;
+    public let SATOSHI_TO_BTC_RATE : Float = 100000000;
 
     //FUNCTIONS
     public func getTimeElapsed(baseTime : DateTime, receivedTime : DateTime) : Int {
@@ -78,6 +80,7 @@ module TransactionTypes {
     public type BitcoinTransactionDetails = {
         commonTransactionDetails : CommonTransactionDetails;
         sourceBtcAddress : Text;
+        receivingAddress : Text;
     };
 
     public type POCTransactionDetails = {
@@ -87,5 +90,11 @@ module TransactionTypes {
     public type TransactionTypeShared = {
         #BTC : BitcoinTransactionDetails;
         #POC : POCTransactionDetails;
+    };
+
+    public type BtcTransactionConfiramtionDetails = {
+        addresses : [Text];
+        confirmations : Int;
+        satoshiAmount : Float;
     };
 };
