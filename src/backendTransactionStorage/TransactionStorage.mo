@@ -11,6 +11,7 @@ import Cycles "mo:base/ExperimentalCycles";
 import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Nat "mo:base/Nat";
 import Time "mo:base/Time";
+import Array "mo:base/Array";
 import EntityTypes "../commons/EntityTypes";
 import ProofOfConceptTransaction "transactions/ProofOfConceptTransaction";
 
@@ -29,6 +30,7 @@ actor class TransactionStorage() {
     type Category = EntityTypes.Category;
     type POCTransactionDetails = TransactionTypes.POCTransactionDetails;
     type ProofOfConceptTransaction = ProofOfConceptTransaction.ProofOfConceptTransaction;
+    type Currency = TransactionTypes.Currency;
 
     //Transaction Storage
     stable var transactionArray : [Transaction] = [];
@@ -44,11 +46,12 @@ actor class TransactionStorage() {
         let btcDetails : BitcoinTransactionDetails = {
             commonTransactionDetails = {
                 amounts = amounts;
-                receivers = receivers;
+                receivers = normalizeReceivers(receivers);
                 receivingEntityId = receivingEntityId;
                 receivingEntityName = entity.name;
                 status = #pending;
                 transactionId = transactionId;
+                receivedTime = Time.now();
             };
             sourceBtcAddress = sourceAddress;
         };
@@ -71,6 +74,7 @@ actor class TransactionStorage() {
                 receivingEntityName = entity.name;
                 status = #pending;
                 transactionId = transactionId;
+                receivedTime = Time.now();
             };
         };
         let cycles1 = ExperimentalCycles.add(200000000000);
@@ -154,6 +158,7 @@ actor class TransactionStorage() {
     };
 
     public func getAccumulatedByBeneficiary(benificiary : Text) : async [Amount] {
+        let normalizedBeneficiary = Text.toLowercase(benificiary);
         var sumBtc : Float = 0.0;
         var sumPOC : Float = 0.0;
         var sumSatoshi : Float = 0.0;
@@ -161,7 +166,7 @@ actor class TransactionStorage() {
         for (transaction in transactionArray.vals()) {
             let receivers = await transaction.getReceivers();
             for (receiver in receivers.vals()) {
-                if (receiver.benificiary == benificiary) {
+                if (receiver.benificiary == normalizedBeneficiary) {
                     let amounts = receiver.amounts;
                     var amountBtc = TransactionTypes.findAmountForCurrency(amounts, #bitcoin);
                     var amountSatoshi = TransactionTypes.findAmountForCurrency(amounts, #satoshi);
@@ -176,7 +181,7 @@ actor class TransactionStorage() {
         return [{ amount = sumBtc; currency = #bitcoin }, { amount = sumSatoshi; currency = #satoshi }, { amount = sumPOC; currency = #proofOfConcept }];
     };
 
-    public func getTransactionByStatus(status : Types.Status) : async [Transaction] {
+    private func getTransactionByStatus(status : Types.Status) : async [Transaction] {
         let buffer = Buffer.Buffer<Transaction>(0);
         for (transaction in transactionArray.vals()) {
             let transactionStatus = await transaction.getStatus();
@@ -190,6 +195,26 @@ actor class TransactionStorage() {
     public func getSharedTransactionTypeByStatus(status : Types.Status) : async [TransactionTypeShared] {
         let transactionsByStatus = await getTransactionByStatus(status);
         await getTransactionTypeListFrom(transactionsByStatus);
+    };
+
+    public func getTransactionByCurrency(currency : Currency) : async [TransactionTypeShared] {
+        let buffer = Buffer.Buffer<TransactionTypeShared>(0);
+        let transactions = await getAllTransactionsSharedType();
+        for (transaction in transactions.vals()) {
+            switch (transaction) {
+                case (#BTC(transaction)) {
+                    if (currency == #bitcoin or currency == #satoshi) {
+                        buffer.add(#BTC(transaction));
+                    };
+                };
+                case (#POC(transaction)) {
+                    if (currency == #proofOfConcept) {
+                        buffer.add(#POC(transaction));
+                    };
+                };
+            };
+        };
+        return Buffer.toArray(buffer);
     };
 
     private func getTransactionTypeListFrom(transactions : [Transaction]) : async [TransactionTypeShared] {
@@ -247,5 +272,16 @@ actor class TransactionStorage() {
 
     private func incrementEntityId() : () {
         entityId += 1;
+    };
+
+    private func normalizeReceivers(receivers : [Reciever]) : [Reciever] {
+        Array.map<Reciever, Reciever>(
+            receivers,
+            func receiver = {
+                amounts = receiver.amounts;
+                percentage = receiver.percentage;
+                benificiary = Text.toLowercase(receiver.benificiary);
+            },
+        );
     };
 };

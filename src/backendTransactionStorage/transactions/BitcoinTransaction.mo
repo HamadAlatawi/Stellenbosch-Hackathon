@@ -1,4 +1,3 @@
-import Time "mo:base/Time";
 import Int "mo:base/Int";
 import TransactionTypes "../../commons/TransactionTypes";
 import Types "../../commons/Types";
@@ -12,7 +11,7 @@ actor class BitcoinTransaction(transactionDetails : TransactionTypes.BitcoinTran
     type Status = TransactionTypes.Status;
     type BitcoinAddress = Types.BitcoinAddress;
 
-    let receivedTime : DateTime = Time.now();
+    let receivedTime : DateTime = transactionDetails.commonTransactionDetails.receivedTime;
     let transactionId : Text = transactionDetails.commonTransactionDetails.transactionId;
     let sourceBtcAddress : BitcoinAddress = transactionDetails.sourceBtcAddress;
     let amounts : [Amount] = transactionDetails.commonTransactionDetails.amounts;
@@ -75,6 +74,7 @@ actor class BitcoinTransaction(transactionDetails : TransactionTypes.BitcoinTran
                 receivingEntityId = receivingEntityId;
                 receivingEntityName = receivingEntityName;
                 status = status;
+                receivedTime = receivedTime;
             };
             sourceBtcAddress = sourceBtcAddress;
         };

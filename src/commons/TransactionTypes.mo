@@ -71,6 +71,7 @@ module TransactionTypes {
         receivingEntityId : Nat;
         receivingEntityName : Text;
         status : Status;
+        receivedTime : DateTime;
 
     };
 

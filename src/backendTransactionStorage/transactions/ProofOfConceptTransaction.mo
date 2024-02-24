@@ -1,4 +1,3 @@
-import Time "mo:base/Time";
 import CommonTransaction "CommonTransaction";
 import TransactionTypes "../../commons/TransactionTypes";
 
@@ -8,7 +7,7 @@ actor class ProofOfConceptTransaction(transactionDetails : TransactionTypes.POCT
     type Reciever = TransactionTypes.Reciever;
     type Status = TransactionTypes.Status;
 
-    let receivedTime : DateTime = Time.now();
+    let receivedTime : DateTime = transactionDetails.commonTransactionDetails.receivedTime;
     let transactionId : Text = transactionDetails.commonTransactionDetails.transactionId;
     let amounts : [Amount] = transactionDetails.commonTransactionDetails.amounts;
     let receivers : [Reciever] = transactionDetails.commonTransactionDetails.receivers;
@@ -26,7 +25,7 @@ actor class ProofOfConceptTransaction(transactionDetails : TransactionTypes.POCT
     };
 
     public query func getReceivedTime() : async DateTime {
-        return Time.now();
+        return receivedTime;
     };
 
     public query func getReceivers() : async [Reciever] {
@@ -59,6 +58,7 @@ actor class ProofOfConceptTransaction(transactionDetails : TransactionTypes.POCT
                 receivingEntityName = receivingEntityName;
                 status = status;
                 transactionId = transactionId;
+                receivedTime = receivedTime;
             };
         };
     };
