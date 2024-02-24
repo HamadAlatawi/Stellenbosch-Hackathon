@@ -111,38 +111,4 @@ actor class Transaction(transaction : SharedTypes.TransactionType) {
             };
         };
     };
-
-    //HELPER FUNCTIONS BTC
-    // private func isBtcTransction() : Bool {
-    //     if (transactionType == #BTC) {
-    //         return true;
-    //     };
-    //     return false;
-    // };
-
-    // private func getBtcTransaction() : async BitcoinTransaction {
-    //     switch (bitcoinTransaction) {
-    //         case (null) { throw Error.reject("No Bitcoin transaction found!") };
-    //         case (?bitcoinTransaction) { return bitcoinTransaction };
-    //     };
-    // };
-
-    //HELPER FUNCTIONS POC
-    // private func isPocTransction() : async Bool {
-    //     if (transactionType == #POC) {
-    //         return true;
-    //     };
-    //     return false;
-    // };
-
-    // private func getPocTransaction() : async ProofOfConceptTransaction {
-    //     switch (proofOfConceptTransaction) {
-    //         case (null) {
-    //             throw Error.reject("No ProofOfConcept transaction found!");
-    //         };
-    //         case (?proofOfConceptTransaction) {
-    //             return proofOfConceptTransaction;
-    //         };
-    //     };
-    // };
 };

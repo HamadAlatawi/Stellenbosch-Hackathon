@@ -13,6 +13,7 @@ import Nat "mo:base/Nat";
 import Array "mo:base/Array";
 import Blob "mo:base/Blob";
 import Float "mo:base/Float";
+import Timer "mo:base/Timer";
 import EntityTypes "../commons/EntityTypes";
 import ProofOfConceptTransaction "transactions/ProofOfConceptTransaction";
 
@@ -144,14 +145,18 @@ actor class TransactionStorage() {
         for (transaction in transactions.vals()) {
             switch (transaction) {
                 case (#BTC(transaction)) {
-                    var amountBtc = TransactionTypes.findAmountForCurrency(transaction.commonTransactionDetails.amounts, #bitcoin);
-                    var amountSatoshi = TransactionTypes.findAmountForCurrency(transaction.commonTransactionDetails.amounts, #satoshi);
-                    sumBtc += amountBtc;
-                    sumSatoshi += amountSatoshi;
+                    if (transaction.commonTransactionDetails.status == #confirmed) {
+                        var amountBtc = TransactionTypes.findAmountForCurrency(transaction.commonTransactionDetails.amounts, #bitcoin);
+                        var amountSatoshi = TransactionTypes.findAmountForCurrency(transaction.commonTransactionDetails.amounts, #satoshi);
+                        sumBtc += amountBtc;
+                        sumSatoshi += amountSatoshi;
+                    };
                 };
                 case (#POC(transaction)) {
-                    var amountPOC = TransactionTypes.findAmountForCurrency(transaction.commonTransactionDetails.amounts, #proofOfConcept);
-                    sumPOC += amountPOC;
+                    if (transaction.commonTransactionDetails.status == #confirmed) {
+                        var amountPOC = TransactionTypes.findAmountForCurrency(transaction.commonTransactionDetails.amounts, #proofOfConcept);
+                        sumPOC += amountPOC;
+                    };
                 };
             };
         };
@@ -166,21 +171,29 @@ actor class TransactionStorage() {
         var sumSatoshi : Float = 0.0;
 
         for (transaction in transactionArray.vals()) {
-            let receivers = await transaction.getReceivers();
-            for (receiver in receivers.vals()) {
-                if (receiver.benificiary == normalizedBeneficiary) {
-                    let amounts = receiver.amounts;
-                    var amountBtc = TransactionTypes.findAmountForCurrency(amounts, #bitcoin);
-                    var amountSatoshi = TransactionTypes.findAmountForCurrency(amounts, #satoshi);
-                    var amountPOC = TransactionTypes.findAmountForCurrency(amounts, #proofOfConcept);
-                    sumBtc += amountBtc;
-                    sumSatoshi += amountSatoshi;
-                    sumPOC += amountPOC;
+            let status = await transaction.getStatus();
+            if (status == #confirmed) {
+                let receivers = await transaction.getReceivers();
+                for (receiver in receivers.vals()) {
+                    if (receiver.benificiary == normalizedBeneficiary) {
+                        let amounts = receiver.amounts;
+                        var amountBtc = TransactionTypes.findAmountForCurrency(amounts, #bitcoin);
+                        var amountSatoshi = TransactionTypes.findAmountForCurrency(amounts, #satoshi);
+                        var amountPOC = TransactionTypes.findAmountForCurrency(amounts, #proofOfConcept);
+                        sumBtc += amountBtc;
+                        sumSatoshi += amountSatoshi;
+                        sumPOC += amountPOC;
+                    };
                 };
             };
-
         };
         return [{ amount = sumBtc; currency = #bitcoin }, { amount = sumSatoshi; currency = #satoshi }, { amount = sumPOC; currency = #proofOfConcept }];
+    };
+
+    public func confirmTransaction(id : Text) : async Status {
+        var currentTime = Time.now();
+        var pendingTransaction = await getTransactionById(id);
+        return await pendingTransaction.confirmTransaction(currentTime);
     };
 
     private func getTransactionByStatus(status : Types.Status) : async [Transaction] {
@@ -232,15 +245,6 @@ actor class TransactionStorage() {
         transactionBuffer.clear();
     };
 
-    public func confirmTransactions() : async () {
-        var currentTime = Time.now();
-        var pendingTransactions = await getTransactionByStatus(#pending);
-        for (transaction in pendingTransactions.vals()) {
-            let stat = await transaction.confirmTransaction(currentTime);
-        };
-        return;
-    };
-
     // Entities Code
     public func createAndAddEntity(name : Text, category : Category) : async Entity {
         let entity : Entity = {
@@ -287,4 +291,17 @@ actor class TransactionStorage() {
             },
         );
     };
+    // end entities code
+
+    // Transaction Confirmation Job
+    func confirmTransactions() : async () {
+        var currentTime = Time.now();
+        var pendingTransactions = await getTransactionByStatus(#pending);
+        for (transaction in pendingTransactions.vals()) {
+            let stat = await transaction.confirmTransaction(currentTime);
+        };
+        return;
+    };
+
+    let confirmTransactionsDailyJob = Timer.recurringTimer(#seconds(24 * 60 * 60), confirmTransactions);
 };
