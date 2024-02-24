@@ -16,6 +16,7 @@ actor class Transaction(transaction : SharedTypes.TransactionType) {
     type BitcoinTransactionObj = BitcoinTransaction.BitcoinTransaction;
     type TransactionTypeShared = TransactionTypes.TransactionTypeShared;
     type ProofOfConceptTransaction = ProofOfConceptTransaction.ProofOfConceptTransaction;
+    type POCTransactionDetails = TransactionTypes.POCTransactionDetails;
 
     public func getTransactionId() : async Text {
         switch (transaction) {
@@ -100,7 +101,7 @@ actor class Transaction(transaction : SharedTypes.TransactionType) {
         };
     };
 
-    public func getProofOfConceptTransactionDetails() : async Any {
+    public func getPOCTransactionDetails() : async POCTransactionDetails {
         switch (transaction) {
             case (#BTC(transaction)) {
                 throw Error.reject("Not a proof of concept transaction");

@@ -2,6 +2,9 @@ import TransactionTypes "../../commons/TransactionTypes";
 import Time "mo:base/Time";
 
 actor class CommonTransaction() {
+
+
+
     public query func getTransactionId() : async Text {
         return "";
     };
@@ -45,4 +48,4 @@ actor class CommonTransaction() {
     public func getTransactionDetails() : async Any {
         return "";
     };
-}
+};

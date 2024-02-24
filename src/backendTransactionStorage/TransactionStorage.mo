@@ -12,6 +12,7 @@ import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Nat "mo:base/Nat";
 import Time "mo:base/Time";
 import EntityTypes "../commons/EntityTypes";
+import ProofOfConceptTransaction "transactions/ProofOfConceptTransaction";
 
 actor class TransactionStorage() {
     //TYPES
@@ -26,6 +27,8 @@ actor class TransactionStorage() {
     type TransactionTypeShared = TransactionTypes.TransactionTypeShared;
     type Entity = EntityTypes.Entity;
     type Category = EntityTypes.Category;
+    type POCTransactionDetails = TransactionTypes.POCTransactionDetails;
+    type ProofOfConceptTransaction = ProofOfConceptTransaction.ProofOfConceptTransaction;
 
     //Transaction Storage
     stable var transactionArray : [Transaction] = [];
@@ -56,6 +59,27 @@ actor class TransactionStorage() {
         transactionBuffer.insert(0, transaction);
         transactionArray := Buffer.toArray<Transaction>(transactionBuffer);
         return await transaction.getBtcTransactionDetails();
+    };
+
+    public func storePocTransaction(transactionId : Text, amounts : [Amount], receivers : [Reciever], receivingEntityId : Nat) : async POCTransactionDetails {
+        let entity = await getEntityById(receivingEntityId);
+        let pocDetails : POCTransactionDetails = {
+            commonTransactionDetails = {
+                amounts = amounts;
+                receivers = receivers;
+                receivingEntityId = receivingEntityId;
+                receivingEntityName = entity.name;
+                status = #pending;
+                transactionId = transactionId;
+            };
+        };
+        let cycles1 = ExperimentalCycles.add(200000000000);
+        let pocTransaction = await ProofOfConceptTransaction.ProofOfConceptTransaction(pocDetails);
+        let cycles2 = ExperimentalCycles.add(200000000000);
+        let transaction = await Transaction.Transaction(#POC(pocTransaction));
+        transactionBuffer.insert(0, transaction);
+        transactionArray := Buffer.toArray<Transaction>(transactionBuffer);
+        return await transaction.getPOCTransactionDetails();
     };
 
     public func getAllTransactions() : async [Transaction] {
