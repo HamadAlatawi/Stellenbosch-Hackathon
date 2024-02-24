@@ -218,7 +218,7 @@ actor class TransactionSorting() {
                         return getIdFromTransaction(t1) < getIdFromTransaction(t2);
                     };
                     case ("Recipient") {
-                        return getBeneficiaryFromTransaction(t1) < getBeneficiaryFromTransaction(t2);
+                        return getRecipientFromTransaction(t1) < getRecipientFromTransaction(t2);
                     };
                     case ("Sender") {
                         return getSourceAddressFromTransaction(t1) < getSourceAddressFromTransaction(t2);
@@ -266,13 +266,13 @@ actor class TransactionSorting() {
         };
     };
 
-    private func getBeneficiaryFromTransaction(transaction : TransactionTypeShared) : Text {
+    private func getRecipientFromTransaction(transaction : TransactionTypeShared) : Text {
         switch (transaction) {
             case (#BTC(t1)) {
-                t1.commonTransactionDetails.receivers[0].benificiary;
+                t1.commonTransactionDetails.receivingEntityName;
             };
             case (#POC(t1)) {
-                t1.commonTransactionDetails.receivers[0].benificiary;
+                t1.commonTransactionDetails.receivingEntityName;
             };
         };
     };
@@ -281,11 +281,10 @@ actor class TransactionSorting() {
         switch (transaction) {
             case (#BTC(transaction)) {
                 let amounts = transaction.commonTransactionDetails.amounts;
-                getAmountPerCurrency(amounts, #bitcoin);
+                getAmountPerCurrency(amounts, #satoshi);
             };
             case (#POC(transaction)) {
                 return 0.0;
-
             };
         };
     };
