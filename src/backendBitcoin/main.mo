@@ -31,7 +31,7 @@ actor class BasicBitcoin(_network : Types.Network) {
   // The ECDSA key name.
   let KEY_NAME : Text = switch NETWORK {
     // For local development, we use a special test key with dfx.
-    case (#regtest) "dfx_test_key";
+    case (#regtest) "test_key_1";
     // On the IC we're using a test ECDSA key.
     case _ "test_key_1";
   };

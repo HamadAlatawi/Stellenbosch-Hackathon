@@ -1,6 +1,3 @@
-import Nat64 "mo:base/Nat64";
-import Time "mo:base/Time";
-
 import Curves "../../motoko-bitcoin/src/ec/Curves";
 
 module Types {
@@ -158,22 +155,5 @@ module Types {
     public type Block = {
         value : Satoshi;
         height : BlockHeight;
-    };
-    public type DateTime = Time.Time;
-    
-    public type TransactionType = {
-        transactionID : Text;
-        sourceBTCAddy : Text;
-        transactionAmount : Amount;
-        transactionDateTime : DateTime;
-        transactionReceivers : [Reciever];
-        transactionEntityID : Nat;
-        transactionStatus : Status;
-    };
-
-    public type EntityType = {
-        id:Nat;
-        name:Text;
-        category:Category;
     };
 };

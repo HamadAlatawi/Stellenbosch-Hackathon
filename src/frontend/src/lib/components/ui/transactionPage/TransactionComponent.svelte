@@ -10,8 +10,10 @@
     import { Reload, ChevronDown, ChevronUp } from "radix-icons-svelte";
     import { sortStore, sortStoreTable } from '$lib/data/stores/stores';
     import { actorSorting } from "$lib/motokoImports/backend"
+    import { actorBackEndTransaction } from '$lib/motokoImports/backend';
 
     let actor : any = null;
+    let actorBackendTrans : any = null;
     let count = 0;
     let currentPage = 1;
     let pageChange = false;
@@ -32,12 +34,16 @@
     onMount(async () => {
         try {
 			actor = actorSorting;
+            actorBackendTrans = actorBackEndTransaction;
 
             const countBigInt = await actor.getCountOfAllTransactions();
 
             count = Number(countBigInt);
 
             invoiceList = await actor.getAllTransactionTypes(1,20);
+            console.log(JSON.stringify(invoiceList, (key, value) =>
+            typeof value === 'bigint' ? value.toString() : value
+            ));
             console.log(invoiceList)
             showSkeleton = false;
             defaultResults = true;
@@ -51,13 +57,19 @@
             defaultResults = false;
             SearchResults = false;
             showSkeleton = true;
-            invoiceList = await actor.getTransactionTypeById(transactionID);
+            let response = await actorBackendTrans.getTransactionByIdSharedType(transactionID);
+            invoiceList = Array.isArray(response) ? response : [response];
             showSkeleton = false;
             SearchResults = true;
+            console.log(JSON.stringify(invoiceList, (key, value) =>
+            typeof value === 'bigint' ? value.toString() : value
+            ));
             console.log(invoiceList)
 
         } catch (err: unknown) {
-			console.error(err);
+			invoiceList = [];
+            showSkeleton = false;
+            SearchResults = true;
 		};
     }
 
@@ -110,7 +122,7 @@
             case "Amount ASC":
                 $sortStore = "Amount ASC";
                 console.log($sortStore)
-                invoiceList = await actor.sortTransactionTypes(event, 20, "Amount", true);
+                invoiceList = await actor.sortTransactionTypes(event, 20, "AmountBtc", true);
                 $sortStoreTable = "Amount ASC";
                 defaultResults = false;
                 sorted = true;
@@ -142,7 +154,7 @@
             case "Amount DESC":
                 $sortStore = "Amount DESC";
                 console.log($sortStore)
-                invoiceList = await actor.sortTransactionTypes(event, 20, "Amount", false);
+                invoiceList = await actor.sortTransactionTypes(event, 20, "AmountBtc", false);
                 $sortStoreTable = "Amount DESC";
                 defaultResults = false;
                 sorted = true;
@@ -171,8 +183,6 @@
         pageChange = false;
         sorted = true;
     }
-
-    
 </script>
 
 <svelte:head>
@@ -182,13 +192,13 @@
 
 <svelte:window bind:innerWidth />
 
-<section class="grid grid-cols-12 flex text-center">
+<section class="grid grid-cols-12  text-center">
     <div class="hidden lg:flex col-span-1"></div>
     <div class="col-span-12 lg:col-span-10"><h1 class="p-1 text-3xl md:text-5xl lg:text-6xl font-semibold">List of Donations</h1></div>
     <div class="hidden lg:flex col-span-1"></div>
 </section>
 
-<section class="grid grid-cols-12 flex mt-10">
+<section class="grid grid-cols-12 mt-10">
     <div class="col-span-1"></div>
     <div class="col-span-10 mb-10 md:mb-0 md:col-span-5 flex items-center space-x-2 md:max-w-sm">
         <form class="flex w-full md:w-full items-center space-x-2">
@@ -198,7 +208,7 @@
     </div>
     <div class="col-span-1 md:hidden"></div>
     <div class="col-span-1 md:hidden"></div>
-    <div class="col-span-10 md:col-span-5 flex justify-end">
+    <div class="col-span-10 md:col-span-5 flex justify-end {SearchResults ? "hidden" : ""}">
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild let:builder>
                 <Button disabled={pageChange || SearchResults} class="w-full md:w-[150px]" variant="{SearchResults ? "ghost" : "outline"}" builders={[builder]}>
@@ -235,6 +245,16 @@
             Reset
            </Button>
     </div>
+    <div class="col-span-10 md:col-span-5 flex justify-end {SearchResults ? "" : "hidden"}">
+          <Button 
+            type="submit"
+            on:click={showSkeleton === false ? resetResults : null}
+            disabled={showSkeleton || defaultResults}
+            class="{innerWidth > 800 ? "w-44" :"w-full"}"
+           >
+            Reset
+           </Button>
+    </div>
     <div class="col-span-1"></div>
 </section>
 
@@ -247,38 +267,43 @@
                 <Table.Caption>Donation Transaction Explorer</Table.Caption>
                 <Table.Header>
                     <Table.Row class="max-[400px]:text-xs max-[500px]:text-md">
-                        <Table.Head class="{innerWidth <= 800 ? 'w-[25%]' : 'w-1/10'}">ID</Table.Head>
-                        <Table.Head class="{innerWidth <= 800 ? 'w-[32%]' : 'w-1-/10'}">Amount</Table.Head>
+                        <Table.Head class="{innerWidth <= 800 ? 'w-[33%]' : 'w-1/5'}">Transaction ID</Table.Head>
                         {#if innerWidth > 800}
+                            <Table.Head class="{innerWidth <= 800 ? 'w-[32%]' : 'w-1-/10'}">Amount</Table.Head>
                             <Table.Head class="w-1/10">Date</Table.Head>
-                            <Table.Head class="w-1/5">Recipient</Table.Head>
+                            <Table.Head class="w-1/10">Recipient</Table.Head>
                             <Table.Head class="w-1/5">Sender</Table.Head>
                         {/if}
-                        <Table.Head class="{innerWidth <= 800 ? 'w-[35%]' : 'w-1/5'} text-right">More Details</Table.Head>
+                        <Table.Head class="{innerWidth <= 800 ? 'w-[33%]' : 'w-1-/10'}">Status</Table.Head>
+                        <Table.Head class="{innerWidth <= 800 ? 'w-[43%]' : 'w-1/5'} text-right">More Details</Table.Head>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
                     {#each Array.from({ length: 20 }, (_, i) => i) as index}
                         <Table.Row>
                             <Table.Cell class="font-medium">
-                                <Skeleton class="w-[40%] h-[27px]" />
-                            </Table.Cell>
-                            <Table.Cell>
-                                <Skeleton class="w-[40%] h-[27px]" />
+                                <Skeleton class="w-[60%] h-[27px]" />
                             </Table.Cell>
                             {#if innerWidth > 800}
+                                <Table.Cell>
+                                    <Skeleton class="w-[40%] h-[27px]" />
+                                </Table.Cell>
+                                <Table.Cell>
+                                    <Skeleton class="w-[60%] h-[27px]" />
+                                </Table.Cell>
                                 <Table.Cell>
                                     <Skeleton class="w-[60%] h-[27px]" />
                                 </Table.Cell>
                                 <Table.Cell>
                                     <Skeleton class="w-[45%] h-[27px]" />
                                 </Table.Cell>
-                                <Table.Cell>
-                                    <Skeleton class="w-[45%] h-[27px]" />
-                                </Table.Cell>
+                                
                             {/if}
+                            <Table.Cell>
+                                <Skeleton class="w-[45%] h-[27px]" />
+                            </Table.Cell>
                             <Table.Cell class="flex justify-end items-end">
-                                <Skeleton class="w-[62%] h-[27px]" />
+                                <Skeleton class="w-[40%] h-[27px]" />
                             </Table.Cell>
                         </Table.Row>
                     {/each}
@@ -295,25 +320,33 @@
                         <Table.Caption>Donation Transaction Explorer</Table.Caption>
                         <Table.Header>
                             <Table.Row class="max-[400px]:text-xs max-[500px]:text-md">
-                                <Table.Head class="w-1/10">ID</Table.Head>
-                                <Table.Head class="w-1/10">Amount</Table.Head>
+                                <Table.Head class="w-1/5">Transaction ID</Table.Head>
                                 {#if innerWidth > 800}
+                                    <Table.Head class="w-1/10">Amount</Table.Head>
                                     <Table.Head class="w-1/10">Date</Table.Head>
-                                    <Table.Head class="w-1/5">Recipient</Table.Head>
+                                    <Table.Head class="w-1/10">Recipient</Table.Head>
                                     <Table.Head class="w-1/5">Sender</Table.Head>
                                 {/if}
+                                <Table.Head class="{innerWidth <= 800 ? 'w-[32%]' : 'w-1-/10'}">Status</Table.Head>
                                 <Table.Head class="w-1/5 text-right">More Details</Table.Head>
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
                             {#each invoiceList as invoice}
                             <Table.Row>
-                                <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
-                                <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
+                                <Table.Cell class="font-medium">{invoice.BTC.commonTransactionDetails.transactionId}</Table.Cell>
                                 {#if innerWidth > 800}
-                                    <Table.Cell>{new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
-                                    <Table.Cell>{invoice.transactionReceivers[0].benificiary.donation}</Table.Cell>
-                                    <Table.Cell>{invoice.sourceBTCAddy}</Table.Cell>
+                                    <Table.Cell>{invoice.BTC.commonTransactionDetails.amounts[0].amount} BTC</Table.Cell>
+                                    <Table.Cell>{new Date(Number(BigInt(invoice.BTC.commonTransactionDetails.receivedTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
+                                    <Table.Cell>{invoice.BTC.commonTransactionDetails.receivingEntityName}</Table.Cell>
+                                    <Table.Cell>{invoice.BTC.sourceBtcAddress}</Table.Cell>
+                                {/if}
+                                {#if 'pending' in invoice.BTC.commonTransactionDetails.status}
+                                    <Table.Cell><span class="rounded-sm bg-yellow-400 border-yellow-500 text-white px-2 py-0.5 bg-opacity-75">Pending</span></Table.Cell>
+                                {:else if 'rejected' in invoice.BTC.commonTransactionDetails.status}
+                                    <Table.Cell><span class="rounded-sm bg-red-600 border-red-500 text-white px-2 py-0.5 bg-opacity-75">Rejected</span></Table.Cell>
+                                {:else if 'confirmed' in invoice.BTC.commonTransactionDetails.status}
+                                    <Table.Cell><span class="rounded-sm bg-green-600 border-green-500 text-white px-2 py-0.5 bg-opacity-75">Confirmed</span></Table.Cell>
                                 {/if}
                                 <Table.Cell class="text-right">
                                     <Drawer.Root>
@@ -323,22 +356,28 @@
                                         <Drawer.Content>
                                         <div class="mx-auto w-full max-w-sm break-all">
                                             <Drawer.Header>
-                                            <Drawer.Title class="mb-5 leading-7">Transaction: {invoice.transactionID}</Drawer.Title>
+                                            <Drawer.Title class="mb-5 leading-7">Transaction: {invoice.BTC.commonTransactionDetails.transactionId}</Drawer.Title>
                                             <Drawer.Description>Transaction Status: 
-                                                {#if 'pending' in invoice.transactionStatus}
-                                                Pending
-                                                {:else if 'rejected' in invoice.transactionStatus}
-                                                    Rejected
-                                                {:else}
-                                                    Confirmed
-                                                {/if}     
+                                                {#if 'pending' in invoice.BTC.commonTransactionDetails.status}
+                                                    <span class="rounded-sm bg-yellow-400 border-yellow-500 text-white px-2 bg-opacity-75">Pending</span>
+                                                {:else if 'rejected' in invoice.BTC.commonTransactionDetails.status}
+                                                    <span class="rounded-sm bg-red-600 border-red-500 text-white px-2 bg-opacity-75">Rejected</span>
+                                                {:else if 'confirmed' in invoice.BTC.commonTransactionDetails.status}
+                                                    <span class="rounded-sm bg-green-600 border-green-500 text-white px-2 bg-opacity-75">Confirmed</span>
+                                                {/if}       
                                             </Drawer.Description>
-                                            <Drawer.Description>Transaction Recipient: {invoice.transactionReceivers[0].benificiary.donation}</Drawer.Description>
-                                            <Drawer.Description>Transaction EntityID: {invoice.transactionEntityID}</Drawer.Description>
-                                            <Drawer.Description>Transaction Amount Satoshi: {invoice.transactionAmount.amountInSatoshi}</Drawer.Description>
-                                            <Drawer.Description>Transaction Amount BTC: {invoice.transactionAmount.amountBTC}</Drawer.Description>
-                                            <Drawer.Description>Sender Address: {invoice.sourceBTCAddy}</Drawer.Description>
-                                            <Drawer.Description>Transaction Date: {new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Drawer.Description>
+                                            <Drawer.Description>Transaction Recipient: {invoice.BTC.commonTransactionDetails.receivingEntityName}</Drawer.Description>
+                                            <Drawer.Description>Transaction EntityID: {invoice.BTC.commonTransactionDetails.receivingEntityId}</Drawer.Description>
+                                            <Drawer.Description>Transaction Amount BTC: {invoice.BTC.commonTransactionDetails.amounts[1].amount}</Drawer.Description>
+                                            <Drawer.Description>Transaction Amount Satoshi: {invoice.BTC.commonTransactionDetails.amounts[0].amount}</Drawer.Description>
+                                            <Drawer.Description>Sender Address: {invoice.BTC.sourceBtcAddress}</Drawer.Description>
+                                            <Drawer.Description>Transaction Date: {new Date(Number(BigInt(invoice.BTC.commonTransactionDetails.receivedTime)) / 1000000).toLocaleDateString('en-GB')}</Drawer.Description>
+                                            <Drawer.Description class="font-semibold mt-3">Recieving Entities Precentages </Drawer.Description>
+                                            <Drawer.Description>Curriculum Design and Development: {invoice.BTC.commonTransactionDetails.receivers[0].percentage}%</Drawer.Description>
+                                            <Drawer.Description>Teacher Support: {invoice.BTC.commonTransactionDetails.receivers[3].percentage}%</Drawer.Description>
+                                            <Drawer.Description>School Supplies: {invoice.BTC.commonTransactionDetails.receivers[5].percentage}%</Drawer.Description>
+                                            <Drawer.Description>Lunch and Snacks: {invoice.BTC.commonTransactionDetails.receivers[7].percentage}%</Drawer.Description>
+                                            <Drawer.Description class="mt-3 font-bold text-blue-500 hover:text-blue-700 active:text-blue-900"><a target="_blank" href="https://live.blockcypher.com/btc-testnet/tx/{invoice.BTC.commonTransactionDetails.transactionId}/">View More Details in Blockcypher</a></Drawer.Description>
                                             </Drawer.Header>
                                             <Drawer.Footer>
                                             <Drawer.Close asChild let:builder>
@@ -402,14 +441,14 @@
                         <Table.Caption>Donation Transaction Explorer</Table.Caption>
                         <Table.Header>
                             <Table.Row class="max-[400px]:text-xs max-[500px]:text-md">
+                                {#if $sortStoreTable == "ID ASC"}
+                                    <Table.Head class=" flex items-center bg-stone-100">Transaction ID <ChevronUp /> </Table.Head>
+                                {:else if $sortStoreTable == "ID DESC"}
+                                    <Table.Head class=" flex items-center bg-stone-100">Transaction ID <ChevronDown/> </Table.Head>
+                                {:else}
+                                    <Table.Head class="">ID</Table.Head>
+                                {/if}
                                 {#if innerWidth > 800}
-                                    {#if $sortStoreTable == "ID ASC"}
-                                        <Table.Head class=" flex items-center bg-stone-100">ID <ChevronUp /> </Table.Head>
-                                    {:else if $sortStoreTable == "ID DESC"}
-                                        <Table.Head class=" flex items-center bg-stone-100">ID <ChevronDown/> </Table.Head>
-                                    {:else}
-                                        <Table.Head class="">ID</Table.Head>
-                                    {/if}
                                     {#if $sortStoreTable == "Amount ASC"}
                                         <Table.Head class=" flex items-center bg-stone-100">Amount <ChevronUp /> </Table.Head>
                                     {:else if $sortStoreTable == "Amount DESC"}
@@ -433,11 +472,7 @@
                                         <Table.Head class="">Sender</Table.Head>
                                     {/if}
                                 {:else if innerWidth < 800}
-                                    {#if $sortStoreTable == "ID ASC"}
-                                        <Table.Head class=" flex items-center bg-stone-100">ID <ChevronUp /> </Table.Head>
-                                    {:else if $sortStoreTable == "ID DESC"}
-                                        <Table.Head class=" flex items-center bg-stone-100">ID <ChevronDown/> </Table.Head>
-                                    {:else if $sortStoreTable == "Amount ASC"}
+                                    {#if $sortStoreTable == "Amount ASC"}
                                         <Table.Head class=" flex items-center bg-stone-100">Amount <ChevronUp /> </Table.Head>
                                     {:else if $sortStoreTable == "Amount DESC"}
                                         <Table.Head class=" flex items-center bg-stone-100">Amount <ChevronDown/></Table.Head>
@@ -451,28 +486,34 @@
                                         <Table.Head class=" flex items-center bg-stone-100">Sender <ChevronDown/></Table.Head>
                                     {/if}
                                 {/if}
+                                <Table.Head class="{innerWidth <= 800 ? 'w-[32%]' : 'w-1-/10'}">Status</Table.Head>
                                 <Table.Head class=" text-right">More Details</Table.Head>
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
                             {#each invoiceList as invoice}
                             <Table.Row>
+                                <Table.Cell class="font-medium">{invoice.BTC.commonTransactionDetails.transactionId}</Table.Cell>
                                 {#if innerWidth > 800}
-                                    <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
-                                    <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
-                                    <Table.Cell>{new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
-                                    <Table.Cell>{invoice.transactionReceivers[0].benificiary.donation}</Table.Cell>
-                                    <Table.Cell>{invoice.sourceBTCAddy}</Table.Cell>
+                                    <Table.Cell>{invoice.BTC.commonTransactionDetails.amounts[0].amount} BTC</Table.Cell>
+                                    <Table.Cell>{new Date(Number(BigInt(invoice.BTC.commonTransactionDetails.receivedTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
+                                    <Table.Cell>{invoice.BTC.commonTransactionDetails.receivingEntityName}</Table.Cell>
+                                    <Table.Cell>{invoice.BTC.sourceBtcAddress}</Table.Cell>
                                 {:else if innerWidth < 800}
-                                    {#if $sortStoreTable == "ID ASC" || $sortStoreTable == "ID DESC"}
-                                        <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
-                                    {:else if $sortStoreTable == "Amount ASC" || $sortStoreTable == "Amount DESC"}
-                                        <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
+                                    {#if $sortStoreTable == "Amount ASC" || $sortStoreTable == "Amount DESC"}
+                                        <Table.Cell>{invoice.BTC.commonTransactionDetails.amounts[0].amount} BTC</Table.Cell>
                                     {:else if $sortStoreTable == "Recipient ASC" || $sortStoreTable == "Recipient DESC"}
-                                        <Table.Cell>{invoice.transactionReceivers[0].benificiary.donation}</Table.Cell>
+                                        <Table.Cell>{invoice.BTC.commonTransactionDetails.receivingEntityName}</Table.Cell>
                                     {:else if $sortStoreTable == "Sender ASC" || $sortStoreTable == "Sender DESC"}
-                                        <Table.Cell>{invoice.sourceBTCAddy}</Table.Cell>
-                                    {/if}   
+                                        <Table.Cell>{invoice.BTC.sourceBtcAddress}</Table.Cell>
+                                    {/if}
+                                {/if}
+                                {#if 'pending' in invoice.BTC.commonTransactionDetails.status}
+                                    <Table.Cell><span class="rounded-sm bg-yellow-400 border-yellow-500 text-white px-2 py-0.5 bg-opacity-75">Pending</span></Table.Cell>
+                                {:else if 'rejected' in invoice.BTC.commonTransactionDetails.status}
+                                    <Table.Cell><span class="rounded-sm bg-red-600 border-red-500 text-white px-2 py-0.5 bg-opacity-75">Rejected</span></Table.Cell>
+                                {:else if 'confirmed' in invoice.BTC.commonTransactionDetails.status}
+                                    <Table.Cell><span class="rounded-sm bg-green-600 border-green-500 text-white px-2 py-0.5 bg-opacity-75">Confirmed</span></Table.Cell>
                                 {/if}
                                 <Table.Cell class="text-right">
                                     <Drawer.Root>
@@ -482,23 +523,29 @@
                                         <Drawer.Content>
                                         <div class="mx-auto w-full max-w-sm break-all">
                                             <Drawer.Header>
-                                            <Drawer.Title class="mb-5 leading-7">Transaction: {invoice.transactionID}</Drawer.Title>
-                                            <Drawer.Description>Transaction Status: 
-                                                {#if 'pending' in invoice.transactionStatus}
-                                                Pending
-                                                {:else if 'rejected' in invoice.transactionStatus}
-                                                    Rejected
-                                                {:else}
-                                                    Confirmed
-                                                {/if}     
-                                            </Drawer.Description>
-                                            <Drawer.Description>Transaction Recipient: {invoice.transactionReceivers[0].benificiary.donation}</Drawer.Description>
-                                            <Drawer.Description>Transaction EntityID: {invoice.transactionEntityID}</Drawer.Description>
-                                            <Drawer.Description>Transaction Amount Satoshi: {invoice.transactionAmount.amountInSatoshi}</Drawer.Description>
-                                            <Drawer.Description>Transaction Amount BTC: {invoice.transactionAmount.amountBTC}</Drawer.Description>
-                                            <Drawer.Description>Sender Address: {invoice.sourceBTCAddy}</Drawer.Description>
-                                            <Drawer.Description>Transaction Date: {new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Drawer.Description>
-                                            </Drawer.Header>
+                                                <Drawer.Title class="mb-5 leading-7">Transaction: {invoice.BTC.commonTransactionDetails.transactionId}</Drawer.Title>
+                                                <Drawer.Description>Transaction Status: 
+                                                    {#if 'pending' in invoice.BTC.commonTransactionDetails.status}
+                                                        <span class="rounded-sm bg-yellow-400 border-yellow-500 text-white px-2 bg-opacity-75">Pending</span>
+                                                    {:else if 'rejected' in invoice.BTC.commonTransactionDetails.status}
+                                                        <span class="rounded-sm bg-red-600 border-red-500 text-white px-2 bg-opacity-75">Rejected</span>
+                                                    {:else if 'confirmed' in invoice.BTC.commonTransactionDetails.status}
+                                                        <span class="rounded-sm bg-green-600 border-green-500 text-white px-2 bg-opacity-75">Confirmed</span>
+                                                    {/if}     
+                                                </Drawer.Description>
+                                                <Drawer.Description>Transaction Recipient: {invoice.BTC.commonTransactionDetails.receivingEntityName}</Drawer.Description>
+                                                <Drawer.Description>Transaction EntityID: {invoice.BTC.commonTransactionDetails.receivingEntityId}</Drawer.Description>
+                                                <Drawer.Description>Transaction Amount BTC: {invoice.BTC.commonTransactionDetails.amounts[1].amount}</Drawer.Description>
+                                                <Drawer.Description>Transaction Amount Satoshi: {invoice.BTC.commonTransactionDetails.amounts[0].amount}</Drawer.Description>
+                                                <Drawer.Description>Sender Address: {invoice.BTC.sourceBtcAddress}</Drawer.Description>
+                                                <Drawer.Description>Transaction Date: {new Date(Number(BigInt(invoice.BTC.commonTransactionDetails.receivedTime)) / 1000000).toLocaleDateString('en-GB')}</Drawer.Description>
+                                                <Drawer.Description class="font-semibold mt-3">Recieving Entities Precentages </Drawer.Description>
+                                                <Drawer.Description>Curriculum Design and Development: {invoice.BTC.commonTransactionDetails.receivers[0].percentage}%</Drawer.Description>
+                                                <Drawer.Description>Teacher Support: {invoice.BTC.commonTransactionDetails.receivers[3].percentage}%</Drawer.Description>
+                                                <Drawer.Description>School Supplies: {invoice.BTC.commonTransactionDetails.receivers[5].percentage}%</Drawer.Description>
+                                                <Drawer.Description>Lunch and Snacks: {invoice.BTC.commonTransactionDetails.receivers[7].percentage}%</Drawer.Description>
+                                                <Drawer.Description class="mt-3 font-bold text-blue-500 hover:text-blue-700 active:text-blue-900"><a target="_blank" href="https://live.blockcypher.com/btc-testnet/tx/{invoice.BTC.commonTransactionDetails.transactionId}/">View More Details in Blockcypher</a></Drawer.Description>
+                                                </Drawer.Header>
                                             <Drawer.Footer>
                                             <Drawer.Close asChild let:builder>
                                                 <Button builders={[builder]} variant="outline">Cancel</Button>
@@ -561,25 +608,33 @@
                         <Table.Caption>Donation Transaction Explorer</Table.Caption>
                         <Table.Header>
                             <Table.Row class="max-[400px]:text-xs max-[500px]:text-md">
-                                <Table.Head class="w-1/10">ID</Table.Head>
-                                <Table.Head class="w-1/10">Amount</Table.Head>
+                                <Table.Head class="w-1/10">Transaction ID</Table.Head>
                                 {#if innerWidth > 800}
+                                    <Table.Head class="w-1/10">Amount</Table.Head>
                                     <Table.Head class="w-1/10">Date</Table.Head>
                                     <Table.Head class="w-1/5">Recipient</Table.Head>
                                     <Table.Head class="w-1/5">Sender</Table.Head>
                                 {/if}
+                                <Table.Head class="{innerWidth <= 800 ? 'w-[32%]' : 'w-1-/10'}">Status</Table.Head>
                                 <Table.Head class="w-1/5 text-right">More Details</Table.Head>
                             </Table.Row>
                         </Table.Header>
                         <Table.Body>
                             {#each invoiceList as invoice}
                             <Table.Row>
-                                <Table.Cell class="font-medium">{invoice.transactionID}</Table.Cell>
-                                <Table.Cell>{invoice.transactionAmount.amountBTC} BTC</Table.Cell>
+                                <Table.Cell class="font-medium">{invoice.BTC.commonTransactionDetails.transactionId}</Table.Cell>
                                 {#if innerWidth > 800}
-                                    <Table.Cell>{new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
-                                    <Table.Cell>{invoice.transactionReceivers[0].benificiary.donation}</Table.Cell>
-                                    <Table.Cell>{invoice.sourceBTCAddy}</Table.Cell>
+                                    <Table.Cell>{invoice.BTC.commonTransactionDetails.amounts[0].amount} BTC</Table.Cell>
+                                    <Table.Cell>{new Date(Number(BigInt(invoice.BTC.commonTransactionDetails.receivedTime)) / 1000000).toLocaleDateString('en-GB')}</Table.Cell>
+                                    <Table.Cell>{invoice.BTC.commonTransactionDetails.receivingEntityName}</Table.Cell>
+                                    <Table.Cell>{invoice.BTC.sourceBtcAddress}</Table.Cell>
+                                {/if}
+                                {#if 'pending' in invoice.BTC.commonTransactionDetails.status}
+                                    <Table.Cell><span class="rounded-sm bg-yellow-400 border-yellow-500 text-white px-2 py-0.5 bg-opacity-75">Pending</span></Table.Cell>
+                                {:else if 'rejected' in invoice.BTC.commonTransactionDetails.status}
+                                    <Table.Cell><span class="rounded-sm bg-red-600 border-red-500 text-white px-2 py-0.5 bg-opacity-75">Rejected</span></Table.Cell>
+                                {:else if 'confirmed' in invoice.BTC.commonTransactionDetails.status}
+                                    <Table.Cell><span class="rounded-sm bg-green-600 border-green-500 text-white px-2 py-0.5 bg-opacity-75">Confirmed</span></Table.Cell>
                                 {/if}
                                 <Table.Cell class="text-right">
                                     <Drawer.Root>
@@ -589,23 +644,29 @@
                                         <Drawer.Content>
                                         <div class="mx-auto w-full max-w-sm break-all">
                                             <Drawer.Header>
-                                            <Drawer.Title class="mb-5 leading-7">Transaction: {invoice.transactionID}</Drawer.Title>
-                                            <Drawer.Description>Transaction Status: 
-                                                {#if 'pending' in invoice.transactionStatus}
-                                                Pending
-                                                {:else if 'rejected' in invoice.transactionStatus}
-                                                    Rejected
-                                                {:else}
-                                                    Confirmed
-                                                {/if}     
-                                            </Drawer.Description>                                                
-                                            <Drawer.Description>Transaction Recipient: {invoice.transactionReceivers[0].benificiary.donation}</Drawer.Description>
-                                            <Drawer.Description>Transaction EntityID: {invoice.transactionEntityID}</Drawer.Description>
-                                            <Drawer.Description>Transaction Amount Satoshi: {invoice.transactionAmount.amountInSatoshi}</Drawer.Description>
-                                            <Drawer.Description>Transaction Amount BTC: {invoice.transactionAmount.amountBTC}</Drawer.Description>
-                                            <Drawer.Description>Sender Address: {invoice.sourceBTCAddy}</Drawer.Description>
-                                            <Drawer.Description>Transaction Date: {new Date(Number(BigInt(invoice.transactionDateTime)) / 1000000).toLocaleDateString('en-GB')}</Drawer.Description>
-                                            </Drawer.Header>
+                                                <Drawer.Title class="mb-5 leading-7">Transaction: {invoice.BTC.commonTransactionDetails.transactionId}</Drawer.Title>
+                                                <Drawer.Description>Transaction Status: 
+                                                    {#if 'pending' in invoice.BTC.commonTransactionDetails.status}
+                                                        <span class="rounded-sm bg-yellow-400 border-yellow-500 text-white px-2 bg-opacity-75">Pending</span>
+                                                    {:else if 'rejected' in invoice.BTC.commonTransactionDetails.status}
+                                                        <span class="rounded-sm bg-red-600 border-red-500 text-white px-2 bg-opacity-75">Rejected</span>
+                                                    {:else if 'confirmed' in invoice.BTC.commonTransactionDetails.status}
+                                                        <span class="rounded-sm bg-green-600 border-green-500 text-white px-2 bg-opacity-75">Confirmed</span>
+                                                    {/if}  
+                                                </Drawer.Description>
+                                                <Drawer.Description>Transaction Recipient: {invoice.BTC.commonTransactionDetails.receivingEntityName}</Drawer.Description>
+                                                <Drawer.Description>Transaction EntityID: {invoice.BTC.commonTransactionDetails.receivingEntityId}</Drawer.Description>
+                                                <Drawer.Description>Transaction Amount BTC: {invoice.BTC.commonTransactionDetails.amounts[1].amount}</Drawer.Description>
+                                                <Drawer.Description>Transaction Amount Satoshi: {invoice.BTC.commonTransactionDetails.amounts[0].amount}</Drawer.Description>
+                                                <Drawer.Description>Sender Address: {invoice.BTC.sourceBtcAddress}</Drawer.Description>
+                                                <Drawer.Description>Transaction Date: {new Date(Number(BigInt(invoice.BTC.commonTransactionDetails.receivedTime)) / 1000000).toLocaleDateString('en-GB')}</Drawer.Description>
+                                                <Drawer.Description class="font-semibold mt-3">Recieving Entities Precentages </Drawer.Description>
+                                                <Drawer.Description>Curriculum Design and Development: {invoice.BTC.commonTransactionDetails.receivers[0].percentage}%</Drawer.Description>
+                                                <Drawer.Description>Teacher Support: {invoice.BTC.commonTransactionDetails.receivers[3].percentage}%</Drawer.Description>
+                                                <Drawer.Description>School Supplies: {invoice.BTC.commonTransactionDetails.receivers[5].percentage}%</Drawer.Description>
+                                                <Drawer.Description>Lunch and Snacks: {invoice.BTC.commonTransactionDetails.receivers[7].percentage}%</Drawer.Description>
+                                                <Drawer.Description class="mt-3 font-bold text-blue-500 hover:text-blue-700 active:text-blue-900"><a target="_blank" href="https://live.blockcypher.com/btc-testnet/tx/{invoice.BTC.commonTransactionDetails.transactionId}/">View More Details in Blockcypher</a></Drawer.Description>
+                                                </Drawer.Header>
                                             <Drawer.Footer>
                                             <Drawer.Close asChild let:builder>
                                                 <Button builders={[builder]} variant="outline">Cancel</Button>

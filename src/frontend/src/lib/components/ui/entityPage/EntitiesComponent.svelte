@@ -6,8 +6,6 @@
     import { Input } from "$lib/components/ui/input";
     import { mode } from "mode-watcher";
     import * as Pagination from "$lib/components/ui/pagination";
-    import { writable, derived } from 'svelte/store';
-
 
     let svgMode = $mode === "light" ? "white" : "black";
     
@@ -35,12 +33,6 @@
     let currentPage = 1;
     const entitiesPerPage = 8;
 
-    const entitieStore = writable(entities)
-
-    const totalPages = derived(
-        entitieStore,
-        ($entities) => Math.ceil($entities.length / entitiesPerPage)
-    );
 
     $: paginatedEntities = filteredEntities.slice(
         (currentPage - 1) * entitiesPerPage,
@@ -61,7 +53,7 @@
   </svelte:head>
   <svelte:window bind:innerWidth />
   
-  <main class="min-h-screen">
+  <main class="min-h-fit ">
       <section class="grid grid-cols-12 mt-10">
         <div class="col-span-1 md:hidden"></div>
         <div
@@ -127,7 +119,7 @@
             >
             {#each paginatedEntities as entity}
             <div
-              class="group relative max-w-md mx-auto bg-stone-900 dark:bg-transparent rounded-xl shadow-lg overflow-hidden md:max-w-2xl my-10 border-4 border-stone-900 dark:border-stone-100 p-4"
+              class="group relative max-w-md mx-auto bg-stone-900 dark:bg-stone-800 rounded-xl shadow-lg overflow-hidden md:max-w-2xl my-10 border-4 border-stone-900 dark:border-0 p-4"
             >
             <div class="px-2 mt-4 flex justify-between flex-col">
               <div class="mb-3">
@@ -189,8 +181,7 @@
                     <Table.Cell class="max-[400px]:text-xs max-[500px]:text-md">
                       <div class="m-1 pr-3">
                         <img
-                          src={entity.image ||
-                            "https://www.google.com/url?sa=i&url=https%3A%2F%2Fstock.adobe.com%2Fsearch%3Fk%3Dperson&psig=AOvVaw08AqwGaHwVbtOKCkCxYa38&ust=1707054467295000&source=images&cd=vfe&opi=89978449&ved=0CBMQjRxqFwoTCKjn0Munj4QDFQAAAAAdAAAAABAE"}
+                          src={entity.image}
                           width="512"
                           height="512"
                           alt={entity.name}

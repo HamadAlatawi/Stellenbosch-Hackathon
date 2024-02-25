@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Button } from "$lib/components/ui/button";
-	import { Person } from "radix-icons-svelte" 
+	import { Person } from "radix-icons-svelte"
 	import LPImageDesktop from '$lib/images/LandingImageDesktop.webp'
     import LPImageMobile from '$lib/images/LandingImageMobile.webp'
 	import { mode } from "mode-watcher";
@@ -30,7 +30,7 @@
 	<meta name="description" content="Donation Engine Home Page" />
 </svelte:head>
 
-<main class="pt-20 grid grid-cols-12 min-h-screen w-full justify-center dark:bg-black" id="homeSection">
+<main class="pt-20 grid grid-cols-12 min-h-screen w-full justify-center" id="homeSection">
     <section class="col-span-12 grid grid-cols-12 gap-4 ">
 		<div class="col-span-12 lg:col-span-6 px-5 md:px-20 lg:px-20 flex flex-col justify-center">
 			<div class="lg:text-left">
@@ -55,7 +55,7 @@
 			</div>
 		</div>			
 		<div class="col-span-2 lg:hidden"></div>
-        <div class="col-span-10 lg:col-span-6 mt-9 lg:mt-0 rounded-tl-[8rem] bg-black dark:bg-white pt-12 pl-12">
+        <div class="col-span-10 lg:col-span-6 mt-9 lg:mt-0 rounded-tl-[8rem] bg-stone-900 dark:bg-white pt-12 pl-12">
 			<div class="border inset-0 bottom-0 border-stone-300 bg-stone-300 dark:border-stone-800 dark:bg-stone-800 border-t-8 border-l-8 rounded-tl-[5rem]">
 				<picture>
                 	<source media="(min-width: 768px)" srcset="{LPImageDesktop}" />
@@ -108,7 +108,7 @@
 			</div>
 		</div>
 	</section>
-	<section class="col-span-12 bg-stone-100 dark:bg-black grid grid-cols-12 gap-4 border-y-stone-500 dark:border-y-stone-100 border-y-8" id="donateSection">
+	<section class="col-span-12 bg-stone-100grid grid-cols-12 gap-4 border-y-stone-500 dark:border-y-stone-100 border-y-8" id="donateSection">
 		<div class="grid grid-cols-12 w-full col-span-12 my-16">
 			<div class="col-span-1"></div>
 			<div class="col-span-10 text-4xl mb-2 font-bold md:text-5xl lg:text-4xl xl:text-5xl text-center">Meet the Hopeful</div>

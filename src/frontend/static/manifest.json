@@ -1,0 +1,43 @@
+{
+	"id": "DonationEngine-Manifest",
+	"name": "Donatio Engine - Stellenbosch Hackathon",
+	"short_name": "Donation Engine",
+	"start_url": "/",
+	"scope": "/",
+	"display": "standalone",
+	"orientation": "any",
+	"background_color": "#19171c",
+	"dir": "ltr",
+	"lang": "en",
+    "description" :"Cryptocurrency Donation Engine Template for Stellenbosch Hackathon",
+	"icons": [
+		{
+			"src": "/DonationLogo.webp",
+			"sizes": "345x345",
+			"type": "image/webp",
+			"purpose": "any maskable"
+		},
+		{
+			"src": "/DonationLogo.png",
+			"sizes": "345x345",
+			"type": "image/png",
+			"purpose": "any maskable"
+		}
+	],
+    "screenshots" : [
+        {
+          "src": "/Desktop.png",
+          "sizes": "1440x4358",
+          "type": "image/webp",
+          "form_factor": "narrow",
+          "label": "Homescreen of Donation Engine"
+        },
+        {
+            "src": "/Desktop.png",
+            "sizes": "1440x4358",
+            "type": "image/webp",
+            "form_factor": "wide",
+            "label": "Homescreen of Donation Engine"
+          }
+      ]
+}

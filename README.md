@@ -135,18 +135,47 @@ Using svelte's native localhost:5173 local server you can now edit your code wit
 
 ## Deploying to IC
 
-Todo
+To deploy to the internet computer run the following command:
+
+```bash
+npm run deployIC
+```
+
+or
+
+```bash
+dfx deploy --network ic backendBitcoin --argument '(variant { regtest })' && dfx deploy --network ic backendTransactionSorting && dfx deploy --network ic backendTransactionStorage && dfx deploy --network ic frontend
+```
+
+## Additional Commands
+A list of all predefined commands can be found in the package.json file.
+
+Here are some commands that might be useful:
+
+To deposit cycles to a canister run:
+
+```bash
+npm run addCyclesIC <amount> <Canister ID>
+```
+
+To check the status of a canister run:
+
+```bash
+npm run canisterStatus <Canister ID>
+```
+To rebuild a canisters on the internet computer run:
+
+```bash
+npm run rebuildCanister <Canister ID>
+```
+
+To get the ID of a canister from the canister name run:
+
+```bash
+npm run canisterIDIC <Canister Name>
+```
+
 
 ## Design Documents
 
-todo
-
-[architecture design]()
-
-[UI mockups]()
-
-[data designs]()
-
-[flow diagrams]()
-
-[interaction diagrams]()
+Design documents such as architecture design, UI mokcups, and data designs can be found in the design documents folder in this repository. [View Design Documnets](https://github.com/HamadAlatawi/Stellenbosch-Hackathon/tree/master/Design%20Documents)

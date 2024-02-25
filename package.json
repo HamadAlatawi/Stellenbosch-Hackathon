@@ -23,11 +23,17 @@
     "deploy:ic": "dfx deploy --network=ic",
     "generate": "dfx generate && node ./update.types.mjs",
     "startdfx": "dfx start --clean --background",
-    "deploy": "dfx deploy backend --argument '(variant { regtest })' && dfx deploy frontend",
-    "deployTransactionCanister": "dfx deploy backendTransaction --argument '(\"mnZ5VcsUJbm3DDc4ayeGsD4FXypWbU1aX4\")'",
-    "deployBackend": "dfx deploy backend --argument '(variant { regtest })' && dfx deploy backendTransaction --argument '(\"mnZ5VcsUJbm3DDc4ayeGsD4FXypWbU1aX4\")' && dfx deploy backendSorting",
-    "startBTC": "./bin/bitcoind -conf=$(pwd)/bitcoin.conf -datadir=$(pwd)/data --port=18444",
-    "deploySorting" : "dfx deploy backendSorting"
+    "deploy": "dfx deploy backendBitcoin --argument '(variant { regtest })' && dfx deploy backendTransactionSorting && dfx deploy backendTransactionStorage && dfx deploy frontend",
+    "deployTransactionCanister": "dfx deploy backendTransactionSorting && dfx deploy backendTransactionStorage",
+    "deployBackend": "dfx deploy backendBitcoin --argument '(variant { regtest })' && dfx deploy backendTransactionSorting && dfx deploy backendTransactionStorage",
+    "deployIC" : "dfx deploy --network ic backendBitcoin --argument '(variant { regtest })' && dfx deploy --network ic backendTransactionSorting && dfx deploy --network ic backendTransactionStorage && dfx deploy --network ic frontend",
+    "addCycles" : "dfx canister deposit-cycles $AMOUNT $CANISTERID",
+    "addCyclesIC" : "dfx canister --network ic deposit-cycles $AMOUNT $CANISTERID",
+    "rebuildCanister" : "dfx canister --network ic install $CANISTERID --mode reinstall",
+    "canisterStatus" : "dfx canister status --network ic --all",
+    "canisterID" : "dfx canister id $CANISTERNAME",
+    "canisterIDIC" : "dfx canister id $CANISTERNAME --network ic",
+    "canisterBitcoinRebuild" : "dfx canister install backendBitcoin --argument '(variant { regtest })' --mode reinstall --network ic"
   },
   "dependencies": {
     "@dfinity/agent": "^0.19.3",

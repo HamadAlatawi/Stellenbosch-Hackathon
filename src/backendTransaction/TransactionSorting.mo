@@ -1,34 +1,31 @@
-import Transactions "canister:backendTransaction";
-
+import TransactionStorage "canister:backendTransactionStorage";
+import TransactionTypes "../commons/TransactionTypes";
+import SharedTypes "../commons/SharedTypes";
+import Transaction "transactions/Transaction";
 
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import Cycles "mo:base/ExperimentalCycles";
-import ExperimentalCycles "mo:base/ExperimentalCycles";
 import Float "mo:base/Float";
 import Iter "mo:base/Iter";
 import List "mo:base/List";
 import Nat "mo:base/Nat";
-import Transaction "../backendTransaction/Transaction";
 
-import Types "../commons/Types";
-
-actor class SortingMain() {
-    type TransactionType = Types.TransactionType;
+actor class TransactionSorting() {
+    type TransactionTypeShared = TransactionTypes.TransactionTypeShared;
     type Transaction = Transaction.Transaction;
 
+    stable var amountArrayASC : [TransactionTypeShared] = [];
+    stable var amountArrayDESC : [TransactionTypeShared] = [];
+    stable var iDArrayASC : [TransactionTypeShared] = [];
+    stable var iDArrayDESC : [TransactionTypeShared] = [];
+    stable var recipientArrayASC : [TransactionTypeShared] = [];
+    stable var recipientArrayDESC : [TransactionTypeShared] = [];
+    stable var senderArrayASC : [TransactionTypeShared] = [];
+    stable var senderArrayDESC : [TransactionTypeShared] = [];
 
-    stable var amountArrayASC : [TransactionType] = [];
-    stable var amountArrayDESC : [TransactionType] = [];
-    stable var iDArrayASC : [TransactionType] = [];
-    stable var iDArrayDESC : [TransactionType] = [];
-    stable var recipientArrayASC : [TransactionType] = [];
-    stable var recipientArrayDESC : [TransactionType] = [];
-    stable var senderArrayASC : [TransactionType] = [];
-    stable var senderArrayDESC : [TransactionType] = [];
-
-    public func getAllTransactionsSubset(pageNumber : Nat, pageSize : Nat) : async [TransactionType] {
-        let reversedTotalTransactions = await Transactions.getAllTransactions();
+    public func getAllTransactionsSubset(pageNumber : Nat, pageSize : Nat) : async [TransactionTypeShared] {
+        let reversedTotalTransactions = await TransactionStorage.getAllTransactions();
         let totalTransactions = Array.size(reversedTotalTransactions);
         var startIndex = (pageNumber - 1) * pageSize;
         var endIndex = Nat.min(startIndex + pageSize, totalTransactions);
@@ -42,11 +39,11 @@ actor class SortingMain() {
     };
 
     public func getCountOfAllTransactions() : async Nat {
-        let array = await Transactions.getAllTransactions();
+        let array = await TransactionStorage.getAllTransactions();
         return array.size();
     };
 
-    public func getAllTransactionsSubsetArrayArgs(sortedSliced : [TransactionType], pageNumber : Nat, pageSize : Nat) : async [TransactionType] {
+    public func getAllTransactionsSubsetArrayArgs(sortedSliced : [TransactionTypeShared], pageNumber : Nat, pageSize : Nat) : async [TransactionTypeShared] {
         let totalTransactions = Array.size(sortedSliced);
         var startIndex = (pageNumber - 1) * pageSize;
         var endIndex = Nat.min(startIndex + pageSize, totalTransactions);
@@ -58,12 +55,12 @@ actor class SortingMain() {
         return sortedReversedArray;
     };
 
-    public func getAllTransactionTypes(pageNumber : Nat, pageSize : Nat) : async [TransactionType] {
+    public func getAllTransactionTypes(pageNumber : Nat, pageSize : Nat) : async [TransactionTypeShared] {
         let slicedTransactions = await getAllTransactionsSubset(pageNumber, pageSize);
         return slicedTransactions;
     };
 
-    public func mapSortingArray(array : [TransactionType], sortField : Text, isAscending : Bool, transactionArray : [TransactionType]) : async [TransactionType] {
+    public func mapSortingArray(array : [TransactionTypeShared], sortField : Text, isAscending : Bool, transactionArray : [TransactionTypeShared]) : async [TransactionTypeShared] {
         if (array.size() != transactionArray.size()) {
             switch (sortField, isAscending) {
                 case ("ID", true) {
@@ -74,11 +71,11 @@ actor class SortingMain() {
                     iDArrayDESC := transactionArray;
                     return iDArrayDESC;
                 };
-                case ("Amount", true) {
+                case ("AmountBtc", true) {
                     amountArrayASC := transactionArray;
                     return amountArrayASC;
                 };
-                case ("Amount", false) {
+                case ("AmountBtc", false) {
                     amountArrayDESC := transactionArray;
                     return amountArrayDESC;
                 };
@@ -105,8 +102,8 @@ actor class SortingMain() {
         };
     };
 
-    public func updateSortingArray(array : [TransactionType], sortField : Text, isAscending : Bool, transactionArray : [TransactionType]) : async [TransactionType] {
-        let transactionArrayCase : [TransactionType] = switch (sortField, isAscending) {
+    public func updateSortingArray(array : [TransactionTypeShared], sortField : Text, isAscending : Bool, transactionArray : [TransactionTypeShared]) : async [TransactionTypeShared] {
+        let transactionArrayCase : [TransactionTypeShared] = switch (sortField, isAscending) {
             case ("ID", true) {
                 iDArrayASC := array;
                 return iDArrayASC;
@@ -115,11 +112,11 @@ actor class SortingMain() {
                 iDArrayDESC := array;
                 return iDArrayDESC;
             };
-            case ("Amount", true) {
+            case ("AmountBtc", true) {
                 amountArrayASC := array;
                 return amountArrayASC;
             };
-            case ("Amount", false) {
+            case ("AmountBtc", false) {
                 amountArrayDESC := array;
                 return amountArrayDESC;
             };
@@ -145,12 +142,12 @@ actor class SortingMain() {
         };
     };
 
-    public func getSortedArray(sortField : Text, isAscending : Bool, transactionArray : [TransactionType]) : async [TransactionType] {
-        let sortedArray : [TransactionType] = switch (sortField, isAscending) {
+    public func getSortedArray(sortField : Text, isAscending : Bool, transactionArray : [TransactionTypeShared]) : async [TransactionTypeShared] {
+        let sortedArray : [TransactionTypeShared] = switch (sortField, isAscending) {
             case ("ID", true) { iDArrayASC };
             case ("ID", false) { iDArrayDESC };
-            case ("Amount", true) { amountArrayASC };
-            case ("Amount", false) { amountArrayDESC };
+            case ("AmountBtc", true) { amountArrayASC };
+            case ("AmountBtc", false) { amountArrayDESC };
             case ("Recipient", true) { recipientArrayASC };
             case ("Recipient", false) { recipientArrayDESC };
             case ("Sender", true) { senderArrayASC };
@@ -197,7 +194,7 @@ actor class SortingMain() {
         return comparedArray;
     };
 
-    private func mergeSort<T>(array : [TransactionType], isAscending : Bool, compareFunc : (TransactionType, TransactionType) -> Bool) : async [TransactionType] {
+    private func mergeSort<T>(array : [TransactionTypeShared], isAscending : Bool, compareFunc : (TransactionTypeShared, TransactionTypeShared) -> Bool) : async [TransactionTypeShared] {
         if (Array.size(array) <= 1) {
             return array;
         };
@@ -209,25 +206,28 @@ actor class SortingMain() {
         return merge(left, right, isAscending, compareFunc);
     };
 
-    public func sortTransactionTypes(pageNumber : Nat, pageSize : Nat, sortField : Text, isAscending : Bool) : async [TransactionType] {
-        let reversedTotalTransactions = await getTransactionTypeListFromNonNullable(await Transactions.getAllTransactions());
+    public func sortTransactionTypes(pageNumber : Nat, pageSize : Nat, sortField : Text, isAscending : Bool) : async [TransactionTypeShared] {
+        let reversedTotalTransactions = await getTransactionTypeListFromNonNullable(await TransactionStorage.getAllTransactions());
         let caseArray = await getSortedArray(sortField, isAscending, reversedTotalTransactions);
 
         if (reversedTotalTransactions.size() != caseArray.size()) {
             let sortedMappedCaseArray = await mapSortingArray(caseArray, sortField, isAscending, reversedTotalTransactions);
-            let compareFunc = func(t1 : TransactionType, t2 : TransactionType) : Bool {
+            let compareFunc = func(t1 : TransactionTypeShared, t2 : TransactionTypeShared) : Bool {
                 switch (sortField) {
                     case ("ID") {
-                        return t1.transactionID < t2.transactionID;
+                        return getIdFromTransaction(t1) < getIdFromTransaction(t2);
                     };
                     case ("Recipient") {
-                        return t1.transactionReceivers[0].benificiary.donation < t2.transactionReceivers[0].benificiary.donation;
+                        return getRecipientFromTransaction(t1) < getRecipientFromTransaction(t2);
                     };
                     case ("Sender") {
-                        return t1.sourceBTCAddy < t2.sourceBTCAddy;
+                        return getSourceAddressFromTransaction(t1) < getSourceAddressFromTransaction(t2);
                     };
-                    case ("Amount") {
-                        return t1.transactionAmount.amountBTC > t2.transactionAmount.amountBTC;
+                    case ("AmountBtc") {
+                        return getAmountBtc(t1) > getAmountBtc(t2);
+                    };
+                    case ("AmountPoc") {
+                        return getAmountPoc(t1) > getAmountPoc(t2);
                     };
                     case (_) { false };
                 };
@@ -241,11 +241,73 @@ actor class SortingMain() {
         };
     };
 
-    public func getTransactionTypeListFromNonNullable(transactions : [Transaction]) : async [TransactionType] {
-        let transactionTypeBuffer = Buffer.Buffer<TransactionType>(0);
+    //HELPER FUNCTIONS
+    public func getTransactionTypeListFromNonNullable(transactions : [Transaction]) : async [TransactionTypeShared] {
+        let transactionTypeBuffer = Buffer.Buffer<TransactionTypeShared>(0);
         for (transaction in transactions.vals()) {
-            transactionTypeBuffer.add(await Transactions.getTransactionTypeFrom(transaction));
+            transactionTypeBuffer.add(await transaction.getTransactionDetails());
         };
         return Buffer.toArray(transactionTypeBuffer);
+    };
+
+    private func getIdFromTransaction(transaction : TransactionTypeShared) : Text {
+        switch (transaction) {
+            case (#BTC(t1)) { t1.commonTransactionDetails.transactionId };
+            case (#POC(t1)) {
+                t1.commonTransactionDetails.transactionId;
+            };
+        };
+    };
+
+    private func getSourceAddressFromTransaction(transaction : TransactionTypeShared) : Text {
+        switch (transaction) {
+            case (#BTC(t1)) { t1.sourceBtcAddress };
+            case (#POC(t1)) { "" };
+        };
+    };
+
+    private func getRecipientFromTransaction(transaction : TransactionTypeShared) : Text {
+        switch (transaction) {
+            case (#BTC(t1)) {
+                t1.commonTransactionDetails.receivingEntityName;
+            };
+            case (#POC(t1)) {
+                t1.commonTransactionDetails.receivingEntityName;
+            };
+        };
+    };
+
+    private func getAmountBtc(transaction : TransactionTypeShared) : Float {
+        var amountForCurrency : Float = 0.0;
+        switch (transaction) {
+            case (#BTC(transaction)) {
+                let amounts = transaction.commonTransactionDetails.amounts;
+                getAmountPerCurrency(amounts, #bitcoin);
+            };
+            case (#POC(transaction)) {
+                return 0.0;
+            };
+        };
+    };
+
+    private func getAmountPoc(transaction : TransactionTypeShared) : Float {
+        switch (transaction) {
+            case (#BTC(transaction)) {
+                return 0.0;
+            };
+            case (#POC(transaction)) {
+                let amounts = transaction.commonTransactionDetails.amounts;
+                getAmountPerCurrency(amounts, #proofOfConcept);
+            };
+        };
+    };
+
+    private func getAmountPerCurrency(amounts : [TransactionTypes.Amount], currency : TransactionTypes.Currency) : Float {
+        for (amount in amounts.vals()) {
+            if (amount.currency == currency) {
+                return amount.amount;
+            };
+        };
+        return 0.0;
     };
 };

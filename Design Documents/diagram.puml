@@ -1,0 +1,181 @@
+@startuml
+'skinparam dpi 600
+abstract class CommonTransaction {
+    +getTransactionId() : async Text
+    +getAmounts() : async [Amount]
+    +getReceivedTime() : async DateTime
+    +getReceivers() : async [Reciever]
+    +getEntityId() : async Nat
+    +getEntityName() : async Text
+    +getStatus() : async Status
+    +confirmTransaction(timeOfCheck : DateTime) : async Status
+    +getTransactionDetails() : async Any
+}
+
+class BitcoinTransaction {
+  - receivedTime: DateTime
+  - transactionId: Text
+  - sourceBtcAddress: Text
+  - amounts: [Amount]
+  - receivers: [Receiver]
+  - receivingEntityId: Nat
+  - receivingEntityName: Text
+  - receivingAddress: Text
+  - status: Status
+
+  + getTransactionId(): Text
+  + getSourceAddress(): Text
+  + getAmounts(): [Amount]
+  + getReceivedTime(): DateTime
+  + getReceivers(): [Receiver]
+  + getEntityId(): Nat
+  + getEntityName(): Text
+  + getStatus(): Status
+  + confirmTransaction(timeOfCheck: DateTime): Status
+  + getTransactionDetails(): BitcoinTransactionDetails
+  - mutateAmountIfIncorrectForConfirmed(satoshiAmount: Float): ()
+  - mutateReceivers(satoshiAmount: Float): [Receiver]
+  + getTransactionConfirmationDetails(txidHash: Text): TransactionConfirmationDetails
+  - parseConfirmationDetails(decodedResponse: Text): TransactionConfirmationDetails
+  + transform(raw: TransformArgs): CanisterHttpResponsePayload
+}
+class ProofOfConceptTransaction {
+    - receivedTime: DateTime
+    - transactionId: Text
+    - amounts: [Amount]
+    - receivers: [Receiver]
+    - receivingEntityId: Nat
+    - receivingEntityName: Text
+    - status: Status
+
+    + getTransactionId(): async Text
+    + getAmounts(): async [Amount]
+    + getReceivedTime(): async DateTime
+    + getReceivers(): async [Receiver]
+    + getEntityId(): async Nat
+    + getEntityName(): async Text
+    + getStatus(): async Status
+    + confirmTransaction(timeOfCheck: DateTime): async Status
+    + getTransactionDetails(): async POCTransactionDetails
+}
+
+class Transaction {
+    - transaction: TransactionType
+    + getTransactionId(): async Text
+    + getAmounts(): async [Amount]
+    + getReceivedTime(): async DateTime
+    + getReceivers(): async [Receiver]
+    + getEntityId(): async Nat
+    + getEntityName(): async Text
+    + getStatus(): async Status
+    + confirmTransaction(timeOfCheck: DateTime): async Status
+    + getTransactionDetails(): async TransactionTypeShared
+    + getBtcTransactionDetails(): async BitcoinTransactionDetails
+    + getPOCTransactionDetails(): async POCTransactionDetails
+}
+
+class TransactionSorting {
+    - stable amountArrayASC : [TransactionTypeShared] = []
+    - stable amountArrayDESC : [TransactionTypeShared] = []
+    - stable iDArrayASC : [TransactionTypeShared] = []
+    - stable iDArrayDESC : [TransactionTypeShared] = []
+    - stable recipientArrayASC : [TransactionTypeShared] = []
+    - stable recipientArrayDESC : [TransactionTypeShared] = []
+    - stable senderArrayASC : [TransactionTypeShared] = []
+    - stable senderArrayDESC : [TransactionTypeShared] = []
+
+    + getAllTransactionsSubset(pageNumber : Nat, pageSize : Nat) : async [TransactionTypeShared]
+    + getCountOfAllTransactions() : async Nat
+    + getAllTransactionsSubsetArrayArgs(sortedSliced : [TransactionTypeShared], pageNumber : Nat, pageSize : Nat) : async [TransactionTypeShared]
+    + getAllTransactionTypes(pageNumber : Nat, pageSize : Nat) : async [TransactionTypeShared]
+    + mapSortingArray(array : [TransactionTypeShared], sortField : Text, isAscending : Bool, transactionArray : [TransactionTypeShared]) : async [TransactionTypeShared]
+    + updateSortingArray(array : [TransactionTypeShared], sortField : Text, isAscending : Bool, transactionArray : [TransactionTypeShared]) : async [TransactionTypeShared]
+    + getSortedArray(sortField : Text, isAscending : Bool, transactionArray : [TransactionTypeShared]) : async [TransactionTypeShared]
+    + sortTransactionTypes(pageNumber : Nat, pageSize : Nat, sortField : Text, isAscending : Bool) : async [TransactionTypeShared]
+    + getTransactionTypeListFromNonNullable(transactions : [Transaction]) : async [TransactionTypeShared]
+    - merge<T>(left : [T], right : [T], isAscending : Bool, compareFunc : (T, T) -> Bool) : [T]
+    - mergeSort<T>(array : [TransactionTypeShared], isAscending : Bool, compareFunc : (TransactionTypeShared, TransactionTypeShared) -> Bool) : async [TransactionTypeShared]
+    - getIdFromTransaction(transaction : TransactionTypeShared) : Text
+    - getSourceAddressFromTransaction(transaction : TransactionTypeShared) : Text
+    - getRecipientFromTransaction(transaction : TransactionTypeShared) : Text
+    - getAmountBtc(transaction : TransactionTypeShared) : Float
+    - getAmountPoc(transaction : TransactionTypeShared) : Float
+    - getAmountPerCurrency(amounts : [TransactionTypes.Amount], currency : TransactionTypes.Currency) : Float
+}
+
+class TransactionStorage {
+    - transactionArray : [Transaction]
+    - transactionBuffer : Buffer<Transaction>
+    - entityId : int
+    - entityArray : [Entity]
+    - entityBuffer : Buffer<Entity>
+
+    + storeBtcTransaction(transactionId : Text, sourceAddress : BitcoinAddress, amounts : [Amount], receivers : [Receiver], receivingEntityId : int, receivingAddress : BitcoinAddress) : async BitcoinTransactionDetails
+    + storePocTransaction(transactionId : Text, amounts : [Amount], receivers : [Receiver], receivingEntityId : int) : async POCTransactionDetails
+    + getAllTransactions() : async [Transaction]
+    + getAllTransactionsSharedType() : async [TransactionTypeShared]
+    + getTransactionById(id : Text) : async Transaction
+    + getTransactionByIdSharedType(id : Text) : async TransactionTypeShared
+    + getTransactionsByEntityId(entityId : int) : async [TransactionTypeShared]
+    + getAccumulatedByEntity(entityId : int) : async [Amount]
+    + getAccumulatedByBeneficiary(benificiary : Text) : async [Amount]
+    + confirmTransaction(id : Text) : async Status
+    + getSharedTransactionTypeByStatus(status : Status) : async [TransactionTypeShared]
+    + getTransactionByCurrency(currency : Currency) : async [TransactionTypeShared]
+    + clearTransactions()
+    + createAndAddEntity(name : Text, category : Category) : async Entity
+    + getAllEntities() : async [Entity]
+    + getEntityById(id : int) : async Entity
+    + clearEntities()
+    + confirmTransactions()
+}
+
+enum TransactionType {
+    BTC : BitcoinTransaction
+    POC : ProofOfConceptTransaction
+}
+
+class CommonTransactionDetails {
+    - transactionId : Text
+    - amounts : [Amount]
+    - receivers : [Receiver]
+    - receivingEntityId : Nat
+    - receivingEntityName : Text
+    - status : Status
+    - receivedTime : DateTime
+}
+
+class BitcoinTransactionDetails {
+    - commonTransactionDetails : CommonTransactionDetails
+    - sourceBtcAddress : Text
+    - receivingAddress : Text
+}
+
+class POCTransactionDetails {
+    - commonTransactionDetails : CommonTransactionDetails
+}
+
+class TransactionTypeShared {
+    - BTC : BitcoinTransactionDetails
+    - POC : POCTransactionDetails
+}
+
+BitcoinTransaction --|> CommonTransaction
+ProofOfConceptTransaction --|> CommonTransaction
+
+TransactionStorage "1" --> "*" Transaction : contains
+TransactionSorting "1" --> "*" TransactionTypeShared : contains
+
+
+Transaction "1" --> "1" TransactionType : contains
+
+TransactionType <|-- BitcoinTransaction
+TransactionType <|-- ProofOfConceptTransaction
+
+
+CommonTransactionDetails "1" -- "1" BitcoinTransactionDetails : commonTransactionDetails
+CommonTransactionDetails "1" -- "1" POCTransactionDetails : commonTransactionDetails
+BitcoinTransactionDetails "1" -- "1" TransactionTypeShared : BTC
+POCTransactionDetails "1" -- "1" TransactionTypeShared : POC
+
+@enduml
